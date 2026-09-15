@@ -32,16 +32,16 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ## Week 1 (Days 1-7): Foundations and membership
 
 ### Day 1: Setup
-- [ ] **A** `serverpod create open_basket`, git repo, `.gitignore` (including `passwords.yaml`)
-- [ ] **A** Postgres via Docker, first migration applied, server running
+- [x] **A** `serverpod create open_basket`, git repo, `.gitignore` (including `passwords.yaml`)
+- [x] **A** Postgres (embedded, see ADR-003 — Docker not needed locally), first migration applied, server running
 - [ ] **B** Flutter packages: `flutter_riverpod`, `go_router`, `firebase_messaging`, `geolocator`, `intl`, `flutter_localizations`
 - [ ] **B** `l10n.yaml` + `app_en.arb`, `core/client_provider.dart`, `core/router.dart`, empty screen skeleton
-- [ ] **Both** Commit `CLAUDE.md` and `PLAN.md`; branch rule: protected `main`, PRs from `feat/*`
+- [x] **Both** Commit `CLAUDE.md` and `PLAN.md`; PRs from `feat/*` — **branch protection on `main` still to be enabled**
 
 ### Day 2: Models and CI
 - [ ] **A** Write all `.spy.yaml` models (schema below), `serverpod generate`, migration
 - [ ] **A** `analytics_service.dart`: `track(session, type, householdId, basketId, payload)`
-- [ ] **B** GitHub Actions: `dart analyze`, `dart test` (server), `flutter analyze`, `flutter test`
+- [x] **B** GitHub Actions: analyze / format / tests, all green (came with the Serverpod 4 template, PATH fixed)
 - [ ] **B** Design direction: colors, type, rough sketch of the countdown banner, app icon draft
 - ✅ **M0**
 
