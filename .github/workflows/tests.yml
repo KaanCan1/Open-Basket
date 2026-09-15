@@ -19,7 +19,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.4'
+          flutter-version: '3.47.4'
 
       - name: Start containers
         working-directory: open_basket_server
@@ -29,7 +29,9 @@ jobs:
         run: flutter pub get
 
       - name: Install Serverpod CLI
-        run: dart install serverpod_cli $VERSION
+        run: |
+          dart install serverpod_cli $VERSION
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
 
       - name: Run Serverpod generator
         working-directory: open_basket_server
