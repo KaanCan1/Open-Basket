@@ -1,0 +1,56 @@
+# Secrets - never commit
+**/config/passwords.yaml
+**/config/google_service_account.json
+*.keystore
+*.jks
+key.properties
+.env
+
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+pubspec.lock.bak
+doc/api/
+
+# Flutter platform noise
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/ephemeral/
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/macos/Pods/
+**/macos/Flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+
+# Serverpod
+open_basket_server/generated/
+open_basket_server/.serverpod/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Claude Code - personal settings stay local, shared settings are committed
+.claude/settings.local.json
+
+# --- Serverpod / Dart workspace (from the generated template) ---
+pubspec_overrides.yaml
+.scloud/
+
+# Agent tooling that is fetched, not authored
+.dart_skills/
+.agents/
+.claude/skills/
+.gemini/
+.codex/
+.cursor/
+.vscode/mcp.json

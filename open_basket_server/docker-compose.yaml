@@ -1,0 +1,44 @@
+services:
+  # Development services
+  postgres:
+    image: ghcr.io/serverpod/postgres:16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: open_basket
+      POSTGRES_PASSWORD: "134-2tq8TOtIsJfoJYGu1OU-RuQpfyXg"
+    volumes:
+      - open_basket_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "S-LYp9EIm1Qmpx6qhXVyXpPXI-qc-J89"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  # Test services
+  postgres_test:
+    image: ghcr.io/serverpod/postgres:16
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: open_basket_test
+      POSTGRES_PASSWORD: "vb8ta-H3jLwjd27WTKZOzX7ymU9e8ahV"
+    volumes:
+      - open_basket_test_data:/var/lib/postgresql/data
+
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "Hi_XAeJPe3ICcTbEDBX5OJn5YpqSOH5C"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+volumes:
+  open_basket_data:
+  open_basket_test_data:

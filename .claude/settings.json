@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dart analyze:*)",
+      "Bash(dart format:*)",
+      "Bash(dart test:*)",
+      "Bash(dart pub get:*)",
+      "Bash(dart run:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter test:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter gen-l10n:*)",
+      "Bash(serverpod generate:*)",
+      "Bash(serverpod version:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker compose logs:*)"
+    ]
+  }
+}
