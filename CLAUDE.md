@@ -1,6 +1,7 @@
 # CLAUDE.md: Open Basket
 
 Project context for Claude Code. Read at the start of every session. For the task list see `PLAN.md`.
+`docs/CONTEXT.md` is the one-page briefing for a cold session; keep its status section current.
 Serverpod's own generated guidance lives in `AGENTS.md`; read it too before touching server code.
 Where the two disagree, this file wins.
 
