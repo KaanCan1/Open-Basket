@@ -1,4 +1,7 @@
-# Open Basket
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/open-basket-white-on-black-banner.png">
+  <img alt="Open Basket" src="docs/brand/open-basket-black-on-white-banner.png" width="640">
+</picture>
 
 A live, time-boxed shared shopping basket for families and housemates.
 
