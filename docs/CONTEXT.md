@@ -105,10 +105,15 @@ Done:
 - `docs/ARCHITECTURE.md`: ADR-001 server owns time, ADR-002 client-side ETA, ADR-003 embedded
   Postgres for local development.
 - `docs/brand/` holds the monochrome logo pack and the derived transparent and inverted variants.
+- **Day 2 is done and merged**: 14 models, 9 endpoint signatures with `UnimplementedError` bodies,
+  one migration applied. The generated client compiles, so B can build screens against typed calls.
+  Rule 4 is not enforced yet — it needs a partial unique index added by hand on Day 8.
 - `docs/DESIGN_BRIEF.md` holds the design prompt. The screen set is finished (v3, 21 screens,
   light and dark): near-monochrome on paper with a single lime signal used only as a fill, the
   brand mark integrated, and every colour pair measured — all seven published contrast ratios
-  verified against WCAG AA.
+  verified against WCAG AA. The addendum added the states that prove the product's central claim:
+  arriving into a basket that closed itself, a household that already has one open, the stream
+  reconnecting with an item queued on the phone, a rotated code, and past runs in detail.
 - **The design set is the specification for product behaviour.** Where it overruled the original
   plan, `docs/ARCHITECTURE.md` ADR-004 to ADR-011 record the change and `PLAN.md` has been
   rewritten to match: emailed sign-in codes instead of passwords, marking items while the basket
@@ -119,9 +124,8 @@ Done:
 Open:
 
 - Branch protection on `main` is not enabled yet.
-- Five states are still undesigned and are queued as a design addendum: arriving after a basket
-  auto-closed, a second `open` on a household that already has one, the live basket reconnecting,
-  an invalid or rotated household code, and the history detail view.
+- Nothing in the design is outstanding: the addendum landed, so the set is 30 screens and carries
+  a state inventory naming every condition it draws.
 - The Flutter Day 1 tasks (Riverpod, go_router, FCM and geolocator packages, `l10n.yaml`,
   `app_en.arb`, client provider, router, screen skeletons) have not started — they are B's.
 - Launcher icons are not wired up; the master is `docs/brand/open-basket-app-icon-1024.png`
