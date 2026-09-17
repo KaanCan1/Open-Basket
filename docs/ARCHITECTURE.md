@@ -44,9 +44,18 @@ digit code, and enters it.
 - Requesting a new code invalidates the previous one immediately.
 - Resend is rate limited; the design shows a 24-second cooldown on the button.
 
-This is a departure from "Serverpod auth module, email sign-in" in the original plan. Check what
-the installed auth module offers before writing anything custom, and if a code flow is not
-supported out of the box, budget the difference on Day 3-4 — M1 depends on it.
+**Checked on Day 2: the bundled provider does not do this, so the flow is ours to write.**
+`serverpod_auth_idp_server` 4.0.0's email provider is password-based — `login(email, password)`,
+with codes appearing only in `startRegistration` / `verifyRegistrationCode` and in password reset.
+There is no passwordless code login.
+
+What makes a custom flow cheap rather than alarming:
+`ServerSideSessions.createSession(session, authUserId:, method:, scopes:, expiresAt:)` in
+`serverpod_auth_core_server` mints a session for any `AuthUser`. So `AuthEndpoint` finds or creates
+the `AuthUser` for the address, emails a code, and calls `createSession` once the code checks out.
+`SignInCode` is the server-only table holding the hashed code, its expiry and the attempts left.
+
+Budget Day 3-4 accordingly: this is real work, not configuration, and M1 depends on it.
 
 ## ADR-005: The shopper marks items while the basket is still open
 

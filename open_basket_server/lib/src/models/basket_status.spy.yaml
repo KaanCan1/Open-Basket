@@ -1,0 +1,6 @@
+enum: BasketStatus
+values:
+  - open
+  - frozen
+  - settled
+  - cancelled

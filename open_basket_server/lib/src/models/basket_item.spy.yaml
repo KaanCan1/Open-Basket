@@ -1,0 +1,16 @@
+### Something a member asked for on a run.
+class: BasketItem
+table: basket_item
+fields:
+  basketId: int, relation(parent=basket, onDelete=Cascade)
+  ### Who asked for it. Drives the avatar on the row and who owes for it.
+  requesterMemberId: int, relation(parent=household_member, onDelete=Cascade)
+  name: String
+  quantity: int, default=1
+  ### Free text: brand, size, "only if fresh".
+  note: String?
+  ### The shopper may set this while the basket is still open (ADR-005).
+  status: ItemStatus, default=requested
+  ### Minor units. Only set once the basket is frozen.
+  priceMinor: int?
+  addedAt: DateTime, default=now

@@ -11,13 +11,49 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:open_basket_client/src/protocol/basket.dart' as _ifmsley9;
+import 'package:open_basket_client/src/protocol/household_member.dart'
+    as _i5id5rp2;
+import 'package:open_basket_client/src/protocol/settlement_line.dart'
+    as _i27lt87a;
+import 'package:open_basket_client/src/protocol/store.dart' as _icg68kho;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'analytics_event.dart' as _iuylzfvu;
+import 'basket.dart' as _incyaby3;
+import 'basket_error.dart' as _ix8f32lp;
+import 'basket_event.dart' as _imfibvkw;
+import 'basket_event_type.dart' as _i1f6eto5;
+import 'basket_item.dart' as _iqfe96ip;
+import 'basket_status.dart' as _iumwz8so;
+import 'device_token.dart' as _ilggw95u;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'household.dart' as _ijonbu5t;
+import 'household_member.dart' as _iv10erpj;
+import 'item_status.dart' as _ibbyonnn;
+import 'member_role.dart' as _insyygng;
+import 'open_basket_exception.dart' as _ityrezdb;
+import 'settlement_line.dart' as _i7gf6igf;
+import 'store.dart' as _ixrn3cz3;
+export 'analytics_event.dart';
+export 'basket.dart';
+export 'basket_error.dart';
+export 'basket_event.dart';
+export 'basket_event_type.dart';
+export 'basket_item.dart';
+export 'basket_status.dart';
+export 'device_token.dart';
 export 'greetings/greeting.dart';
+export 'household.dart';
+export 'household_member.dart';
+export 'item_status.dart';
+export 'member_role.dart';
+export 'open_basket_exception.dart';
+export 'settlement_line.dart';
+export 'store.dart';
 export 'client.dart';
 
 class Protocol extends _isc.SerializationManager {
@@ -54,11 +90,144 @@ class Protocol extends _isc.SerializationManager {
       }
     }
 
+    if (t == _iuylzfvu.AnalyticsEvent) {
+      return _iuylzfvu.AnalyticsEvent.fromJson(data) as T;
+    }
+    if (t == _incyaby3.Basket) {
+      return _incyaby3.Basket.fromJson(data) as T;
+    }
+    if (t == _ix8f32lp.BasketError) {
+      return _ix8f32lp.BasketError.fromJson(data) as T;
+    }
+    if (t == _imfibvkw.BasketEvent) {
+      return _imfibvkw.BasketEvent.fromJson(data) as T;
+    }
+    if (t == _i1f6eto5.BasketEventType) {
+      return _i1f6eto5.BasketEventType.fromJson(data) as T;
+    }
+    if (t == _iqfe96ip.BasketItem) {
+      return _iqfe96ip.BasketItem.fromJson(data) as T;
+    }
+    if (t == _iumwz8so.BasketStatus) {
+      return _iumwz8so.BasketStatus.fromJson(data) as T;
+    }
+    if (t == _ilggw95u.DeviceToken) {
+      return _ilggw95u.DeviceToken.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _ijonbu5t.Household) {
+      return _ijonbu5t.Household.fromJson(data) as T;
+    }
+    if (t == _iv10erpj.HouseholdMember) {
+      return _iv10erpj.HouseholdMember.fromJson(data) as T;
+    }
+    if (t == _ibbyonnn.ItemStatus) {
+      return _ibbyonnn.ItemStatus.fromJson(data) as T;
+    }
+    if (t == _insyygng.MemberRole) {
+      return _insyygng.MemberRole.fromJson(data) as T;
+    }
+    if (t == _ityrezdb.OpenBasketException) {
+      return _ityrezdb.OpenBasketException.fromJson(data) as T;
+    }
+    if (t == _i7gf6igf.SettlementLine) {
+      return _i7gf6igf.SettlementLine.fromJson(data) as T;
+    }
+    if (t == _ixrn3cz3.Store) {
+      return _ixrn3cz3.Store.fromJson(data) as T;
+    }
+    if (t == _isc.getType<_iuylzfvu.AnalyticsEvent?>()) {
+      return (data != null ? _iuylzfvu.AnalyticsEvent.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_incyaby3.Basket?>()) {
+      return (data != null ? _incyaby3.Basket.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ix8f32lp.BasketError?>()) {
+      return (data != null ? _ix8f32lp.BasketError.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_imfibvkw.BasketEvent?>()) {
+      return (data != null ? _imfibvkw.BasketEvent.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i1f6eto5.BasketEventType?>()) {
+      return (data != null ? _i1f6eto5.BasketEventType.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_iqfe96ip.BasketItem?>()) {
+      return (data != null ? _iqfe96ip.BasketItem.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_iumwz8so.BasketStatus?>()) {
+      return (data != null ? _iumwz8so.BasketStatus.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ilggw95u.DeviceToken?>()) {
+      return (data != null ? _ilggw95u.DeviceToken.fromJson(data) : null) as T;
+    }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ijonbu5t.Household?>()) {
+      return (data != null ? _ijonbu5t.Household.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_iv10erpj.HouseholdMember?>()) {
+      return (data != null ? _iv10erpj.HouseholdMember.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_ibbyonnn.ItemStatus?>()) {
+      return (data != null ? _ibbyonnn.ItemStatus.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_insyygng.MemberRole?>()) {
+      return (data != null ? _insyygng.MemberRole.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ityrezdb.OpenBasketException?>()) {
+      return (data != null
+              ? _ityrezdb.OpenBasketException.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _isc.getType<_i7gf6igf.SettlementLine?>()) {
+      return (data != null ? _i7gf6igf.SettlementLine.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_ixrn3cz3.Store?>()) {
+      return (data != null ? _ixrn3cz3.Store.fromJson(data) : null) as T;
+    }
+    if (t == List<_iqfe96ip.BasketItem>) {
+      return (data as List)
+              .map((e) => deserialize<_iqfe96ip.BasketItem>(e))
+              .toList()
+          as T;
+    }
+    if (t == _isc.getType<List<_iqfe96ip.BasketItem>?>()) {
+      return (data != null
+              ? (data as List)
+                    .map((e) => deserialize<_iqfe96ip.BasketItem>(e))
+                    .toList()
+              : null)
+          as T;
+    }
+    if (t == List<_ifmsley9.Basket>) {
+      return (data as List)
+              .map((e) => deserialize<_ifmsley9.Basket>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i5id5rp2.HouseholdMember>) {
+      return (data as List)
+              .map((e) => deserialize<_i5id5rp2.HouseholdMember>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i27lt87a.SettlementLine>) {
+      return (data as List)
+              .map((e) => deserialize<_i27lt87a.SettlementLine>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_icg68kho.Store>) {
+      return (data as List).map((e) => deserialize<_icg68kho.Store>(e)).toList()
+          as T;
     }
     try {
       return _iaic.Protocol().deserialize<T>(data, t);
@@ -71,7 +240,22 @@ class Protocol extends _isc.SerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _iuylzfvu.AnalyticsEvent => 'AnalyticsEvent',
+      _incyaby3.Basket => 'Basket',
+      _ix8f32lp.BasketError => 'BasketError',
+      _imfibvkw.BasketEvent => 'BasketEvent',
+      _i1f6eto5.BasketEventType => 'BasketEventType',
+      _iqfe96ip.BasketItem => 'BasketItem',
+      _iumwz8so.BasketStatus => 'BasketStatus',
+      _ilggw95u.DeviceToken => 'DeviceToken',
       _izw8z7ou.Greeting => 'Greeting',
+      _ijonbu5t.Household => 'Household',
+      _iv10erpj.HouseholdMember => 'HouseholdMember',
+      _ibbyonnn.ItemStatus => 'ItemStatus',
+      _insyygng.MemberRole => 'MemberRole',
+      _ityrezdb.OpenBasketException => 'OpenBasketException',
+      _i7gf6igf.SettlementLine => 'SettlementLine',
+      _ixrn3cz3.Store => 'Store',
       _ => null,
     };
   }
@@ -86,8 +270,38 @@ class Protocol extends _isc.SerializationManager {
     }
 
     switch (data) {
+      case _iuylzfvu.AnalyticsEvent():
+        return 'AnalyticsEvent';
+      case _incyaby3.Basket():
+        return 'Basket';
+      case _ix8f32lp.BasketError():
+        return 'BasketError';
+      case _imfibvkw.BasketEvent():
+        return 'BasketEvent';
+      case _i1f6eto5.BasketEventType():
+        return 'BasketEventType';
+      case _iqfe96ip.BasketItem():
+        return 'BasketItem';
+      case _iumwz8so.BasketStatus():
+        return 'BasketStatus';
+      case _ilggw95u.DeviceToken():
+        return 'DeviceToken';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _ijonbu5t.Household():
+        return 'Household';
+      case _iv10erpj.HouseholdMember():
+        return 'HouseholdMember';
+      case _ibbyonnn.ItemStatus():
+        return 'ItemStatus';
+      case _insyygng.MemberRole():
+        return 'MemberRole';
+      case _ityrezdb.OpenBasketException():
+        return 'OpenBasketException';
+      case _i7gf6igf.SettlementLine():
+        return 'SettlementLine';
+      case _ixrn3cz3.Store():
+        return 'Store';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -110,8 +324,53 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'AnalyticsEvent') {
+      return deserialize<_iuylzfvu.AnalyticsEvent>(data['data']);
+    }
+    if (dataClassName == 'Basket') {
+      return deserialize<_incyaby3.Basket>(data['data']);
+    }
+    if (dataClassName == 'BasketError') {
+      return deserialize<_ix8f32lp.BasketError>(data['data']);
+    }
+    if (dataClassName == 'BasketEvent') {
+      return deserialize<_imfibvkw.BasketEvent>(data['data']);
+    }
+    if (dataClassName == 'BasketEventType') {
+      return deserialize<_i1f6eto5.BasketEventType>(data['data']);
+    }
+    if (dataClassName == 'BasketItem') {
+      return deserialize<_iqfe96ip.BasketItem>(data['data']);
+    }
+    if (dataClassName == 'BasketStatus') {
+      return deserialize<_iumwz8so.BasketStatus>(data['data']);
+    }
+    if (dataClassName == 'DeviceToken') {
+      return deserialize<_ilggw95u.DeviceToken>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
+    }
+    if (dataClassName == 'Household') {
+      return deserialize<_ijonbu5t.Household>(data['data']);
+    }
+    if (dataClassName == 'HouseholdMember') {
+      return deserialize<_iv10erpj.HouseholdMember>(data['data']);
+    }
+    if (dataClassName == 'ItemStatus') {
+      return deserialize<_ibbyonnn.ItemStatus>(data['data']);
+    }
+    if (dataClassName == 'MemberRole') {
+      return deserialize<_insyygng.MemberRole>(data['data']);
+    }
+    if (dataClassName == 'OpenBasketException') {
+      return deserialize<_ityrezdb.OpenBasketException>(data['data']);
+    }
+    if (dataClassName == 'SettlementLine') {
+      return deserialize<_i7gf6igf.SettlementLine>(data['data']);
+    }
+    if (dataClassName == 'Store') {
+      return deserialize<_ixrn3cz3.Store>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);

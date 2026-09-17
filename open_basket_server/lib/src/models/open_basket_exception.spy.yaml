@@ -1,0 +1,9 @@
+### The one exception every endpoint throws, so the client can switch on
+### `error` instead of matching strings. Never put anything sensitive in here:
+### serializable exceptions are sent to the client in full.
+exception: OpenBasketException
+fields:
+  error: BasketError
+  ### English, safe to show. Built from `app_en.arb` on the client where the
+  ### wording matters; this is the fallback.
+  message: String

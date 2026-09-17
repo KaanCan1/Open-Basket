@@ -1,0 +1,7 @@
+### An FCM registration token for one installation.
+class: DeviceToken
+table: device_token
+fields:
+  userId: UuidValue
+  token: String, unique
+  updatedAt: DateTime, default=now

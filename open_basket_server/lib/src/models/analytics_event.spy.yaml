@@ -1,0 +1,15 @@
+### Every key event lands here. The Day 26 report is built from this table, so
+### a metric added later is data already lost.
+class: AnalyticsEvent
+table: analytics_event
+fields:
+  type: String
+  householdId: int?
+  basketId: int?
+  memberId: int?
+  ### JSON blob, free shape per event type.
+  payload: String?
+  createdAt: DateTime, default=now
+indexes:
+  analytics_type_idx:
+    fields: type, createdAt
