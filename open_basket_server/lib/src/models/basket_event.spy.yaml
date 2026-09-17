@@ -1,0 +1,14 @@
+### Pushed over the live basket stream. Not a table.
+###
+### The first event on every connection is a `snapshot` carrying the whole
+### basket, so a client that reconnects can resync without a second call.
+class: BasketEvent
+fields:
+  type: BasketEventType
+  basket: Basket?
+  ### Set on `snapshot`.
+  items: List<BasketItem>?
+  ### Set on the single-item events.
+  item: BasketItem?
+  ### Sent on every event so the client can keep correcting for clock drift.
+  serverTime: DateTime

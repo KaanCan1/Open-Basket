@@ -1,0 +1,19 @@
+### A six-digit sign-in code (ADR-004). Server-only: the code must never be
+### serialized to a client.
+###
+### Policy: expires 10 minutes after issue, 3 attempts, and issuing a new code
+### for an address invalidates every earlier one.
+class: SignInCode
+table: sign_in_code
+serverOnly: true
+fields:
+  email: String
+  ### Hashed, never stored in the clear.
+  codeHash: String
+  expiresAt: DateTime
+  attemptsRemaining: int, default=3
+  consumedAt: DateTime?
+  createdAt: DateTime, default=now
+indexes:
+  sign_in_code_email_idx:
+    fields: email, createdAt

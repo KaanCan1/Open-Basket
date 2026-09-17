@@ -1,0 +1,22 @@
+enum: BasketError
+values:
+  ### The caller is not a member of this household.
+  - notAMember
+  ### The action is shopper-only: extend, freeze, mark, price, settle, cancel.
+  - notTheShopper
+  ### Owner-only: rotating the code, renaming, changing currency.
+  - notTheOwner
+  ### Rule 4: a household may have one open basket at a time.
+  - householdAlreadyHasOpenBasket
+  ### A user belongs to one household at a time.
+  - alreadyInAHousehold
+  ### The six-character household code is wrong, or was rotated away.
+  - unknownHouseholdCode
+  - basketNotOpen
+  - basketNotFrozen
+  - basketAlreadySettled
+  ### One +5 min extension per basket (ADR-009).
+  - extensionAlreadyUsed
+  - invalidSignInCode
+  - signInCodeExpired
+  - tooManySignInAttempts

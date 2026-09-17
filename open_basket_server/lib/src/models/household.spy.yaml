@@ -1,0 +1,12 @@
+### A group of people who shop for each other. A user belongs to one at a time.
+class: Household
+table: household
+fields:
+  ### Display name, e.g. "Kaya household".
+  name: String
+  ### ISO 4217 code. Every price, settlement and shared summary uses it (ADR-008).
+  currencyCode: String, default='TRY'
+  ### Permanent six-character join code. Owner-rotatable; rotating invalidates
+  ### the previous code immediately (ADR-006). There is no expiry.
+  code: String, unique
+  createdAt: DateTime, default=now

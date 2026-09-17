@@ -9,5 +9,48 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+auth:
+  - requestSignInCode:
+  - verifySignInCode:
+basket:
+  - getServerTime:
+  - open:
+  - extend:
+  - freeze:
+  - cancel:
+  - getActive:
+  - addItem:
+  - updateItem:
+  - removeItem:
+  - markItem:
+  - setReceiptTotal:
+basketStream:
+  - watch:
+device:
+  - registerToken:
+  - removeToken:
+history:
+  - list:
+  - get:
+household:
+  - create:
+  - getMine:
+  - joinWithCode:
+  - rotateCode:
+  - listMembers:
+  - rename:
+  - setCurrency:
+  - setNotificationPreferences:
+  - leave:
+settlement:
+  - preview:
+  - settle:
+  - get:
+stats:
+  - report:
+store:
+  - add:
+  - list:
+  - remove:
 greeting:
   - hello:

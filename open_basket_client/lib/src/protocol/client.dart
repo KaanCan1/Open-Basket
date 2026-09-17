@@ -12,8 +12,19 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
+import 'package:open_basket_client/src/protocol/basket.dart' as _ifmsley9;
+import 'package:open_basket_client/src/protocol/basket_event.dart' as _ivynb499;
+import 'package:open_basket_client/src/protocol/basket_item.dart' as _iuuhmcji;
+import 'package:open_basket_client/src/protocol/device_token.dart' as _i06kh2mj;
 import 'package:open_basket_client/src/protocol/greetings/greeting.dart'
     as _i7bh5n7n;
+import 'package:open_basket_client/src/protocol/household.dart' as _iig1c7mf;
+import 'package:open_basket_client/src/protocol/household_member.dart'
+    as _i5id5rp2;
+import 'package:open_basket_client/src/protocol/item_status.dart' as _i3z6uioy;
+import 'package:open_basket_client/src/protocol/settlement_line.dart'
+    as _i27lt87a;
+import 'package:open_basket_client/src/protocol/store.dart' as _icg68kho;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
@@ -246,6 +257,489 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// Passwordless sign-in: the user types an email address, we email a six-digit
+/// code, they type it back (ADR-004).
+///
+/// The bundled email identity provider is password-based — its only code flows
+/// are registration verification and password reset — so this flow is ours.
+/// `ServerSideSessions.createSession(session, authUserId:, method:)` in
+/// `serverpod_auth_core_server` is what mints the session once a code checks
+/// out; look up or create the `AuthUser` for the address first.
+///
+/// Policy, enforced here and not in the UI: a code expires 10 minutes after it
+/// is issued, survives 3 failed attempts, and is invalidated the moment a new
+/// code is issued for the same address.
+/// {@category Endpoint}
+class EndpointAuth extends _isc.EndpointRef {
+  EndpointAuth(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'auth';
+
+  /// Issues a code and emails it. Invalidates any code still outstanding for
+  /// this address.
+  ///
+  /// Returns the same result whether or not the address already has an account:
+  /// the response must not reveal who has signed up. Rate limited per address.
+  _ida.Future<void> requestSignInCode(String email) =>
+      caller.callServerEndpoint<void>(
+        'auth',
+        'requestSignInCode',
+        {'email': email},
+      );
+
+  /// Exchanges a code for a session, creating the account on first use.
+  ///
+  /// Throws `OpenBasketException` with `invalidSignInCode`, `signInCodeExpired`
+  /// or `tooManySignInAttempts` so the client can tell the three apart — the
+  /// screens word them differently.
+  _ida.Future<_iacc.AuthSuccess> verifySignInCode(
+    String email,
+    String code,
+  ) => caller.callServerEndpoint<_iacc.AuthSuccess>(
+    'auth',
+    'verifySignInCode',
+    {
+      'email': email,
+      'code': code,
+    },
+  );
+}
+
+/// The basket lifecycle: open, extend, freeze, cancel, and everything that
+/// happens to the items inside it.
+///
+/// `open -> frozen -> settled`, plus `open -> cancelled`.
+/// {@category Endpoint}
+class EndpointBasket extends _isc.EndpointRef {
+  EndpointBasket(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'basket';
+
+  /// The server's clock, fetched on connect so the countdown can correct for
+  /// drift. The client never trusts the device clock for `closesAt`.
+  _ida.Future<DateTime> getServerTime() => caller.callServerEndpoint<DateTime>(
+    'basket',
+    'getServerTime',
+    {},
+  );
+
+  /// Opens a run. `closesAt` is `now + durationMinutes`, computed here.
+  ///
+  /// Throws `householdAlreadyHasOpenBasket` when one is already running — the
+  /// client turns that into the "someone else already has a basket open"
+  /// screen rather than an error. Two simultaneous calls must not both
+  /// succeed: the partial unique index noted in `basket.spy.yaml` is the real
+  /// guarantee, the transaction alone is not.
+  ///
+  /// Schedules the close and the "2 minutes left" future calls.
+  _ida.Future<_ifmsley9.Basket> open({
+    int? storeId,
+    required int durationMinutes,
+  }) => caller.callServerEndpoint<_ifmsley9.Basket>(
+    'basket',
+    'open',
+    {
+      'storeId': storeId,
+      'durationMinutes': durationMinutes,
+    },
+  );
+
+  /// Adds five minutes, once per basket, shopper only (ADR-009). Throws
+  /// `extensionAlreadyUsed` on the second attempt. Reschedules the future
+  /// calls; the superseded one becomes a no-op when it fires.
+  _ida.Future<_ifmsley9.Basket> extend(int basketId) =>
+      caller.callServerEndpoint<_ifmsley9.Basket>(
+        'basket',
+        'extend',
+        {'basketId': basketId},
+      );
+
+  /// "At checkout" — no more items. Shopper only.
+  _ida.Future<_ifmsley9.Basket> freeze(int basketId) =>
+      caller.callServerEndpoint<_ifmsley9.Basket>(
+        'basket',
+        'freeze',
+        {'basketId': basketId},
+      );
+
+  /// Shopper only. Nothing is priced and nobody owes anybody; the run shows up
+  /// in history as cancelled.
+  _ida.Future<_ifmsley9.Basket> cancel(int basketId) =>
+      caller.callServerEndpoint<_ifmsley9.Basket>(
+        'basket',
+        'cancel',
+        {'basketId': basketId},
+      );
+
+  /// The household's open or frozen basket, or null. This is also what a
+  /// client calls on cold start to discover that a basket closed while it was
+  /// away.
+  _ida.Future<_ifmsley9.Basket?> getActive() =>
+      caller.callServerEndpoint<_ifmsley9.Basket?>(
+        'basket',
+        'getActive',
+        {},
+      );
+
+  /// Any member, while the basket is `open`.
+  _ida.Future<_iuuhmcji.BasketItem> addItem(
+    int basketId,
+    String name, {
+    required int quantity,
+    String? note,
+  }) => caller.callServerEndpoint<_iuuhmcji.BasketItem>(
+    'basket',
+    'addItem',
+    {
+      'basketId': basketId,
+      'name': name,
+      'quantity': quantity,
+      'note': note,
+    },
+  );
+
+  /// Only the member who asked for the item, and only while `open`.
+  _ida.Future<_iuuhmcji.BasketItem> updateItem(
+    int itemId, {
+    String? name,
+    int? quantity,
+    String? note,
+  }) => caller.callServerEndpoint<_iuuhmcji.BasketItem>(
+    'basket',
+    'updateItem',
+    {
+      'itemId': itemId,
+      'name': name,
+      'quantity': quantity,
+      'note': note,
+    },
+  );
+
+  /// Only the member who asked for it, and only while `open`.
+  _ida.Future<void> removeItem(int itemId) => caller.callServerEndpoint<void>(
+    'basket',
+    'removeItem',
+    {'itemId': itemId},
+  );
+
+  /// Ticks an item off. Shopper only, allowed in **both** `open` and `frozen`
+  /// (ADR-005) — the shopper marks things as they walk the aisles. `priceMinor`
+  /// is only accepted once the basket is `frozen`.
+  ///
+  /// Publishes an `itemUpdated` event, so members watching see it live.
+  _ida.Future<_iuuhmcji.BasketItem> markItem(
+    int itemId,
+    _i3z6uioy.ItemStatus status, {
+    int? priceMinor,
+  }) => caller.callServerEndpoint<_iuuhmcji.BasketItem>(
+    'basket',
+    'markItem',
+    {
+      'itemId': itemId,
+      'status': status,
+      'priceMinor': priceMinor,
+    },
+  );
+
+  /// The till total, in minor units. Any difference from the item sum is split
+  /// across every member at settlement (ADR-007); this only records it.
+  _ida.Future<_ifmsley9.Basket> setReceiptTotal(
+    int basketId,
+    int receiptTotalMinor,
+  ) => caller.callServerEndpoint<_ifmsley9.Basket>(
+    'basket',
+    'setReceiptTotal',
+    {
+      'basketId': basketId,
+      'receiptTotalMinor': receiptTotalMinor,
+    },
+  );
+}
+
+/// The live basket.
+/// {@category Endpoint}
+class EndpointBasketStream extends _isc.EndpointRef {
+  EndpointBasketStream(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'basketStream';
+
+  /// Watches one basket.
+  ///
+  /// The first event is always a `snapshot` carrying the basket and all of its
+  /// items, so a client that dropped its connection resyncs from the stream
+  /// itself and never needs a second call. Every event carries `serverTime`.
+  ///
+  /// Throws `notAMember` before yielding anything.
+  _ida.Stream<_ivynb499.BasketEvent> watch(int basketId) =>
+      caller.callStreamingServerEndpoint<
+        _ida.Stream<_ivynb499.BasketEvent>,
+        _ivynb499.BasketEvent
+      >(
+        'basketStream',
+        'watch',
+        {'basketId': basketId},
+        {},
+      );
+}
+
+/// FCM registration tokens. Which of the three notification types actually go
+/// out is a per-member preference on `HouseholdMember` (ADR-010), checked on
+/// the server before sending.
+/// {@category Endpoint}
+class EndpointDevice extends _isc.EndpointRef {
+  EndpointDevice(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'device';
+
+  /// Idempotent: re-registering an existing token refreshes it.
+  _ida.Future<_i06kh2mj.DeviceToken> registerToken(String token) =>
+      caller.callServerEndpoint<_i06kh2mj.DeviceToken>(
+        'device',
+        'registerToken',
+        {'token': token},
+      );
+
+  /// Called on sign-out, so a shared phone stops receiving another member's
+  /// notifications.
+  _ida.Future<void> removeToken(String token) =>
+      caller.callServerEndpoint<void>(
+        'device',
+        'removeToken',
+        {'token': token},
+      );
+}
+
+/// Past runs.
+/// {@category Endpoint}
+class EndpointHistory extends _isc.EndpointRef {
+  EndpointHistory(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'history';
+
+  /// Newest first. Settled and cancelled runs both appear.
+  _ida.Future<List<_ifmsley9.Basket>> list({required int limit}) =>
+      caller.callServerEndpoint<List<_ifmsley9.Basket>>(
+        'history',
+        'list',
+        {'limit': limit},
+      );
+
+  /// One past run in full: its items with who asked and what they cost, and
+  /// its settlement lines if it has any. A cancelled run has neither prices
+  /// nor lines. Read-only.
+  _ida.Future<_ivynb499.BasketEvent> get(int basketId) =>
+      caller.callServerEndpoint<_ivynb499.BasketEvent>(
+        'history',
+        'get',
+        {'basketId': basketId},
+      );
+}
+
+/// Creating, joining and administering a household.
+/// {@category Endpoint}
+class EndpointHousehold extends _isc.EndpointRef {
+  EndpointHousehold(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'household';
+
+  /// Creates a household with a fresh six-character code and makes the caller
+  /// its owner. Throws `alreadyInAHousehold` if the caller is already in one.
+  _ida.Future<_iig1c7mf.Household> create(String name) =>
+      caller.callServerEndpoint<_iig1c7mf.Household>(
+        'household',
+        'create',
+        {'name': name},
+      );
+
+  /// The caller's household, or null if they have not joined one yet. The
+  /// router sends a null here to "Create or join".
+  _ida.Future<_iig1c7mf.Household?> getMine() =>
+      caller.callServerEndpoint<_iig1c7mf.Household?>(
+        'household',
+        'getMine',
+        {},
+      );
+
+  /// Joins by code. Throws `unknownHouseholdCode` for both a typo and a code
+  /// that has been rotated away — the client words those differently but the
+  /// server must not confirm that a code once existed.
+  _ida.Future<_iig1c7mf.Household> joinWithCode(String code) =>
+      caller.callServerEndpoint<_iig1c7mf.Household>(
+        'household',
+        'joinWithCode',
+        {'code': code},
+      );
+
+  /// Issues a new code and kills the old one immediately (ADR-006). Owner only.
+  /// Existing members are unaffected and nothing in history changes.
+  _ida.Future<_iig1c7mf.Household> rotateCode() =>
+      caller.callServerEndpoint<_iig1c7mf.Household>(
+        'household',
+        'rotateCode',
+        {},
+      );
+
+  _ida.Future<List<_i5id5rp2.HouseholdMember>> listMembers() =>
+      caller.callServerEndpoint<List<_i5id5rp2.HouseholdMember>>(
+        'household',
+        'listMembers',
+        {},
+      );
+
+  /// Owner only.
+  _ida.Future<_iig1c7mf.Household> rename(String name) =>
+      caller.callServerEndpoint<_iig1c7mf.Household>(
+        'household',
+        'rename',
+        {'name': name},
+      );
+
+  /// Owner only. ISO 4217. Never converts anything: settled baskets keep the
+  /// code they closed with (ADR-008).
+  _ida.Future<_iig1c7mf.Household> setCurrency(String currencyCode) =>
+      caller.callServerEndpoint<_iig1c7mf.Household>(
+        'household',
+        'setCurrency',
+        {'currencyCode': currencyCode},
+      );
+
+  /// The caller's own three notification switches (ADR-010).
+  _ida.Future<_i5id5rp2.HouseholdMember> setNotificationPreferences({
+    required bool basketOpened,
+    required bool closingSoon,
+    required bool settlementReady,
+  }) => caller.callServerEndpoint<_i5id5rp2.HouseholdMember>(
+    'household',
+    'setNotificationPreferences',
+    {
+      'basketOpened': basketOpened,
+      'closingSoon': closingSoon,
+      'settlementReady': settlementReady,
+    },
+  );
+
+  /// Leaves the household. The caller loses access to its history.
+  _ida.Future<void> leave() => caller.callServerEndpoint<void>(
+    'household',
+    'leave',
+    {},
+  );
+}
+
+/// Working out who owes whom. The arithmetic lives in
+/// `services/settlement_service.dart` as a pure function so it can be tested
+/// without a database.
+/// {@category Endpoint}
+class EndpointSettlement extends _isc.EndpointRef {
+  EndpointSettlement(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'settlement';
+
+  /// What settling would produce, without writing anything. Lets the checkout
+  /// screen show the split before the shopper commits.
+  _ida.Future<List<_i27lt87a.SettlementLine>> preview(int basketId) =>
+      caller.callServerEndpoint<List<_i27lt87a.SettlementLine>>(
+        'settlement',
+        'preview',
+        {'basketId': basketId},
+      );
+
+  /// Writes the lines and moves the basket to `settled`. Shopper only.
+  ///
+  /// Each member owes their own picked items plus an even share of the gap
+  /// between the receipt total and the item sum — every member, including one
+  /// who asked for nothing. The remainder goes to the shopper so the lines
+  /// always sum to exactly what they paid (ADR-007).
+  ///
+  /// Throws `basketNotFrozen` too early and `basketAlreadySettled` twice: the
+  /// result is immutable.
+  _ida.Future<List<_i27lt87a.SettlementLine>> settle(int basketId) =>
+      caller.callServerEndpoint<List<_i27lt87a.SettlementLine>>(
+        'settlement',
+        'settle',
+        {'basketId': basketId},
+      );
+
+  _ida.Future<List<_i27lt87a.SettlementLine>> get(int basketId) =>
+      caller.callServerEndpoint<List<_i27lt87a.SettlementLine>>(
+        'settlement',
+        'get',
+        {'basketId': basketId},
+      );
+}
+
+/// Numbers for the Day 26 report, read out of `analytics_event`. Everything
+/// here depends on events having been written since Day 2 — a metric added
+/// later is data already lost.
+/// {@category Endpoint}
+class EndpointStats extends _isc.EndpointRef {
+  EndpointStats(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'stats';
+
+  /// Baskets opened, items per basket, how runs ended (auto-closed, frozen by
+  /// hand, cancelled, settled), average chosen duration, extension rate,
+  /// median time from open to first item, and the share of members who added
+  /// at least one item — the headline metric, "shared attention".
+  ///
+  /// Returns JSON so the report script can grow new metrics without a model
+  /// change.
+  _ida.Future<String> report() => caller.callServerEndpoint<String>(
+    'stats',
+    'report',
+    {},
+  );
+}
+
+/// Shops the household uses. Only a store's own fixed location is ever stored;
+/// nobody's live position reaches the server (ADR-002).
+/// {@category Endpoint}
+class EndpointStore extends _isc.EndpointRef {
+  EndpointStore(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'store';
+
+  /// `lat`/`lng` are null when the member skipped the location step, in which
+  /// case the client stops suggesting a duration and defaults to 10 minutes.
+  _ida.Future<_icg68kho.Store> add(
+    String name, {
+    double? lat,
+    double? lng,
+  }) => caller.callServerEndpoint<_icg68kho.Store>(
+    'store',
+    'add',
+    {
+      'name': name,
+      'lat': lat,
+      'lng': lng,
+    },
+  );
+
+  _ida.Future<List<_icg68kho.Store>> list() =>
+      caller.callServerEndpoint<List<_icg68kho.Store>>(
+        'store',
+        'list',
+        {},
+      );
+
+  /// Baskets that already used this store keep working: the relation is
+  /// `onDelete=SetNull`, so history does not lose its rows.
+  _ida.Future<void> remove(int storeId) => caller.callServerEndpoint<void>(
+    'store',
+    'remove',
+    {'storeId': storeId},
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -304,6 +798,15 @@ class Client extends _isc.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    auth = EndpointAuth(this);
+    basket = EndpointBasket(this);
+    basketStream = EndpointBasketStream(this);
+    device = EndpointDevice(this);
+    history = EndpointHistory(this);
+    household = EndpointHousehold(this);
+    settlement = EndpointSettlement(this);
+    stats = EndpointStats(this);
+    store = EndpointStore(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -311,6 +814,24 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointAuth auth;
+
+  late final EndpointBasket basket;
+
+  late final EndpointBasketStream basketStream;
+
+  late final EndpointDevice device;
+
+  late final EndpointHistory history;
+
+  late final EndpointHousehold household;
+
+  late final EndpointSettlement settlement;
+
+  late final EndpointStats stats;
+
+  late final EndpointStore store;
 
   late final EndpointGreeting greeting;
 
@@ -320,6 +841,15 @@ class Client extends _isc.ServerpodClientShared {
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'auth': auth,
+    'basket': basket,
+    'basketStream': basketStream,
+    'device': device,
+    'history': history,
+    'household': household,
+    'settlement': settlement,
+    'stats': stats,
+    'store': store,
     'greeting': greeting,
   };
 

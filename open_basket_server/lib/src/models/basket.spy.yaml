@@ -1,0 +1,30 @@
+### One shopping run. At most one per household may be open at a time.
+class: Basket
+table: basket
+fields:
+  householdId: int, relation(parent=household, onDelete=Cascade)
+  ### The member doing the shopping. Only they may extend, freeze, mark items,
+  ### enter prices, settle or cancel.
+  shopperMemberId: int, relation(parent=household_member, onDelete=Cascade)
+  storeId: int?, relation(parent=store, onDelete=SetNull)
+  status: BasketStatus, default=open
+  openedAt: DateTime, default=now
+  ### The server owns this. The client only renders closesAt - serverNow.
+  closesAt: DateTime
+  frozenAt: DateTime?
+  ### True when the future call closed it rather than the shopper.
+  closedAutomatically: bool, default=false
+  ### One +5 min extension per basket (ADR-009), so this is 0 or 1.
+  extendCount: int, default=0
+  ### What the till actually charged, in minor units. Null until entered.
+  receiptTotalMinor: int?
+  ### The household's currency at the moment this basket closed. A settled
+  ### basket keeps it, so changing the household setting never rewrites history.
+  currencyCode: String, default='TRY'
+# Rule 4 — one open basket per household — cannot be expressed here: .spy.yaml
+# has no partial index, and a plain unique index on householdId would allow only
+# one basket ever. The real guarantee is a partial unique index,
+#   CREATE UNIQUE INDEX basket_one_open_per_household_idx
+#     ON basket ("householdId") WHERE status = 'open';
+# added by hand to the migration on Day 8. Until it exists, two simultaneous
+# `open` calls can both succeed, so the transaction check is not enough on its own.

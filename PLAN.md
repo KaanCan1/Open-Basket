@@ -39,10 +39,11 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **Both** Commit `CLAUDE.md` and `PLAN.md`; PRs from `feat/*` — **branch protection on `main` still to be enabled**
 
 ### Day 2: Models and CI
-- [ ] **A** Write all `.spy.yaml` models (schema below), `serverpod generate`, migration
+- [x] **A** Write all `.spy.yaml` models (schema below), `serverpod generate`, migration
+- [x] **A** All endpoint signatures with `UnimplementedError` bodies, generated into the client — B can build against a typed, compiling client without waiting for bodies
 - [ ] **A** `analytics_service.dart`: `track(session, type, householdId, basketId, payload)`
 - [x] **B** GitHub Actions: analyze / format / tests, all green (came with the Serverpod 4 template, PATH fixed)
-- [ ] **B** Design direction: colors, type, rough sketch of the countdown banner, app icon draft
+- [x] **B** Design direction: the v3 screen set is finished — 21 screens, light and dark, contrast verified
 - ✅ **M0**
 
 ### Days 3-4: Auth
@@ -74,6 +75,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
   - `freeze(basketId)` → "At checkout"
   - `cancel(basketId)`
   - `getActive(householdId)`, `getServerTime()`
+- [ ] **A** Partial unique index `basket ("householdId") WHERE status = 'open'`, added by hand to the migration — `.spy.yaml` cannot express it and the transaction alone does not stop a race
 - [ ] **A** `close_basket_future_call.dart` + registration in `server.dart` + **startup sweep**
 - [ ] **A** `auto_close_test.dart`: a short basket becomes `frozen` on time; an extended basket does not close early
 

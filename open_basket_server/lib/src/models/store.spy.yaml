@@ -1,0 +1,11 @@
+### A shop the household uses. Only its fixed location, never anyone's live position.
+class: Store
+table: store
+fields:
+  householdId: int, relation(parent=household, onDelete=Cascade)
+  name: String
+  ### Pinned once when the store is added, so the client can suggest a duration.
+  ### Null when the member skipped the location step.
+  lat: double?
+  lng: double?
+  createdAt: DateTime, default=now

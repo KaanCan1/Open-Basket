@@ -1,0 +1,13 @@
+### Who owes whom after a run. Immutable once written.
+class: SettlementLine
+table: settlement_line
+fields:
+  basketId: int, relation(parent=basket, onDelete=Cascade)
+  fromMemberId: int, relation(parent=household_member, onDelete=Cascade)
+  toMemberId: int, relation(parent=household_member, onDelete=Cascade)
+  ### Total owed, in minor units: own picked items plus a share of the gap.
+  amountMinor: int
+  ### The two terms above, kept separately so the UI can show
+  ### "₺84.50 items + ₺0.50 gap" without recomputing (ADR-007).
+  itemsMinor: int
+  receiptGapMinor: int

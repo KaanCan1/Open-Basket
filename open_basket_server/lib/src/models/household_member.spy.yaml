@@ -1,0 +1,19 @@
+### A user's membership of a household.
+class: HouseholdMember
+table: household_member
+fields:
+  householdId: int, relation(parent=household, onDelete=Cascade)
+  ### The Serverpod auth user. Auth ids are UUIDs, not ints.
+  userId: UuidValue
+  ### Shown on item rows and person chips.
+  displayName: String
+  role: MemberRole, default=member
+  ### Notification preferences, checked on the server before sending (ADR-010).
+  notifyBasketOpened: bool, default=true
+  notifyClosingSoon: bool, default=true
+  notifySettlementReady: bool, default=true
+  joinedAt: DateTime, default=now
+indexes:
+  member_unique_idx:
+    fields: householdId, userId
+    unique: true

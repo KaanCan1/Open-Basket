@@ -1,0 +1,10 @@
+enum: BasketEventType
+values:
+  - snapshot
+  - itemAdded
+  - itemUpdated
+  - itemRemoved
+  - timerExtended
+  - basketFrozen
+  - basketSettled
+  - basketCancelled
