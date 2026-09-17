@@ -39,13 +39,14 @@ Repo: https://github.com/KaanCan1/Open-Basket (public)
    Extending schedules a new future call. Server startup sweeps expired open baskets.
 3. Every endpoint checks authorization. Extend, freeze, price entry and settle are shopper-only.
 4. At most one open basket per household, enforced in a DB transaction.
-5. Money is `int` in minor units. No `double`. Currency is a household setting.
-6. Settlement is computed on the server; settled baskets and their `SettlementLine` rows are immutable.
+5. Money is `int` in minor units. No `double`. Currency is an ISO 4217 code on the household, default `TRY`, with a minor-unit count per currency (2 for TRY/USD, 0 for JPY).
+6. Settlement is computed on the server: own picked items plus an even share of the receipt gap, every member included, remainder to the shopper. Settled baskets and their `SettlementLine` rows are immutable.
 7. Location is read once, on the shopper's phone only, to suggest an ETA. The server receives only
    the store and a number of minutes. Never logged.
 8. Every key event is written to `analytics_event` — the final report depends on it.
 9. Never hand-edit `open_basket_client` or `*.g.dart`. Run `serverpod generate` / `create-migration`.
-10. Everything in English: UI, notifications, errors, code, commits, docs. No hardcoded UI strings;
+10. No passwords: sign-in is a six-digit emailed code (10-min expiry, 3 attempts).
+11. Everything in English: UI, notifications, errors, code, commits, docs. No hardcoded UI strings;
     everything goes through `app_en.arb` so Turkish can be added later without refactoring.
 
 ## State machine
@@ -59,8 +60,9 @@ open ──(timer expires / shopper taps "At checkout")──> frozen ──(pri
 
 ```
 Household(name, currencyCode, createdAt)
-HouseholdMember(householdId, userId, displayName, role, joinedAt)   unique: householdId + userId
-HouseholdInvite(code /* 6 chars */, expiresAt, householdId)
+HouseholdMember(householdId, userId, displayName, role, joinedAt, 3 notification prefs)
+                                                                   unique: householdId + userId
+Household.code is permanent and owner-rotatable — there is no invite row with a TTL
 Store(householdId, name, lat, lng)
 Basket(householdId, shopperMemberId, storeId?, status, openedAt, closesAt, frozenAt?,
        closedAutomatically, extendCount, receiptTotalMinor?)
@@ -89,7 +91,7 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — Day 1, 2026-09-15
+## Status — Day 3, 2026-09-17
 
 Done:
 
@@ -103,11 +105,23 @@ Done:
 - `docs/ARCHITECTURE.md`: ADR-001 server owns time, ADR-002 client-side ETA, ADR-003 embedded
   Postgres for local development.
 - `docs/brand/` holds the monochrome logo pack and the derived transparent and inverted variants.
-- `docs/DESIGN_BRIEF.md` holds the prompt for the 13-screen design set.
+- `docs/DESIGN_BRIEF.md` holds the design prompt. The screen set is finished (v3, 21 screens,
+  light and dark): near-monochrome on paper with a single lime signal used only as a fill, the
+  brand mark integrated, and every colour pair measured — all seven published contrast ratios
+  verified against WCAG AA.
+- **The design set is the specification for product behaviour.** Where it overruled the original
+  plan, `docs/ARCHITECTURE.md` ADR-004 to ADR-011 record the change and `PLAN.md` has been
+  rewritten to match: emailed sign-in codes instead of passwords, marking items while the basket
+  is still open, a permanent rotatable household code, the receipt gap split across every member,
+  currency as a household field, one +5 min extension, per-member notification preferences, and
+  offline item queueing.
 
 Open:
 
 - Branch protection on `main` is not enabled yet.
+- Five states are still undesigned and are queued as a design addendum: arriving after a basket
+  auto-closed, a second `open` on a household that already has one, the live basket reconnecting,
+  an invalid or rotated household code, and the history detail view.
 - The Flutter Day 1 tasks (Riverpod, go_router, FCM and geolocator packages, `l10n.yaml`,
   `app_en.arb`, client provider, router, screen skeletons) have not started — they are B's.
 - Launcher icons are not wired up; the master is `docs/brand/open-basket-app-icon-1024.png`

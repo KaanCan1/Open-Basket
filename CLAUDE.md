@@ -2,6 +2,8 @@
 
 Project context for Claude Code. Read at the start of every session. For the task list see `PLAN.md`.
 `docs/CONTEXT.md` is the one-page briefing for a cold session; keep its status section current.
+The published design set is the specification for product behaviour; `docs/ARCHITECTURE.md`
+ADR-004 to ADR-011 record where it overruled the original plan.
 Serverpod's own generated guidance lives in `AGENTS.md`; read it too before touching server code.
 Where the two disagree, this file wins.
 
@@ -173,14 +175,15 @@ open_basket/
 
 1. **The server is the source of time.** `closesAt` lives on the server. The client only displays `closesAt - serverNow`; server time is fetched on connect to correct clock drift.
 2. **Auto-close must be idempotent.** When the future call fires it reloads the basket; if `status != open` or `closesAt > now` it does nothing. Extending the timer schedules a new future call; the old one simply becomes a no-op. On server startup, expired `open` baskets are swept and closed.
-3. **Every endpoint checks authorization.** Non-members of a household get an error. Extend, freeze, price entry and settle are shopper-only.
+3. **Every endpoint checks authorization.** Non-members of a household get an error. Extend, freeze, marking items, price entry and settle are shopper-only. Marking an item picked or unavailable is allowed while the basket is still `open`; prices are only entered once it is `frozen` (ADR-005).
 4. **At most one open basket per household** (MVP rule, enforced in the DB inside a transaction).
-5. **Money is stored as `int` in minor units** (cents / kuruş). No `double`. Currency is a household setting, formatted with `intl`.
-6. **Settlement is computed on the server.** A `settled` basket and its `SettlementLine` rows are immutable.
+5. **Money is stored as `int` in minor units** (cents / kuruş). No `double`. Currency is an ISO 4217 code on the household, default `TRY`, each with its own minor-unit count — 2 for TRY and USD, 0 for JPY. Formatting follows the currency, not the phone locale. A settled basket keeps the code it closed with; changing the setting never converts (ADR-008).
+6. **Settlement is computed on the server.** Each member owes the sum of their own picked items, plus an even share of any gap between the receipt total and the item sum — every member, including one who asked for nothing. The remainder goes to the shopper so the lines always sum to what they paid. A `settled` basket and its `SettlementLine` rows are immutable (ADR-007).
 7. **Location:** device location is read once, only on the shopper's phone, only to suggest an ETA. The server only receives the chosen store and a duration in minutes. Location is never logged.
 8. **Every key event is written to `analytics_event`** (basket_opened, item_added, basket_extended, basket_frozen, basket_auto_closed, basket_settled, basket_cancelled).
 9. Never edit `open_basket_client` or `*.g.dart` by hand. After model changes run `serverpod generate`; after schema changes run `serverpod create-migration`.
-10. **Everything is in English:** UI, notifications, error messages, code, commits, docs. No hardcoded UI strings: every user-facing string goes through `app_en.arb` so another language can be added later without refactoring.
+10. **There are no passwords.** Sign-in is a six-digit emailed code: 10-minute expiry, 3 attempts, requesting a new code kills the old one (ADR-004). The household code is permanent and owner-rotatable, and rotating invalidates the old code immediately (ADR-006).
+11. **Everything is in English:** UI, notifications, error messages, code, commits, docs. No hardcoded UI strings: every user-facing string goes through `app_en.arb` so another language can be added later without refactoring.
 
 ## Common commands
 

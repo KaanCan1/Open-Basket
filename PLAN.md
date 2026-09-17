@@ -46,16 +46,16 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - ✅ **M0**
 
 ### Days 3-4: Auth
-- [ ] **A** Set up the Serverpod auth module (email sign-up/sign-in) following the docs for the installed version
+- [ ] **A** Six-digit emailed sign-in code, no passwords (ADR-004): 10-min expiry, 3 attempts, a new code kills the old one, resend rate limited. Check what the installed auth module gives before writing anything custom
 - [ ] **A** `authz.dart`: `requireMember(session, householdId)`, `requireShopper(session, basket)`
-- [ ] **B** `sign_in_screen.dart`, persistent session, sign-out
+- [ ] **B** `sign_in_screen.dart` + `code_entry_screen.dart` (screens 01-03), wrong-code and resend-cooldown states, persistent session, sign-out
 - [ ] **B** After sign-in: route to "Create or join a household" if the user has none
 
 ### Days 5-6: Households and invites
-- [ ] **A** `household_endpoint.dart`: `create`, `getMine`, `createInvite` (6-char code, valid 48h), `joinWithCode`, `listMembers`, `leave`
-- [ ] **A** Household has a `currencyCode` setting (default `TRY`)
+- [ ] **A** `household_endpoint.dart`: `create`, `getMine`, `rotateCode` (permanent 6-char code, owner-only, old code dies instantly — ADR-006), `joinWithCode` with a distinguishable stale-code error, `listMembers`, `leave`, `rename`
+- [ ] **A** Household has a `currencyCode` setting, ISO 4217, default `TRY`, with a minor-unit count per currency (ADR-008)
 - [ ] **A** Integration test: a non-member cannot read another household's data
-- [ ] **B** `create_household_screen`, `join_household_screen`, `members_screen`, share invite code via share sheet ("Join our household on Open Basket: 4KX9QP")
+- [ ] **B** `create_household_screen`, `join_household_screen`, `members_screen`, `rotate_code_screen` (screens 04, 17, 18), share code via share sheet ("Join our household on Open Basket: 4KX9QP")
 - ✅ **M1**
 
 ### Day 7: Stores + buffer
@@ -70,7 +70,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ### Day 8: Basket lifecycle
 - [ ] **A** `basket_endpoint.dart`
   - `open(householdId, storeId?, durationMinutes)` → error if the household already has an open basket; `closesAt = now + duration`; schedule future calls
-  - `extend(basketId, extraMinutes)` → shopper only, capped (e.g. 60 min total)
+  - `extend(basketId)` → shopper only, exactly one +5 min extension per basket (ADR-009)
   - `freeze(basketId)` → "At checkout"
   - `cancel(basketId)`
   - `getActive(householdId)`, `getServerTime()`
@@ -94,7 +94,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - ✅ **M2: real usage starts.** Keep notes in `docs/usage_log.md`
 
 ### Days 11-12: Push notifications
-- [ ] **A** `device_endpoint.dart`: register/remove FCM tokens
+- [ ] **A** `device_endpoint.dart`: register/remove FCM tokens; per-member notification preferences for the three types, checked server-side before sending (ADR-010)
 - [ ] **A** `notification_service.dart`: send via FCM HTTP v1 (service account key in `passwords.yaml`)
   - Basket opened → all members except shopper: "Kaan is heading to Migros. Add what you need in the next 10 min."
   - 2 minutes left → members who haven't added anything yet (`closing_soon_future_call.dart`, same idempotency rule)
@@ -106,6 +106,9 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **A** Race between two simultaneous `open` calls: transaction guarantees a single basket
 - [ ] **A** `basket_stream_test.dart`: two clients, one adds, the other sees it
 - [ ] **B** Resync when returning from background, airplane mode test
+- [ ] **B** Items added offline are queued on the device and replayed on reconnect (ADR-011) — or change the error copy in the same PR
+- [ ] **B** Reconnecting state on the live basket, and the "this basket closed while you were away" arrival state
+- [ ] **A/B** Second `open` on a household that already has one: clear error, and the screen that shows it
 - [ ] **Both** Fix the top 3 issues from the first week of real use
 
 ---
@@ -113,19 +116,21 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ## Week 3 (Days 15-21): Checkout and settlement
 
 ### Days 15-16: Checkout flow
-- [ ] **A** In `frozen` state, shopper-only `markItem(itemId, status: picked | unavailable, priceMinor)`
-- [ ] **A** Optional "receipt total" field; show the difference from the item sum (warning, not a blocker)
+- [ ] **A** Shopper-only `markItem(itemId, status: picked | unavailable, priceMinor?)`, allowed in **both** `open` and `frozen`; prices only in `frozen` (ADR-005). Marking publishes an item event on the stream
+- [ ] **A** Optional "receipt total" field; the difference from the item sum is split evenly across every member (ADR-007), shown before settling
 - [ ] **B** `checkout_screen.dart`: items grouped by person, price field per row, "Not available" button
 - ✅ **M3**
 
 ### Days 17-18: Settlement
 - [ ] **A** `settlement_service.dart` (pure Dart function, testable without DB)
   - The shopper paid
-  - Each member owes the sum of their own `picked` items
+  - Each member owes the sum of their own `picked` items, plus an even share of the receipt gap
+  - Members who asked for nothing still owe their share of the gap
+  - The remainder after dividing goes to the shopper, so the lines sum exactly to what they paid
   - The shopper's own items create no debt
   - Everything is already in minor units, so no rounding
 - [ ] **A** `settlement_endpoint.dart`: `settle(basketId)` → writes `SettlementLine` rows + `status = settled`, errors if called twice; `getSettlement(basketId)`
-- [ ] **A** `settlement_calc_test.dart`: single member, three members, nothing picked, shopper's own items
+- [ ] **A** `settlement_calc_test.dart`: single member, three members, nothing picked, shopper's own items, a member with no items at all, a gap that does not divide evenly, a zero-decimal currency
 - [ ] **B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary
 
 ### Days 19-20: ETA suggestion
@@ -135,7 +140,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 
 ### Day 21: History + review
 - [ ] **A** `getHistory(householdId, limit)`
-- [ ] **B** `history_screen.dart`: past baskets, totals, who asked for what
+- [ ] **B** `history_screen.dart`: past baskets, totals, who asked for what, plus the detail view for one past run
 - [ ] **Both** Review usage notes; the last big change decision is made here
 - ✅ **M4**
 
@@ -147,7 +152,8 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **B** Empty states, loading skeletons, clear English error messages (all from ARB)
 - [ ] **B** Small animation when an item lands on another device, haptic in the last minute
 - [ ] **B** Suggestion chips from the household's frequent items (simple server query)
-- [ ] **B** Final app name, icon and store-style screenshots
+- [ ] **B** `settings_screen.dart` and `currency_screen.dart` (screens 19-20), including sign out and leave household
+- [ ] **B** Final app name, launcher icons from `docs/brand/open-basket-app-icon-1024.png`, store-style screenshots
 - [ ] **A** Rate limiting (item spam), input validation (name length, quantity range)
 
 ### Days 24-25: Testing and code freeze
@@ -189,7 +195,8 @@ class: Household
 table: household
 fields:
   name: String
-  currencyCode: String   # e.g. TRY, EUR
+  currencyCode: String   # ISO 4217, default TRY (ADR-008)
+  code: String           # permanent 6-char join code, rotatable (ADR-006)
   createdAt: DateTime
 
 # household_member.spy.yaml
@@ -200,6 +207,9 @@ fields:
   userId: int            # user from the auth module
   displayName: String
   role: String           # owner | member
+  notifyBasketOpened: bool
+  notifyClosingSoon: bool
+  notifySettlementReady: bool
   joinedAt: DateTime
 indexes:
   member_unique_idx:
