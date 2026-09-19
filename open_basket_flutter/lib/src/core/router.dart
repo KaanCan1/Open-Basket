@@ -13,14 +13,16 @@ abstract final class Routes {
 }
 
 final routerProvider = Provider<GoRouter>((final ref) {
+  final client = ref.watch(clientProvider);
+
   return GoRouter(
     initialLocation: Routes.home,
+    // Without this the redirect runs once, at startup, and never again — so
+    // signing in left the user on the sign-in screen and a signed-out user sat
+    // on the home screen. Only running the app showed it.
+    refreshListenable: ref.watch(authListenableProvider),
     redirect: (final context, final state) {
-      // While the stored session is still being read, stay put rather than
-      // bouncing the user to sign-in and back.
-      final signedIn = ref.read(authStateProvider).value;
-      if (signedIn == null) return null;
-
+      final signedIn = isSignedIn(client);
       final onAuthScreen = state.matchedLocation.startsWith(Routes.signIn);
       if (!signedIn && !onAuthScreen) return Routes.signIn;
       if (signedIn && onAuthScreen) return Routes.home;

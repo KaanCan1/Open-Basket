@@ -23,10 +23,6 @@ class OpenBasketApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watched, not read: signing in or out has to rebuild the router so its
-    // redirect runs again.
-    ref.watch(authStateProvider);
-
     return MaterialApp.router(
       title: 'Open Basket',
       debugShowCheckedModeBanner: false,

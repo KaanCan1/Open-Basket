@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
@@ -29,23 +28,19 @@ final signOutProvider = Provider<Future<void> Function()>((final ref) {
   return client.auth.signOutDevice;
 });
 
-/// Whether someone is signed in, rebuilt whenever that changes.
+/// Notifies whenever the session changes, which is what makes the router
+/// re-run its redirect on sign-in and sign-out.
 ///
-/// The session manager keeps the token across restarts, so this is also what
-/// decides whether a cold start lands on sign-in or on the household.
-final authStateProvider = StreamProvider<bool>((final ref) {
-  final client = ref.watch(clientProvider);
-  final controller = StreamController<bool>();
+/// This is the auth module's own listenable rather than something derived:
+/// routing has to read the current answer synchronously, and a stream that has
+/// not emitted yet reads as "no answer", which left an unauthenticated user
+/// sitting on the home screen.
+final authListenableProvider = Provider<Listenable>(
+  (final ref) => ref.watch(clientProvider).auth.authInfoListenable,
+);
 
-  void emit() => controller.add(client.auth.isAuthenticated);
-
-  client.auth.authInfoListenable.addListener(emit);
-  emit();
-
-  ref.onDispose(() {
-    client.auth.authInfoListenable.removeListener(emit);
-    controller.close();
-  });
-
-  return controller.stream;
-});
+/// Whether someone is signed in, right now.
+///
+/// Accurate from the first build because `createClient` awaits
+/// `auth.initialize()`, which is what restores a stored session.
+bool isSignedIn(Client client) => client.auth.isAuthenticated;
