@@ -1,26 +1,24 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart';
 
+import '../services/sign_in_service.dart';
+
 /// Passwordless sign-in: the user types an email address, we email a six-digit
 /// code, they type it back (ADR-004).
 ///
 /// The bundled email identity provider is password-based — its only code flows
 /// are registration verification and password reset — so this flow is ours.
-/// `ServerSideSessions.createSession(session, authUserId:, method:)` in
-/// `serverpod_auth_core_server` is what mints the session once a code checks
-/// out; look up or create the `AuthUser` for the address first.
-///
-/// Policy, enforced here and not in the UI: a code expires 10 minutes after it
-/// is issued, survives 3 failed attempts, and is invalidated the moment a new
-/// code is issued for the same address.
+/// The policy lives in [SignInService]; this is the wire.
 class AuthEndpoint extends Endpoint {
   /// Issues a code and emails it. Invalidates any code still outstanding for
   /// this address.
   ///
-  /// Returns the same result whether or not the address already has an account:
-  /// the response must not reveal who has signed up. Rate limited per address.
-  Future<void> requestSignInCode(Session session, String email) async {
-    throw UnimplementedError('Day 3-4');
+  /// Returns the same result whether or not the address already has an
+  /// account: the response must not reveal who has signed up. Inside the
+  /// resend cooldown it does nothing and the code already in flight stays
+  /// valid.
+  Future<void> requestSignInCode(Session session, String email) {
+    return SignInService.requestCode(session, email);
   }
 
   /// Exchanges a code for a session, creating the account on first use.
@@ -32,7 +30,7 @@ class AuthEndpoint extends Endpoint {
     Session session,
     String email,
     String code,
-  ) async {
-    throw UnimplementedError('Day 3-4');
+  ) {
+    return SignInService.verifyCode(session, email, code);
   }
 }

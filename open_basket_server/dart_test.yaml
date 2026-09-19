@@ -1,2 +1,8 @@
 tags:
   integration: {}
+
+# One test file at a time. Every integration file brings up a Serverpod, and
+# with `database.dataPath` set they all want the same embedded PostgreSQL —
+# run two at once and the second dies with "Another process is using the local
+# database". Raise this only if the tests stop sharing a database.
+concurrency: 1
