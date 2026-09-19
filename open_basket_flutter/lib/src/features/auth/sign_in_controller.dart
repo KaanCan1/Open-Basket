@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_basket_client/open_basket_client.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../../core/client_provider.dart';
 
@@ -40,10 +41,20 @@ class SignInController {
   Future<void> requestCode(String email) =>
       _client.signIn.requestSignInCode(email);
 
-  /// Exchanges the code for a session. The client's session manager stores the
-  /// token, so [authStateProvider] flips and the router moves the user on.
-  Future<void> verifyCode(String email, String code) =>
-      _client.signIn.verifySignInCode(email, code);
+  /// Exchanges the code for a session.
+  ///
+  /// The endpoint hands back an `AuthSuccess`, but nothing adopts it on its
+  /// own: the bundled providers store the token through their own client-side
+  /// helpers, and our flow has none. Without this call the code verified, the
+  /// server minted a session, and the app stayed signed out — which is exactly
+  /// what the integration test caught.
+  ///
+  /// Storing it also flips `authInfoListenable`, which is what makes the
+  /// router re-run its redirect and move the user on.
+  Future<void> verifyCode(String email, String code) async {
+    final success = await _client.signIn.verifySignInCode(email, code);
+    await _client.auth.updateSignedInUser(success);
+  }
 }
 
 final signInControllerProvider = Provider<SignInController>(

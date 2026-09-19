@@ -57,12 +57,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        // Scrollable rather than balanced with flexible gaps: a raised
+        // keyboard takes a few hundred pixels away, and the code screen next
+        // door overflowed for exactly this reason.
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Spacer(),
+              const SizedBox(height: 96),
               Text(l10n.signInHeadline, style: theme.textTheme.displayLarge),
               const SizedBox(height: 12),
               Text(l10n.signInBlurb, style: theme.textTheme.bodyMedium),
@@ -101,7 +104,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 textAlign: TextAlign.center,
                 style: OpenBasketText.meta(muted),
               ),
-              const Spacer(),
+              const SizedBox(height: 72),
               Text(
                 l10n.signInTerms,
                 textAlign: TextAlign.center,
