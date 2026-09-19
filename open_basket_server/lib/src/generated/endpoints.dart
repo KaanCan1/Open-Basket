@@ -794,6 +794,16 @@ class Endpoints extends _is.EndpointDispatch {
                     params['currencyCode'],
                   ),
         ),
+        'currencyMinorUnitDigits': _is.MethodConnector(
+          name: 'currencyMinorUnitDigits',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['household'] as _izqmqbob.HouseholdEndpoint)
+                  .currencyMinorUnitDigits(session),
+        ),
         'setNotificationPreferences': _is.MethodConnector(
           name: 'setNotificationPreferences',
           params: {

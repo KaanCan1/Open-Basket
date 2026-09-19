@@ -53,9 +53,9 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **B** After sign-in: route to "Create or join a household" if the user has none
 
 ### Days 5-6: Households and invites
-- [ ] **A** `household_endpoint.dart`: `create`, `getMine`, `rotateCode` (permanent 6-char code, owner-only, old code dies instantly — ADR-006), `joinWithCode` with a distinguishable stale-code error, `listMembers`, `leave`, `rename`
-- [ ] **A** Household has a `currencyCode` setting, ISO 4217, default `TRY`, with a minor-unit count per currency (ADR-008)
-- [ ] **A** Integration test: a non-member cannot read another household's data
+- [x] **A** `household_endpoint.dart`: `create`, `getMine`, `rotateCode` (permanent 6-char code, owner-only, old code dies instantly — ADR-006), `joinWithCode` with a distinguishable stale-code error, `listMembers`, `leave`, `rename`
+- [x] **A** Household has a `currencyCode` setting, ISO 4217, default `TRY`, with a minor-unit count per currency (ADR-008)
+- [x] **A** Integration test: a non-member cannot read another household's data
 - [ ] **B** `create_household_screen`, `join_household_screen`, `members_screen`, `rotate_code_screen` (screens 04, 17, 18), share code via share sheet ("Join our household on Open Basket: 4KX9QP")
 - ✅ **M1**
 
