@@ -13,6 +13,11 @@ jobs:
       VERSION: '4.0.0'
       SERVERPOD_PASSWORD_database: 'vb8ta-H3jLwjd27WTKZOzX7ymU9e8ahV'
       SERVERPOD_PASSWORD_redis: 'Hi_XAeJPe3ICcTbEDBX5OJn5YpqSOH5C'
+      # passwords.yaml is gitignored, so CI has no secrets file at all and
+      # Serverpod reads them from SERVERPOD_PASSWORD_<key> instead. This one
+      # peppers the sign-in code hashes (ADR-004); it is a throwaway value for
+      # a throwaway database, not a secret that guards anything.
+      SERVERPOD_PASSWORD_emailSecretHashPepper: 'ci-test-pepper-not-a-secret'
 
     steps:
       - uses: actions/checkout@v4
