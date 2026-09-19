@@ -19,6 +19,7 @@ jobs:
       # a throwaway database, not a secret that guards anything.
       SERVERPOD_PASSWORD_emailSecretHashPepper: 'ci-test-pepper-not-a-secret'
       SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper: 'ci-test-jwt-pepper-not-a-secret'
+      SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: 'ci-test-jwt-signing-key-not-a-secret'
 
     steps:
       - uses: actions/checkout@v4
