@@ -20,6 +20,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Analyze
+      - name: Analyze server
         working-directory: open_basket_server
         run: dart analyze --fatal-infos
+
+      - name: Analyze Flutter app
+        working-directory: open_basket_flutter
+        run: flutter analyze

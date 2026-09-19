@@ -29,6 +29,11 @@ dependencies:
   cupertino_icons: ^1.0.5
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.0.0
+  go_router: ^16.0.0
+  intl: any
   google_fonts: ^8.1.0
   open_basket_client:
     path: ../open_basket_client
@@ -51,6 +56,10 @@ dependency_overrides:
 
 # The following section is specific to Flutter.
 flutter:
+  # Turns `lib/l10n/*.arb` into the generated `AppLocalizations`. Rule 11: no
+  # user-facing string is hardcoded, so another language costs a file rather
+  # than a refactor.
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

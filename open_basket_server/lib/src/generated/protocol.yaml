@@ -9,9 +9,6 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
-auth:
-  - requestSignInCode:
-  - verifySignInCode:
 basket:
   - getServerTime:
   - open:
@@ -46,6 +43,9 @@ settlement:
   - preview:
   - settle:
   - get:
+signIn:
+  - requestSignInCode:
+  - verifySignInCode:
 stats:
   - report:
 store:

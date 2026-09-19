@@ -48,6 +48,10 @@ jobs:
         working-directory: open_basket_server
         run: dart test
 
+      - name: Run Flutter tests
+        working-directory: open_basket_flutter
+        run: flutter test
+
       - name: Stop containers
         if: always()
         working-directory: open_basket_server

@@ -18,13 +18,13 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
-import '../endpoints/auth_endpoint.dart' as _iyggisn2;
 import '../endpoints/basket_endpoint.dart' as _iq57g1s3;
 import '../endpoints/basket_stream_endpoint.dart' as _i83pphaf;
 import '../endpoints/device_endpoint.dart' as _ipl99gaq;
 import '../endpoints/history_endpoint.dart' as _inbipg11;
 import '../endpoints/household_endpoint.dart' as _izqmqbob;
 import '../endpoints/settlement_endpoint.dart' as _ioestwe6;
+import '../endpoints/sign_in_endpoint.dart' as _ihicvi3m;
 import '../endpoints/stats_endpoint.dart' as _ii1l42ti;
 import '../endpoints/store_endpoint.dart' as _iaxecmt0;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
@@ -43,12 +43,6 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
-          null,
-        ),
-      'auth': _iyggisn2.AuthEndpoint()
-        ..initialize(
-          server,
-          'auth',
           null,
         ),
       'basket': _iq57g1s3.BasketEndpoint()
@@ -85,6 +79,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'settlement',
+          null,
+        ),
+      'signIn': _ihicvi3m.SignInEndpoint()
+        ..initialize(
+          server,
+          'signIn',
           null,
         ),
       'stats': _ii1l42ti.StatsEndpoint()
@@ -309,56 +309,6 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
-        ),
-      },
-    );
-    connectors['auth'] = _is.EndpointConnector(
-      name: 'auth',
-      endpoint: endpoints['auth']!,
-      methodConnectors: {
-        'requestSignInCode': _is.MethodConnector(
-          name: 'requestSignInCode',
-          params: {
-            'email': _is.ParameterDescription(
-              name: 'email',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _iyggisn2.AuthEndpoint)
-                  .requestSignInCode(
-                    session,
-                    params['email'],
-                  ),
-        ),
-        'verifySignInCode': _is.MethodConnector(
-          name: 'verifySignInCode',
-          params: {
-            'email': _is.ParameterDescription(
-              name: 'email',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'code': _is.ParameterDescription(
-              name: 'code',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _iyggisn2.AuthEndpoint)
-                  .verifySignInCode(
-                    session,
-                    params['email'],
-                    params['code'],
-                  ),
         ),
       },
     );
@@ -948,6 +898,56 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['settlement'] as _ioestwe6.SettlementEndpoint).get(
                     session,
                     params['basketId'],
+                  ),
+        ),
+      },
+    );
+    connectors['signIn'] = _is.EndpointConnector(
+      name: 'signIn',
+      endpoint: endpoints['signIn']!,
+      methodConnectors: {
+        'requestSignInCode': _is.MethodConnector(
+          name: 'requestSignInCode',
+          params: {
+            'email': _is.ParameterDescription(
+              name: 'email',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['signIn'] as _ihicvi3m.SignInEndpoint)
+                  .requestSignInCode(
+                    session,
+                    params['email'],
+                  ),
+        ),
+        'verifySignInCode': _is.MethodConnector(
+          name: 'verifySignInCode',
+          params: {
+            'email': _is.ParameterDescription(
+              name: 'email',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'code': _is.ParameterDescription(
+              name: 'code',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['signIn'] as _ihicvi3m.SignInEndpoint)
+                  .verifySignInCode(
+                    session,
+                    params['email'],
+                    params['code'],
                   ),
         ),
       },

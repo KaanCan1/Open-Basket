@@ -257,51 +257,6 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
-/// Passwordless sign-in: the user types an email address, we email a six-digit
-/// code, they type it back (ADR-004).
-///
-/// The bundled email identity provider is password-based — its only code flows
-/// are registration verification and password reset — so this flow is ours.
-/// The policy lives in [SignInService]; this is the wire.
-/// {@category Endpoint}
-class EndpointAuth extends _isc.EndpointRef {
-  EndpointAuth(_isc.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'auth';
-
-  /// Issues a code and emails it. Invalidates any code still outstanding for
-  /// this address.
-  ///
-  /// Returns the same result whether or not the address already has an
-  /// account: the response must not reveal who has signed up. Inside the
-  /// resend cooldown it does nothing and the code already in flight stays
-  /// valid.
-  _ida.Future<void> requestSignInCode(String email) =>
-      caller.callServerEndpoint<void>(
-        'auth',
-        'requestSignInCode',
-        {'email': email},
-      );
-
-  /// Exchanges a code for a session, creating the account on first use.
-  ///
-  /// Throws `OpenBasketException` with `invalidSignInCode`, `signInCodeExpired`
-  /// or `tooManySignInAttempts` so the client can tell the three apart — the
-  /// screens word them differently.
-  _ida.Future<_iacc.AuthSuccess> verifySignInCode(
-    String email,
-    String code,
-  ) => caller.callServerEndpoint<_iacc.AuthSuccess>(
-    'auth',
-    'verifySignInCode',
-    {
-      'email': email,
-      'code': code,
-    },
-  );
-}
-
 /// The basket lifecycle: open, extend, freeze, cancel, and everything that
 /// happens to the items inside it.
 ///
@@ -671,6 +626,55 @@ class EndpointSettlement extends _isc.EndpointRef {
       );
 }
 
+/// Passwordless sign-in: the user types an email address, we email a six-digit
+/// code, they type it back (ADR-004).
+///
+/// The bundled email identity provider is password-based — its only code flows
+/// are registration verification and password reset — so this flow is ours.
+/// The policy lives in [SignInService]; this is the wire.
+/// Named `SignInEndpoint`, not `AuthEndpoint`, so the client reaches it at
+/// `client.signIn`. `client.auth` belongs to the Serverpod auth module — the
+/// session manager, `isAuthenticated`, sign-out — and an endpoint called
+/// `auth` silently shadows all of it.
+/// {@category Endpoint}
+class EndpointSignIn extends _isc.EndpointRef {
+  EndpointSignIn(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'signIn';
+
+  /// Issues a code and emails it. Invalidates any code still outstanding for
+  /// this address.
+  ///
+  /// Returns the same result whether or not the address already has an
+  /// account: the response must not reveal who has signed up. Inside the
+  /// resend cooldown it does nothing and the code already in flight stays
+  /// valid.
+  _ida.Future<void> requestSignInCode(String email) =>
+      caller.callServerEndpoint<void>(
+        'signIn',
+        'requestSignInCode',
+        {'email': email},
+      );
+
+  /// Exchanges a code for a session, creating the account on first use.
+  ///
+  /// Throws `OpenBasketException` with `invalidSignInCode`, `signInCodeExpired`
+  /// or `tooManySignInAttempts` so the client can tell the three apart — the
+  /// screens word them differently.
+  _ida.Future<_iacc.AuthSuccess> verifySignInCode(
+    String email,
+    String code,
+  ) => caller.callServerEndpoint<_iacc.AuthSuccess>(
+    'signIn',
+    'verifySignInCode',
+    {
+      'email': email,
+      'code': code,
+    },
+  );
+}
+
 /// Numbers for the Day 26 report, read out of `analytics_event`. Everything
 /// here depends on events having been written since Day 2 — a metric added
 /// later is data already lost.
@@ -794,13 +798,13 @@ class Client extends _isc.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
-    auth = EndpointAuth(this);
     basket = EndpointBasket(this);
     basketStream = EndpointBasketStream(this);
     device = EndpointDevice(this);
     history = EndpointHistory(this);
     household = EndpointHousehold(this);
     settlement = EndpointSettlement(this);
+    signIn = EndpointSignIn(this);
     stats = EndpointStats(this);
     store = EndpointStore(this);
     greeting = EndpointGreeting(this);
@@ -810,8 +814,6 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
-
-  late final EndpointAuth auth;
 
   late final EndpointBasket basket;
 
@@ -825,6 +827,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointSettlement settlement;
 
+  late final EndpointSignIn signIn;
+
   late final EndpointStats stats;
 
   late final EndpointStore store;
@@ -837,13 +841,13 @@ class Client extends _isc.ServerpodClientShared {
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
-    'auth': auth,
     'basket': basket,
     'basketStream': basketStream,
     'device': device,
     'history': history,
     'household': household,
     'settlement': settlement,
+    'signIn': signIn,
     'stats': stats,
     'store': store,
     'greeting': greeting,
