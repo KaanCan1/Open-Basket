@@ -18,6 +18,7 @@ jobs:
       # peppers the sign-in code hashes (ADR-004); it is a throwaway value for
       # a throwaway database, not a secret that guards anything.
       SERVERPOD_PASSWORD_emailSecretHashPepper: 'ci-test-pepper-not-a-secret'
+      SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper: 'ci-test-jwt-pepper-not-a-secret'
 
     steps:
       - uses: actions/checkout@v4

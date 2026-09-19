@@ -1,3 +1,4 @@
+import 'package:open_basket_server/src/auth_setup.dart';
 import 'package:open_basket_server/src/generated/protocol.dart';
 import 'package:open_basket_server/src/services/sign_in_email_sender.dart';
 import 'package:open_basket_server/src/util/sign_in_code_policy.dart';
@@ -17,6 +18,8 @@ BasketError? _errorOf(Object? e) => e is OpenBasketException ? e.error : null;
 
 void main() {
   withServerpod('Given the auth endpoint', (sessionBuilder, endpoints) {
+    // withServerpod never runs server.dart, so auth has to be configured here.
+    setUpAll(AuthSetup.configureForTests);
     setUp(() => SignInEmailSender.lastCodeForTesting = null);
 
     test('a six-digit code is sent and signs the user in', () async {
