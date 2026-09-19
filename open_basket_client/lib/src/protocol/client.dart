@@ -499,8 +499,11 @@ class EndpointHousehold extends _isc.EndpointRef {
   @override
   String get name => 'household';
 
-  /// Creates a household with a fresh six-character code and makes the caller
-  /// its owner. Throws `alreadyInAHousehold` if the caller is already in one.
+  /// Creates a household with a fresh code and makes the caller its owner.
+  ///
+  /// Throws `alreadyInAHousehold` if the caller is already in one: a user
+  /// belongs to exactly one household at a time, which is what lets every
+  /// other endpoint work out which household they mean without being told.
   _ida.Future<_iig1c7mf.Household> create(String name) =>
       caller.callServerEndpoint<_iig1c7mf.Household>(
         'household',
@@ -508,8 +511,8 @@ class EndpointHousehold extends _isc.EndpointRef {
         {'name': name},
       );
 
-  /// The caller's household, or null if they have not joined one yet. The
-  /// router sends a null here to "Create or join".
+  /// The caller's household, or null when they have not joined one. The client
+  /// turns a null into "Create or join".
   _ida.Future<_iig1c7mf.Household?> getMine() =>
       caller.callServerEndpoint<_iig1c7mf.Household?>(
         'household',
@@ -517,9 +520,12 @@ class EndpointHousehold extends _isc.EndpointRef {
         {},
       );
 
-  /// Joins by code. Throws `unknownHouseholdCode` for both a typo and a code
-  /// that has been rotated away — the client words those differently but the
-  /// server must not confirm that a code once existed.
+  /// Joins by code.
+  ///
+  /// Throws `unknownHouseholdCode` for a typo and for a code that has been
+  /// rotated away. The client words those two differently, but the server must
+  /// not confirm that a code once existed — that is the difference between a
+  /// hint and an oracle.
   _ida.Future<_iig1c7mf.Household> joinWithCode(String code) =>
       caller.callServerEndpoint<_iig1c7mf.Household>(
         'household',
@@ -527,8 +533,10 @@ class EndpointHousehold extends _isc.EndpointRef {
         {'code': code},
       );
 
-  /// Issues a new code and kills the old one immediately (ADR-006). Owner only.
-  /// Existing members are unaffected and nothing in history changes.
+  /// Issues a new code and kills the old one immediately (ADR-006).
+  ///
+  /// Owner only. Everyone already in stays in and nothing in history changes —
+  /// only new joins are affected, which is the whole point of rotating.
   _ida.Future<_iig1c7mf.Household> rotateCode() =>
       caller.callServerEndpoint<_iig1c7mf.Household>(
         'household',
@@ -551,8 +559,10 @@ class EndpointHousehold extends _isc.EndpointRef {
         {'name': name},
       );
 
-  /// Owner only. ISO 4217. Never converts anything: settled baskets keep the
-  /// code they closed with (ADR-008).
+  /// Owner only. ISO 4217.
+  ///
+  /// Never converts anything: a settled basket keeps the code it closed with,
+  /// so changing this only affects what happens next (ADR-008).
   _ida.Future<_iig1c7mf.Household> setCurrency(String currencyCode) =>
       caller.callServerEndpoint<_iig1c7mf.Household>(
         'household',
@@ -560,7 +570,18 @@ class EndpointHousehold extends _isc.EndpointRef {
         {'currencyCode': currencyCode},
       );
 
-  /// The caller's own three notification switches (ADR-010).
+  /// How many minor units make one major unit for the household's currency —
+  /// 2 for lira, 0 for yen. The client needs it to format and to show the
+  /// receipt gap in the right granularity.
+  _ida.Future<int> currencyMinorUnitDigits() => caller.callServerEndpoint<int>(
+    'household',
+    'currencyMinorUnitDigits',
+    {},
+  );
+
+  /// The caller's own three notification switches (ADR-010). Checked on the
+  /// server before anything is sent, so turning one off actually stops the
+  /// push rather than hiding it.
   _ida.Future<_i5id5rp2.HouseholdMember> setNotificationPreferences({
     required bool basketOpened,
     required bool closingSoon,
@@ -576,6 +597,11 @@ class EndpointHousehold extends _isc.EndpointRef {
   );
 
   /// Leaves the household. The caller loses access to its history.
+  ///
+  /// An owner who leaves hands ownership to the longest-standing member left,
+  /// so a household can never end up with nobody able to rotate the code or
+  /// change the currency. The last member out leaves the household empty
+  /// rather than deleted: its baskets are what the report is built from.
   _ida.Future<void> leave() => caller.callServerEndpoint<void>(
     'household',
     'leave',

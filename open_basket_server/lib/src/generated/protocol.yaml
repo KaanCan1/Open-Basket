@@ -37,6 +37,7 @@ household:
   - listMembers:
   - rename:
   - setCurrency:
+  - currencyMinorUnitDigits:
   - setNotificationPreferences:
   - leave:
 settlement:
