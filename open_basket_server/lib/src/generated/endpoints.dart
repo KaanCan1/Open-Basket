@@ -1058,9 +1058,9 @@ class Endpoints extends _is.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _iais.Endpoints()
-      ..initializeEndpoints(server);
     modules['serverpod_auth_core'] = _iacs.Endpoints()
+      ..initializeEndpoints(server);
+    modules['serverpod_auth_idp'] = _iais.Endpoints()
       ..initializeEndpoints(server);
   }
 }

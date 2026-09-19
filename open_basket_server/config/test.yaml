@@ -34,7 +34,11 @@ database:
   port: 9090
   name: open_basket_test
   user: postgres
-  dataPath: .serverpod/test/pgdata
+  # No dataPath on purpose: the test database is a real PostgreSQL, the one
+  # CI brings up from docker-compose.yaml on this port. The embedded server
+  # stays for development (ADR-003) but could not be shared between test
+  # files — every run reported the postmaster lock as busy, even from a
+  # clean slate with no postgres alive.
   #maxConnectionCount: 10 # Defaults to 10, a negative or null value removes the limit
 
 # This is the setup for your Redis test instance.

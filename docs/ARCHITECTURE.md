@@ -24,6 +24,16 @@ Docker is still used where it makes sense: `docker-compose.yaml` stays in the re
 tests workflow starts real Postgres and Redis containers) and for production deployment. Only the
 local development database changed.
 
+**Amended on Day 5: the *test* database is a real PostgreSQL again.** `config/test.yaml` had
+`dataPath` too, and with more than one integration test file every run failed with "Another
+process is using the local database" — including from a clean slate with the data directory
+deleted and no postgres process alive, so it is not a stale lock we can clear. `config/test.yaml`
+now has no `dataPath`, which points it at the container `docker-compose.yaml` already starts on
+port 9090, exactly where CI runs it.
+
+The cost is honest: integration tests need Docker locally, so on a machine without it only the
+unit tests run and CI is what proves the rest. Development is untouched and still needs nothing.
+
 ---
 
 # Decisions taken from the design set (v3)
@@ -56,6 +66,24 @@ the `AuthUser` for the address, emails a code, and calls `createSession` once th
 `SignInCode` is the server-only table holding the hashed code, its expiry and the attempts left.
 
 Budget Day 3-4 accordingly: this is real work, not configuration, and M1 depends on it.
+
+**Built on Day 5.** `SignInService` holds the policy, `SignInCodePolicy` the parts worth testing
+on their own (generation, hashing, comparison, normalisation), `SignInEmailSender` the delivery.
+Decisions worth knowing:
+
+- The hash pepper reuses `emailSecretHashPepper`, which the template already defines in every run
+  mode — one less secret to distribute. A missing pepper throws rather than falling back to a
+  constant, because a fallback would look like it worked while removing the protection.
+- Accounts are created on the first **successful** code, never on request. Otherwise typing a
+  stranger's address would create an account for them.
+- Inside the 24-second resend cooldown the endpoint does nothing and returns: the code already in
+  flight stays valid. That is what the countdown on the resend button enforces, and it stops the
+  endpoint being used to send somebody a stream of email.
+- `requestSignInCode` answers identically whether or not the address has an account, and delivery
+  failures are logged rather than propagated — otherwise the difference between a sent and an
+  unsent code would reveal who has signed up.
+- Codes are consumed before the session is minted, so two requests arriving together cannot
+  redeem the same code twice.
 
 ## ADR-005: The shopper marks items while the basket is still open
 

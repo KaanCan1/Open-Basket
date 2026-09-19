@@ -41,14 +41,14 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ### Day 2: Models and CI
 - [x] **A** Write all `.spy.yaml` models (schema below), `serverpod generate`, migration
 - [x] **A** All endpoint signatures with `UnimplementedError` bodies, generated into the client — B can build against a typed, compiling client without waiting for bodies
-- [ ] **A** `analytics_service.dart`: `track(session, type, householdId, basketId, payload)`
+- [x] **A** `analytics_service.dart`: `track(session, type, householdId, basketId, payload)`
 - [x] **B** GitHub Actions: analyze / format / tests, all green (came with the Serverpod 4 template, PATH fixed)
 - [x] **B** Design direction: the v3 screen set is finished — 21 screens, light and dark, contrast verified
 - ✅ **M0**
 
 ### Days 3-4: Auth
-- [ ] **A** Six-digit emailed sign-in code, no passwords (ADR-004): 10-min expiry, 3 attempts, a new code kills the old one, resend rate limited. Check what the installed auth module gives before writing anything custom
-- [ ] **A** `authz.dart`: `requireMember(session, householdId)`, `requireShopper(session, basket)`
+- [x] **A** Six-digit emailed sign-in code, no passwords (ADR-004): 10-min expiry, 3 attempts, a new code kills the old one, resend rate limited. The bundled provider does not do this, so the flow is ours
+- [x] **A** `authz.dart`: `requireMember(session, householdId)`, `requireShopper(session, basket)`
 - [ ] **B** `sign_in_screen.dart` + `code_entry_screen.dart` (screens 01-03), wrong-code and resend-cooldown states, persistent session, sign-out
 - [ ] **B** After sign-in: route to "Create or join a household" if the user has none
 

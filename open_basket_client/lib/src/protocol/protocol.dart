@@ -230,10 +230,10 @@ class Protocol extends _isc.SerializationManager {
           as T;
     }
     try {
-      return _iaic.Protocol().deserialize<T>(data, t);
+      return _iacc.Protocol().deserialize<T>(data, t);
     } on _isc.DeserializationTypeNotFoundException catch (_) {}
     try {
-      return _iacc.Protocol().deserialize<T>(data, t);
+      return _iaic.Protocol().deserialize<T>(data, t);
     } on _isc.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -303,17 +303,17 @@ class Protocol extends _isc.SerializationManager {
       case _ixrn3cz3.Store():
         return 'Store';
     }
-    className = _iaic.Protocol().getClassNameForObject(data);
-    if (className != null) {
-      return className.contains('.')
-          ? className
-          : 'serverpod_auth_idp.$className';
-    }
     className = _iacc.Protocol().getClassNameForObject(data);
     if (className != null) {
       return className.contains('.')
           ? className
           : 'serverpod_auth_core.$className';
+    }
+    className = _iaic.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_idp.$className';
     }
     return null;
   }
@@ -372,20 +372,20 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'Store') {
       return deserialize<_ixrn3cz3.Store>(data['data']);
     }
-    if (dataClassName.startsWith('serverpod_auth_idp.')) {
-      data['className'] = dataClassName.substring(19);
-      return _iaic.Protocol().deserializeByClassName(data);
-    }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
       return _iacc.Protocol().deserializeByClassName(data);
+    }
+    if (dataClassName.startsWith('serverpod_auth_idp.')) {
+      data['className'] = dataClassName.substring(19);
+      return _iaic.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
 
   void _registerHostProtocols() {
-    _iaic.Protocol().registerHostProtocol('open_basket', this);
     _iacc.Protocol().registerHostProtocol('open_basket', this);
+    _iaic.Protocol().registerHostProtocol('open_basket', this);
   }
 
   @override
@@ -401,10 +401,10 @@ class Protocol extends _isc.SerializationManager {
       return null;
     }
     try {
-      return _iaic.Protocol().mapRecordToJson(record);
+      return _iacc.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _iacc.Protocol().mapRecordToJson(record);
+      return _iaic.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

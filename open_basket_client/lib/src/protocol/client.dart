@@ -262,13 +262,7 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
 ///
 /// The bundled email identity provider is password-based — its only code flows
 /// are registration verification and password reset — so this flow is ours.
-/// `ServerSideSessions.createSession(session, authUserId:, method:)` in
-/// `serverpod_auth_core_server` is what mints the session once a code checks
-/// out; look up or create the `AuthUser` for the address first.
-///
-/// Policy, enforced here and not in the UI: a code expires 10 minutes after it
-/// is issued, survives 3 failed attempts, and is invalidated the moment a new
-/// code is issued for the same address.
+/// The policy lives in [SignInService]; this is the wire.
 /// {@category Endpoint}
 class EndpointAuth extends _isc.EndpointRef {
   EndpointAuth(_isc.EndpointCaller caller) : super(caller);
@@ -279,8 +273,10 @@ class EndpointAuth extends _isc.EndpointRef {
   /// Issues a code and emails it. Invalidates any code still outstanding for
   /// this address.
   ///
-  /// Returns the same result whether or not the address already has an account:
-  /// the response must not reveal who has signed up. Rate limited per address.
+  /// Returns the same result whether or not the address already has an
+  /// account: the response must not reveal who has signed up. Inside the
+  /// resend cooldown it does nothing and the code already in flight stays
+  /// valid.
   _ida.Future<void> requestSignInCode(String email) =>
       caller.callServerEndpoint<void>(
         'auth',
@@ -760,13 +756,13 @@ class EndpointGreeting extends _isc.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    serverpod_auth_idp = _iaic.Caller(client);
     serverpod_auth_core = _iacc.Caller(client);
+    serverpod_auth_idp = _iaic.Caller(client);
   }
 
-  late final _iaic.Caller serverpod_auth_idp;
-
   late final _iacc.Caller serverpod_auth_core;
+
+  late final _iaic.Caller serverpod_auth_idp;
 }
 
 class Client extends _isc.ServerpodClientShared {
@@ -855,7 +851,7 @@ class Client extends _isc.ServerpodClientShared {
 
   @override
   Map<String, _isc.ModuleEndpointCaller> get moduleLookup => {
-    'serverpod_auth_idp': modules.serverpod_auth_idp,
     'serverpod_auth_core': modules.serverpod_auth_core,
+    'serverpod_auth_idp': modules.serverpod_auth_idp,
   };
 }
