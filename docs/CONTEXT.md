@@ -91,49 +91,49 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — Day 3, 2026-09-17
+## Status — end of Day 6, 2026-09-19
 
-Done:
+Backend, Days 1-6, all merged:
 
-- Serverpod 4 monorepo scaffolded and flattened to the repo root as a Dart workspace
-  (`open_basket_server`, `open_basket_client`, `open_basket_flutter`).
-- Server runs on `localhost:8080` against the embedded Postgres, migrations applied.
-- CI green: Analyze, Format, Tests. The template workflows needed a PATH fix — Dart 3.13's
-  `dart install` writes to `~/.local/state/Dart/install/bin`, not `~/.pub-cache/bin`.
-- `CLAUDE.md` carries the pinned toolchain and the ownership table: A owns server, generated
-  client and migrations; B owns the Flutter app and `app_en.arb`; `.spy.yaml` and the docs are shared.
-- `docs/ARCHITECTURE.md`: ADR-001 server owns time, ADR-002 client-side ETA, ADR-003 embedded
-  Postgres for local development.
-- `docs/brand/` holds the monochrome logo pack and the derived transparent and inverted variants.
-- **Day 2 is done and merged**: 14 models, 9 endpoint signatures with `UnimplementedError` bodies,
-  one migration applied. The generated client compiles, so B can build screens against typed calls.
-  Rule 4 is not enforced yet — it needs a partial unique index added by hand on Day 8.
-- `docs/DESIGN_BRIEF.md` holds the design prompt. The screen set is finished (v3, 21 screens,
-  light and dark): near-monochrome on paper with a single lime signal used only as a fill, the
-  brand mark integrated, and every colour pair measured — all seven published contrast ratios
-  verified against WCAG AA. The addendum added the states that prove the product's central claim:
-  arriving into a basket that closed itself, a household that already has one open, the stream
-  reconnecting with an item queued on the phone, a rotated code, and past runs in detail.
-- **The design set is the specification for product behaviour.** Where it overruled the original
-  plan, `docs/ARCHITECTURE.md` ADR-004 to ADR-011 record the change and `PLAN.md` has been
-  rewritten to match: emailed sign-in codes instead of passwords, marking items while the basket
-  is still open, a permanent rotatable household code, the receipt gap split across every member,
-  currency as a household field, one +5 min extension, per-member notification preferences, and
-  offline item queueing.
+- Serverpod 4 workspace; 14 models; migrations applied. `main` holds 59 server tests and 8 Flutter
+  tests, all green in CI.
+- **Sign-in** (ADR-004): six digits by email, no passwords. The bundled provider is password-only,
+  so the flow is ours — `SignInService` for the policy, `SignInCodePolicy` for the hashing and
+  normalisation, `SignInEmailSender` for delivery (console in development).
+- **Households**: create, join by code, rotate the code, members, rename, currency, per-member
+  notification preferences, leave. An owner who leaves hands the household to the longest-standing
+  member. A non-member cannot read another household — tested.
+- Services in place: `Authz`, `AnalyticsService`, `Money.splitEvenly` (ADR-007's arithmetic,
+  property-tested), `HouseholdCode`.
+
+Flutter, the skeleton A built for B (ADR-012):
+
+- Riverpod, go_router, l10n, the design tokens as a real theme, the client behind a provider.
+- Screens 01-03 wired to the real endpoints, **verified end to end against a running server** by
+  an `integration_test` suite that found two bugs a screenshot could not: the session token was
+  never adopted after a correct code, and both auth screens overflowed.
+
+Design: finished. 30 screens, light and dark, every contrast ratio measured and verified.
 
 Open:
 
-- Branch protection on `main` is not enabled yet.
-- Nothing in the design is outstanding: the addendum landed, so the set is 30 screens and carries
-  a state inventory naming every condition it draws.
-- The Flutter Day 1 tasks (Riverpod, go_router, FCM and geolocator packages, `l10n.yaml`,
-  `app_en.arb`, client provider, router, screen skeletons) have not started — they are B's.
-- Launcher icons are not wired up; the master is `docs/brand/open-basket-app-icon-1024.png`
-  and `PLAN.md` schedules it for Day 22.
+- Branch protection on `main` still not enabled.
+- Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
+  the ETA suggestion depends on it.
+- **Everything B owns past the skeleton is unstarted**, and B has not worked on the repo yet.
+- Integration tests need Docker, which does not run on A's machine, so CI is what proves them.
+- The Claude simulator panel only offers iOS 26.5 devices; anything booted on iOS 27 is invisible
+  to it. The app runs on the iPhone 17 it can see.
 
 ## Next
 
-Day 2, contract first and done jointly in one session: write every `.spy.yaml` model and every
-endpoint signature with `UnimplementedError` bodies, run `serverpod generate`, merge to `main`.
-After that both developers work in parallel against a typed, compiling client instead of B waiting
-on endpoints.
+**Days 8-10 are the critical path and the part that justifies Serverpod.** Everything built so far
+is ordinary CRUD that any backend could do; the future call that closes a basket on the server and
+the stream that puts an item on every phone at once are what the pitch is actually about, and
+neither exists yet.
+
+`CLAUDE.md` calls Days 8-10 pair work for a reason: `basket_stream_endpoint` and
+`live_basket_controller` share event types, snapshot ordering and reconnect behaviour.
+
+Day 10 is M2 — deploy plus real usage in both homes — and it buys the ~18 days of data the report
+rests on. It is the one date that cannot slip.
