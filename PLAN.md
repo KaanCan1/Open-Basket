@@ -142,7 +142,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 
 ### Day 21: History + review
 - [ ] **A** `getHistory(householdId, limit)`
-- [ ] **B** `history_screen.dart`: past baskets, totals, who asked for what, plus the detail view for one past run
+- [ ] **B** `history_screen.dart`: past baskets, totals, who asked for what, plus the detail view for one past run (screens 29-30)
 - [ ] **Both** Review usage notes; the last big change decision is made here
 - ✅ **M4**
 
