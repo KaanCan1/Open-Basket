@@ -116,7 +116,10 @@ class _CodeEntryScreenState extends ConsumerState<CodeEntryScreen> {
         leading: BackButton(onPressed: () => context.pop()),
       ),
       body: SafeArea(
-        child: Padding(
+        // Scrollable because the content grows: the failure card adds a block
+        // that overflowed the viewport by 22px, and a raised keyboard takes
+        // another few hundred.
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
