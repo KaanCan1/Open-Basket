@@ -56,7 +56,9 @@ Two people, two separate Claude Code sessions. **The agents cannot see each othe
 | `open_basket_server/**` | A | |
 | `open_basket_client/**` | A | Generated code. **Only A commits it.** B pulls, never commits `serverpod generate` output. |
 | `open_basket_server/migrations/**` | A | One person creates migrations, or they collide. |
-| `open_basket_flutter/**` | B | |
+| `open_basket_flutter/**` | B | **A built the skeleton on Day 5** — packages, l10n, theme, client provider,
+router, the two sign-in screens — because B had not started and Day 10 was at risk (ADR-012).
+Everything from here is B's again. |
 | `lib/l10n/app_en.arb` | B | Server-side notification copy lives in its own file, so this never conflicts. |
 | `*.spy.yaml`, `CLAUDE.md`, `PLAN.md` | shared | Change by PR, the other person approves. |
 

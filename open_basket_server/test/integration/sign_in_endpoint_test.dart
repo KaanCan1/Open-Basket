@@ -17,17 +17,17 @@ String get _sentCode {
 BasketError? _errorOf(Object? e) => e is OpenBasketException ? e.error : null;
 
 void main() {
-  withServerpod('Given the auth endpoint', (sessionBuilder, endpoints) {
+  withServerpod('Given the sign-in endpoint', (sessionBuilder, endpoints) {
     // withServerpod never runs server.dart, so auth has to be configured here.
     setUpAll(AuthSetup.configureForTests);
     setUp(() => SignInEmailSender.lastCodeForTesting = null);
 
     test('a six-digit code is sent and signs the user in', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'kaan@kaya.co');
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'kaan@kaya.co');
 
       expect(_sentCode, hasLength(6));
 
-      final success = await endpoints.auth.verifySignInCode(
+      final success = await endpoints.signIn.verifySignInCode(
         sessionBuilder,
         'kaan@kaya.co',
         _sentCode,
@@ -36,8 +36,8 @@ void main() {
     });
 
     test('the same address signs in to the same account twice', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'ayse@kaya.co');
-      final first = await endpoints.auth.verifySignInCode(
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'ayse@kaya.co');
+      final first = await endpoints.signIn.verifySignInCode(
         sessionBuilder,
         'ayse@kaya.co',
         _sentCode,
@@ -49,8 +49,8 @@ void main() {
         where: (final t) => t.email.equals('ayse@kaya.co'),
       );
 
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'ayse@kaya.co');
-      final second = await endpoints.auth.verifySignInCode(
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'ayse@kaya.co');
+      final second = await endpoints.signIn.verifySignInCode(
         sessionBuilder,
         'ayse@kaya.co',
         _sentCode,
@@ -60,12 +60,16 @@ void main() {
     });
 
     test('a wrong code is rejected and does not sign anyone in', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'deniz@kaya.co');
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'deniz@kaya.co');
       final real = _sentCode;
       final wrong = real == '000000' ? '111111' : '000000';
 
       await expectLater(
-        endpoints.auth.verifySignInCode(sessionBuilder, 'deniz@kaya.co', wrong),
+        endpoints.signIn.verifySignInCode(
+          sessionBuilder,
+          'deniz@kaya.co',
+          wrong,
+        ),
         throwsA(
           predicate(
             (final e) => _errorOf(e) == BasketError.invalidSignInCode,
@@ -74,7 +78,7 @@ void main() {
       );
 
       // The real code still works: one wrong guess must not burn it.
-      final success = await endpoints.auth.verifySignInCode(
+      final success = await endpoints.signIn.verifySignInCode(
         sessionBuilder,
         'deniz@kaya.co',
         real,
@@ -83,7 +87,7 @@ void main() {
     });
 
     test('the code dies after three wrong guesses', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'mert@kaya.co');
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'mert@kaya.co');
       final real = _sentCode;
       final wrong = real == '000000' ? '111111' : '000000';
 
@@ -96,7 +100,7 @@ void main() {
             ? BasketError.invalidSignInCode
             : BasketError.tooManySignInAttempts;
         await expectLater(
-          endpoints.auth.verifySignInCode(
+          endpoints.signIn.verifySignInCode(
             sessionBuilder,
             'mert@kaya.co',
             wrong,
@@ -108,7 +112,7 @@ void main() {
 
       // Even the correct code is no good now — the user has to ask for a new one.
       await expectLater(
-        endpoints.auth.verifySignInCode(sessionBuilder, 'mert@kaya.co', real),
+        endpoints.signIn.verifySignInCode(sessionBuilder, 'mert@kaya.co', real),
         throwsA(
           predicate(
             (final e) => _errorOf(e) == BasketError.tooManySignInAttempts,
@@ -118,7 +122,7 @@ void main() {
     });
 
     test('an expired code is told apart from a wrong one', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'selin@kaya.co');
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'selin@kaya.co');
       final code = _sentCode;
 
       final session = sessionBuilder.build();
@@ -136,7 +140,11 @@ void main() {
       );
 
       await expectLater(
-        endpoints.auth.verifySignInCode(sessionBuilder, 'selin@kaya.co', code),
+        endpoints.signIn.verifySignInCode(
+          sessionBuilder,
+          'selin@kaya.co',
+          code,
+        ),
         throwsA(
           predicate((final e) => _errorOf(e) == BasketError.signInCodeExpired),
         ),
@@ -144,17 +152,21 @@ void main() {
     });
 
     test('a code cannot be redeemed twice', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, 'reuse@kaya.co');
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'reuse@kaya.co');
       final code = _sentCode;
 
-      await endpoints.auth.verifySignInCode(
+      await endpoints.signIn.verifySignInCode(
         sessionBuilder,
         'reuse@kaya.co',
         code,
       );
 
       await expectLater(
-        endpoints.auth.verifySignInCode(sessionBuilder, 'reuse@kaya.co', code),
+        endpoints.signIn.verifySignInCode(
+          sessionBuilder,
+          'reuse@kaya.co',
+          code,
+        ),
         throwsA(
           predicate((final e) => _errorOf(e) == BasketError.invalidSignInCode),
         ),
@@ -164,16 +176,22 @@ void main() {
     test(
       'asking again inside the cooldown keeps the first code alive',
       () async {
-        await endpoints.auth.requestSignInCode(sessionBuilder, 'cool@kaya.co');
+        await endpoints.signIn.requestSignInCode(
+          sessionBuilder,
+          'cool@kaya.co',
+        );
         final first = _sentCode;
 
         SignInEmailSender.lastCodeForTesting = null;
-        await endpoints.auth.requestSignInCode(sessionBuilder, 'cool@kaya.co');
+        await endpoints.signIn.requestSignInCode(
+          sessionBuilder,
+          'cool@kaya.co',
+        );
 
         // Nothing new was sent...
         expect(SignInEmailSender.lastCodeForTesting, isNull);
         // ...and the code already in the user's inbox still works.
-        final success = await endpoints.auth.verifySignInCode(
+        final success = await endpoints.signIn.verifySignInCode(
           sessionBuilder,
           'cool@kaya.co',
           first,
@@ -183,8 +201,11 @@ void main() {
     );
 
     test('the address is normalized, so case cannot fork an account', () async {
-      await endpoints.auth.requestSignInCode(sessionBuilder, '  Case@Kaya.CO ');
-      final success = await endpoints.auth.verifySignInCode(
+      await endpoints.signIn.requestSignInCode(
+        sessionBuilder,
+        '  Case@Kaya.CO ',
+      );
+      final success = await endpoints.signIn.verifySignInCode(
         sessionBuilder,
         'case@kaya.co',
         _sentCode,
@@ -194,7 +215,7 @@ void main() {
 
     test('a malformed address is refused before anything is sent', () async {
       await expectLater(
-        endpoints.auth.requestSignInCode(sessionBuilder, 'not-an-address'),
+        endpoints.signIn.requestSignInCode(sessionBuilder, 'not-an-address'),
         throwsA(
           predicate((final e) => _errorOf(e) == BasketError.invalidSignInCode),
         ),

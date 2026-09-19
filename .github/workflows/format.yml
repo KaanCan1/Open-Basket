@@ -20,6 +20,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Check formatting
+      - name: Check server formatting
         working-directory: open_basket_server
+        run: dart format --set-exit-if-changed .
+
+      - name: Check Flutter formatting
+        working-directory: open_basket_flutter
         run: dart format --set-exit-if-changed .

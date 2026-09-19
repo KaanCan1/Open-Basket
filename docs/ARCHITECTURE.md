@@ -166,3 +166,29 @@ added without a connection is held on the device and replayed when the stream re
 
 If we decide not to build it, the copy has to change in the same PR — a promise in an error
 message is still a promise. Scope it on Day 13-14 with the rest of the resilience work.
+
+
+## ADR-012: A built the Flutter skeleton, once
+
+On Day 5 the Flutter app was still the untouched Serverpod template while the backend had Days
+1-4 behind it. M2 — deploy plus real usage in both homes — is Day 10, and it is what buys the
+roughly 18 days of data the final report rests on. B starting from an empty app on Day 7 would not
+have got there.
+
+So A built the skeleton: packages, `l10n.yaml` and `app_en.arb`, the design tokens and theme,
+the Riverpod client provider, the `go_router` setup, and screens 01-03 wired to the real
+endpoints. That deliberately crosses the ownership line in `CLAUDE.md`, which is why it is written
+down: B picks up a system that runs and signs in, rather than a blank `main.dart`.
+
+Ownership reverts immediately. Everything after this is B's, and A does not touch
+`open_basket_flutter/` again without another entry here.
+
+Two things fell out of doing it:
+
+- **`AuthEndpoint` became `SignInEndpoint`.** Our endpoint was generating `client.auth`, which
+  shadowed the Serverpod auth module's own `client.auth` — the session manager, `isAuthenticated`,
+  sign-out. Ours is `client.signIn` now. Caught by the analyzer the first time the client provider
+  tried to call `client.auth.initialize()`; it would have been much more confusing later.
+- **CI now covers the Flutter app.** It only ever ran `dart analyze`, `dart format` and `dart test`
+  against `open_basket_server`, so the half of the codebase B owns was completely unchecked.
+  Analyze, format and `flutter test` now run against both.

@@ -9,7 +9,11 @@ import '../services/sign_in_service.dart';
 /// The bundled email identity provider is password-based — its only code flows
 /// are registration verification and password reset — so this flow is ours.
 /// The policy lives in [SignInService]; this is the wire.
-class AuthEndpoint extends Endpoint {
+/// Named `SignInEndpoint`, not `AuthEndpoint`, so the client reaches it at
+/// `client.signIn`. `client.auth` belongs to the Serverpod auth module — the
+/// session manager, `isAuthenticated`, sign-out — and an endpoint called
+/// `auth` silently shadows all of it.
+class SignInEndpoint extends Endpoint {
   /// Issues a code and emails it. Invalidates any code still outstanding for
   /// this address.
   ///

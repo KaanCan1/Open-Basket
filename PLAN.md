@@ -34,8 +34,8 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ### Day 1: Setup
 - [x] **A** `serverpod create open_basket`, git repo, `.gitignore` (including `passwords.yaml`)
 - [x] **A** Postgres (embedded, see ADR-003 — Docker not needed locally), first migration applied, server running
-- [ ] **B** Flutter packages: `flutter_riverpod`, `go_router`, `firebase_messaging`, `geolocator`, `intl`, `flutter_localizations`
-- [ ] **B** `l10n.yaml` + `app_en.arb`, `core/client_provider.dart`, `core/router.dart`, empty screen skeleton
+- [x] **A for B** Flutter packages: `flutter_riverpod`, `go_router`, `intl`, `flutter_localizations` (ADR-012). `firebase_messaging` and `geolocator` wait for Days 11-12 and 19-20 — both need platform config
+- [x] **A for B** `l10n.yaml` + `app_en.arb`, `core/theme.dart` with the design tokens, `core/client_provider.dart`, `core/router.dart` (ADR-012)
 - [x] **Both** Commit `CLAUDE.md` and `PLAN.md`; PRs from `feat/*` — **branch protection on `main` still to be enabled**
 
 ### Day 2: Models and CI
@@ -49,7 +49,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ### Days 3-4: Auth
 - [x] **A** Six-digit emailed sign-in code, no passwords (ADR-004): 10-min expiry, 3 attempts, a new code kills the old one, resend rate limited. The bundled provider does not do this, so the flow is ours
 - [x] **A** `authz.dart`: `requireMember(session, householdId)`, `requireShopper(session, basket)`
-- [ ] **B** `sign_in_screen.dart` + `code_entry_screen.dart` (screens 01-03), wrong-code and resend-cooldown states, persistent session, sign-out
+- [x] **A for B** `sign_in_screen.dart` + `code_entry_screen.dart` (screens 01-03), wrong-code and resend-cooldown states, persistent session, sign-out (ADR-012)
 - [ ] **B** After sign-in: route to "Create or join a household" if the user has none
 
 ### Days 5-6: Households and invites
