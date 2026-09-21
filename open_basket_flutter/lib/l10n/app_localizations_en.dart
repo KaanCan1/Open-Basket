@@ -107,4 +107,108 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get commonOfflineNote =>
       'Your items are saved on this phone and will sync the moment you\'re back.';
+
+  @override
+  String get householdChoiceHeadline => 'Who are you\nshopping with?';
+
+  @override
+  String get householdChoiceBlurb =>
+      'Start a household, or join one with the six characters someone already in it can read out.';
+
+  @override
+  String get householdChoiceCreate => 'Start a household';
+
+  @override
+  String get householdChoiceJoin => 'I have a code';
+
+  @override
+  String get createHouseholdTitle => 'Name your household';
+
+  @override
+  String get createHouseholdBlurb =>
+      'Everyone in it will see this name. You can change it later.';
+
+  @override
+  String get createHouseholdLabel => 'NAME';
+
+  @override
+  String get createHouseholdHint => 'Kaya household';
+
+  @override
+  String get createHouseholdAction => 'Create it';
+
+  @override
+  String get createHouseholdEmpty => 'Give it a name first.';
+
+  @override
+  String get joinHouseholdTitle => 'Enter the code';
+
+  @override
+  String get joinHouseholdBlurb =>
+      'Six characters from someone already in the household. Case does not matter.';
+
+  @override
+  String get joinHouseholdLabel => 'CODE';
+
+  @override
+  String get joinHouseholdHint => 'K7Q2M4';
+
+  @override
+  String get joinHouseholdAction => 'Join';
+
+  @override
+  String get joinHouseholdUnknown => 'No household with that code.';
+
+  @override
+  String get joinHouseholdAlreadyIn => 'You are already in a household.';
+
+  @override
+  String homeMembersOne(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people',
+      one: '1 person',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeCodeLabel => 'HOUSEHOLD CODE';
+
+  @override
+  String get homeCodeCopied => 'Code copied';
+
+  @override
+  String get homeCodeNote => 'Anyone with these six characters can join.';
+
+  @override
+  String get homeOpenBasket => 'Open a basket';
+
+  @override
+  String get homeBasketRunning => 'A basket is already open';
+
+  @override
+  String homeBasketRunningNote(String name) {
+    return '$name is shopping. Tap to add what you need.';
+  }
+
+  @override
+  String get homeNoBasket => 'No basket is open.';
+
+  @override
+  String get homeNoBasketNote =>
+      'Open one when you are heading out, and the house has until it closes to add things.';
+
+  @override
+  String get homeSignOut => 'Sign out';
+
+  @override
+  String get homeMembersTitle => 'IN THIS HOUSEHOLD';
+
+  @override
+  String get homeOwnerTag => 'OWNER';
+
+  @override
+  String get homeYouTag => 'YOU';
 }

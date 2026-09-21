@@ -103,4 +103,53 @@ void main() {
       expect(size!.height, greaterThanOrEqualTo(kMinTapTarget));
     });
   });
+
+  group('resolved control colours', () {
+    // The palette test above checks tokens. This checks what Material
+    // actually paints, which is a different thing: Signal is colorScheme
+    // .primary, and Material falls back to primary for the foreground of
+    // anything it has no theme for. Screen 04 shipped an outlined button
+    // reading lime on paper at about 1.6:1 -- every token in it was correct.
+    for (final brightness in Brightness.values) {
+      final theme = buildOpenBasketTheme(brightness);
+      final ground = theme.scaffoldBackgroundColor;
+      final name = brightness.name;
+
+      test('the outlined button is readable on $name paper', () {
+        final foreground = theme.outlinedButtonTheme.style!.foregroundColor!
+            .resolve({})!;
+        expect(_contrast(foreground, ground), greaterThanOrEqualTo(4.5));
+      });
+
+      test('the text button is readable on $name paper', () {
+        final foreground = theme.textButtonTheme.style!.foregroundColor!
+            .resolve({})!;
+        expect(_contrast(foreground, ground), greaterThanOrEqualTo(4.5));
+      });
+
+      test('the filled button is readable in $name', () {
+        final style = theme.filledButtonTheme.style!;
+        expect(
+          _contrast(
+            style.foregroundColor!.resolve({})!,
+            style.backgroundColor!.resolve({})!,
+          ),
+          greaterThanOrEqualTo(4.5),
+        );
+      });
+
+      test('Signal is never a foreground in $name', () {
+        // The one rule the palette has.
+        for (final style in [
+          theme.outlinedButtonTheme.style!,
+          theme.textButtonTheme.style!,
+        ]) {
+          expect(
+            style.foregroundColor!.resolve({}),
+            isNot(OpenBasketColors.signal),
+          );
+        }
+      });
+    }
+  });
 }

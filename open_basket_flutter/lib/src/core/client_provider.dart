@@ -35,6 +35,16 @@ final signOutProvider = Provider<Future<void> Function()>((final ref) {
 /// routing has to read the current answer synchronously, and a stream that has
 /// not emitted yet reads as "no answer", which left an unauthenticated user
 /// sitting on the home screen.
+/// The signed-in user's id, or null.
+///
+/// Wrapped here rather than read in a feature: `client.auth` comes from the
+/// auth package, and keeping that import in one file means a screen only ever
+/// talks to the app's own vocabulary. There is no `authInfo` getter on the
+/// session manager despite what its documentation says, so this reads the
+/// listenable's current value.
+UuidValue? currentUserId(Client client) =>
+    client.auth.authInfoListenable.value?.authUserId;
+
 final authListenableProvider = Provider<Listenable>(
   (final ref) => ref.watch(clientProvider).auth.authInfoListenable,
 );

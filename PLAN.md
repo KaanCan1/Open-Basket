@@ -50,13 +50,13 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **A** Six-digit emailed sign-in code, no passwords (ADR-004): 10-min expiry, 3 attempts, a new code kills the old one, resend rate limited. The bundled provider does not do this, so the flow is ours
 - [x] **A** `authz.dart`: `requireMember(session, householdId)`, `requireShopper(session, basket)`
 - [x] **A for B** `sign_in_screen.dart` + `code_entry_screen.dart` (screens 01-03), wrong-code and resend-cooldown states, persistent session, sign-out (ADR-012)
-- [ ] **B** After sign-in: route to "Create or join a household" if the user has none
+- [x] **A for B** After sign-in: route to "Create or join a household" if the user has none (ADR-020)
 
 ### Days 5-6: Households and invites
 - [x] **A** `household_endpoint.dart`: `create`, `getMine`, `rotateCode` (permanent 6-char code, owner-only, old code dies instantly — ADR-006), `joinWithCode` with a distinguishable stale-code error, `listMembers`, `leave`, `rename`
 - [x] **A** Household has a `currencyCode` setting, ISO 4217, default `TRY`, with a minor-unit count per currency (ADR-008)
 - [x] **A** Integration test: a non-member cannot read another household's data
-- [ ] **B** `create_household_screen`, `join_household_screen`, `members_screen`, `rotate_code_screen` (screens 04, 17, 18), share code via share sheet ("Join our household on Open Basket: 4KX9QP")
+- [x] **A for B** `create_household_screen`, `join_household_screen` and the member list on the home screen (screens 04, 05, 17) — ADR-020. The code is copied to the clipboard rather than shared through the share sheet; **rotate_code_screen (18) and the share sheet are still open**
 - ✅ **M1**
 
 ### Day 7: Stores + buffer
