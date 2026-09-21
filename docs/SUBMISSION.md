@@ -103,6 +103,7 @@ coding assistant, for implementation, review and documentation, and Claude Desig
 interface design. All architectural decisions, the product rules and the final code are
 the team's own and were reviewed by us.
 
+Live: https://open-basket.serverpod.space/
 Source: https://github.com/KaanCan1/Open-Basket
 
 ---
@@ -112,15 +113,34 @@ Source: https://github.com/KaanCan1/Open-Basket
 - [ ] **Demo video under 2:00.** The official rules say "less than two (2) minutes";
       the BuilderBase page says three. Rules section 11: where they disagree, the
       Official Rules prevail. Public on YouTube or Vimeo. No copyrighted music.
-- [ ] **A judge can actually sign in.** Access to a working build must be free and
-      unrestricted until 20 October 17:00 CEST. Sign-in is an emailed six-digit code, so
-      either production email delivery works, or the testing instructions carry a working
-      account and its code.
-- [ ] **Build and run instructions in the repository.** Required by the submission rules;
-      `README.md` does not have them yet.
+- [x] **A judge can actually sign in.** Deployed to Serverpod Cloud on 2026-09-22, which
+      manages `scloudAuthEmailKey`, so the six-digit code is delivered by real email.
+      Verified end to end against production.
+- [ ] Testing instructions written: the API URL, and the fact that any email address works
+      because there is no password and no approval step.
+- [x] **Build and run instructions in the repository.** In `README.md`, including how to
+      point a build at production.
 - [ ] GitHub repository description filled in (currently empty).
 - [ ] Project description above updated to match what actually shipped.
-- [ ] **Most Valuable Feedback submission** ($500 cash + $500 credits, one per entrant):
-      see `docs/SERVERPOD_FEEDBACK.md`.
+- [ ] **Most Valuable Feedback submission** ($500 cash + $500 credits, one per entrant),
+      through the feedback form on BuilderBase. Five findings so far, all hit in this
+      build and all reproducible:
+      1. `serverpod_test` 4.0.0 starts the embedded postmaster twice per test group and
+         the second attempt cannot attach, because `embedded_postgres_resolver.dart`
+         hardcodes `detach: false`. Integration tests are therefore impossible with
+         `database.dataPath`, and the failure is reported as the misleading "Another
+         process is using the local database" (ADR-003).
+      2. `serverpod cloud deploy` cannot handle a project path containing a space. It
+         prints the root as `Open%20Basket` and fails with "No files to upload", which
+         reads like a `.gitignore` problem (ADR-024).
+      3. A defaulted named endpoint parameter (`int quantity = 1`) becomes
+         `required int quantity` on the generated client — the default is lost at the
+         client boundary (ADR-019).
+      4. `.spy.yaml` cannot express a partial index, so a rule like "one open basket per
+         household" has to be hand-written into the migration and re-added after every
+         regeneration (ADR-013).
+      5. The startup schema check reports a hand-written index as **Missing** when the
+         live database is the side that has it. The wording points the wrong way and sends
+         you looking for a migration that did not fail (ADR-024).
 - [ ] A public post about the project, tagging Serverpod, during the event period
       (Best Hackathon Post, $500 in credits).

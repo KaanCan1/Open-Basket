@@ -16,6 +16,16 @@ Built with Serverpod (streaming, future calls, server-side settlement) and Flutt
 
 Status: in development. See `PLAN.md` for the build plan and `CLAUDE.md` for project rules.
 
+**Live:** the app is deployed on Serverpod Cloud.
+
+| | |
+|---|---|
+| API | https://open-basket.api.serverpod.space/ |
+| Web | https://open-basket.serverpod.space/ |
+
+Point a build at it with
+`flutter run --dart-define=SERVER_URL=https://open-basket.api.serverpod.space/`.
+
 ---
 
 ## Build and run
@@ -112,6 +122,22 @@ cd open_basket_flutter && flutter test
 
 `docs/ARCHITECTURE.md` (ADR-003) explains why the embedded database cannot serve the
 integration tests.
+
+### Deploying
+
+The server runs on Serverpod Cloud (ADR-024), which manages every password the auth flow
+needs — including the key that actually sends the sign-in email.
+
+```bash
+cd open_basket_server
+serverpod cloud deploy -p open-basket
+```
+
+> **Deploy from a path with no spaces in it.** This repository is usually checked out at
+> `.../Open Basket`, and the Serverpod Cloud CLI walks the workspace root, prints it as
+> `Open%20Basket` and then reports "No files to upload". It is not a `.gitignore`
+> problem and a symlink does not help, because the CLI resolves the physical path. Clone
+> to a space-free directory and deploy from there, or rename the checkout.
 
 ### After changing a model or an endpoint
 
