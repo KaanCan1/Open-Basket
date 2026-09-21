@@ -271,3 +271,55 @@ future call superseded by an extension, a call firing while the shopper is tappi
 and the startup sweep racing a future call that is already handling the same basket. Extending
 therefore does not need the old call to be cancelled to be correct; cancelling it is tidiness, and
 the startup sweep is the safety net for the case where scheduling failed altogether.
+
+---
+
+# Day 9
+
+## ADR-016: The stream subscribes before it reads the snapshot
+
+`watch` opens the `basket:<id>` subscription *first*, then reads the basket and its items
+and yields them as the first event. The other order looks tidier and is wrong: anything
+published while the snapshot query is in flight would be published to nobody and lost for
+good.
+
+The cost is that an event can arrive that the snapshot already contains — an `itemAdded`
+for a row that is already in the list. So **the client must apply events by item id, not
+by appending**. Applying an event twice is recoverable; missing one is not, and a live
+basket that is quietly short one item is worse than one that flickers.
+
+Everything a client needs to recover is in the stream itself. A reconnect yields a fresh
+snapshot as its first event, so there is no second "catch me up" call and no window where
+the client is connected but wrong.
+
+## ADR-017: The stream ends itself when the basket is over
+
+`settled` and `cancelled` are terminal, and `watch` completes after emitting them. A
+client that sees `onDone` should go back to the household screen rather than reconnect;
+without this it would hold a socket open on a basket nothing can ever happen to, and the
+reconnect-with-backoff logic would fight a server that is behaving correctly.
+
+`frozen` is deliberately **not** terminal. The shopper is still marking items and entering
+prices, and the rest of the household wants to watch that happen.
+
+## ADR-018: Publishing an event may fail; the action may not
+
+`BasketChannels.publish` logs and swallows. A member who misses an event has a briefly
+stale screen and the next reconnect fixes it. A shopper whose `freeze` threw because a
+message could not be posted is a shopper stuck at the till. The stream is a convenience
+over the database, never the record.
+
+**Delivery is local to one server process.** `MessageScope.auto` upgrades to Redis when
+Redis is enabled, and it is not. One instance is the plan for the Day 10 deploy, so this
+is correct today — and it is the first thing that has to change before a second instance
+exists, because two servers would each see only their own half of a household.
+
+## ADR-019: A defaulted endpoint parameter becomes required on the client
+
+`addItem` takes `int? quantity` rather than `int quantity = 1`, and treats null as one.
+This is not a preference: Serverpod's generator turns a defaulted named parameter into a
+**required** one on the generated client, so `int quantity = 1` here produces
+`required int quantity` there and every caller has to spell out the common case. Nullable
+is the only shape that survives the client boundary as optional.
+
+Worth reporting upstream — see the feedback list in `docs/SUBMISSION.md`.

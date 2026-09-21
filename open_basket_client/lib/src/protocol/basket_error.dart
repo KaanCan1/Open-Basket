@@ -38,6 +38,16 @@ enum BasketError implements _isc.SerializableModel {
 
   /// `durationMinutes` outside the range a shopping run can plausibly take.
   invalidDuration,
+
+  /// The item id is unknown, or belongs to a basket outside the caller's
+  /// household. One error for both, for the same reason as basketNotFound.
+  itemNotFound,
+
+  /// Only the member who asked for an item may change or remove it.
+  notYourItem,
+
+  /// An empty name, or a quantity outside what a shopping list can hold.
+  invalidItem,
   basketNotOpen,
   basketNotFrozen,
   basketAlreadySettled,
@@ -66,6 +76,12 @@ enum BasketError implements _isc.SerializableModel {
         return BasketError.basketNotFound;
       case 'invalidDuration':
         return BasketError.invalidDuration;
+      case 'itemNotFound':
+        return BasketError.itemNotFound;
+      case 'notYourItem':
+        return BasketError.notYourItem;
+      case 'invalidItem':
+        return BasketError.invalidItem;
       case 'basketNotOpen':
         return BasketError.basketNotOpen;
       case 'basketNotFrozen':

@@ -773,7 +773,7 @@ class _BasketEndpoint {
     _ist.TestSessionBuilder sessionBuilder,
     int basketId,
     String name, {
-    required int quantity,
+    int? quantity,
     String? note,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
