@@ -109,5 +109,93 @@
   "homeOwnerTag": "OWNER",
   "@homeOwnerTag": {},
   "homeYouTag": "YOU",
-  "@homeYouTag": {}
+  "@homeYouTag": {},
+  "homeBasketOpenTitle": "A basket is open",
+  "@homeBasketOpenTitle": {},
+  "homeBasketOpenNote": "{name} is shopping. Add what you need.",
+  "@homeBasketOpenNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBasketFrozenTitle": "At checkout",
+  "@homeBasketFrozenTitle": {},
+  "homeBasketFrozenNote": "The list is final. {name} is paying.",
+  "@homeBasketFrozenNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBasketSee": "Open it",
+  "@homeBasketSee": {},
+  "openSheetTitle": "How long?",
+  "@openSheetTitle": {},
+  "openSheetBlurb": "The basket closes itself when the time runs out. Everyone can add until then.",
+  "@openSheetBlurb": {},
+  "openSheetMinutes": "{count} min",
+  "@openSheetMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openSheetCustom": "Custom",
+  "@openSheetCustom": {},
+  "openSheetStart": "Open the basket",
+  "@openSheetStart": {},
+  "openSheetAlreadyOpen": "Someone in your household already has a basket open.",
+  "@openSheetAlreadyOpen": {},
+  "liveBasketItems": "{count, plural, =0{No items yet} =1{1 item} other{{count} items}}",
+  "@liveBasketItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketClosesByItself": "CLOSES BY ITSELF",
+  "@liveBasketClosesByItself": {},
+  "liveBasketAddHint": "Add an item",
+  "@liveBasketAddHint": {},
+  "liveBasketNoteHint": "Note (optional)",
+  "@liveBasketNoteHint": {},
+  "liveBasketAdd": "Add",
+  "@liveBasketAdd": {},
+  "liveBasketEmpty": "Nothing in the basket yet.",
+  "@liveBasketEmpty": {},
+  "liveBasketEmptyNote": "Type what you need. Everyone else sees it as you type it.",
+  "@liveBasketEmptyNote": {},
+  "liveBasketExtend": "Extend once",
+  "@liveBasketExtend": {},
+  "liveBasketExtendUsed": "Already extended",
+  "@liveBasketExtendUsed": {},
+  "liveBasketCheckout": "At checkout",
+  "@liveBasketCheckout": {},
+  "liveBasketCancel": "Cancel the run",
+  "@liveBasketCancel": {},
+  "liveBasketCancelConfirm": "Cancel this run?",
+  "@liveBasketCancelConfirm": {},
+  "liveBasketCancelConfirmNote": "Nothing gets priced and nobody owes anybody. The run shows up as cancelled.",
+  "@liveBasketCancelConfirmNote": {},
+  "liveBasketCancelKeep": "Keep shopping",
+  "@liveBasketCancelKeep": {},
+  "liveBasketCancelYes": "Cancel it",
+  "@liveBasketCancelYes": {},
+  "liveBasketReconnecting": "Reconnecting…",
+  "@liveBasketReconnecting": {},
+  "liveBasketClosedTitle": "This basket closed",
+  "@liveBasketClosedTitle": {},
+  "liveBasketClosedNote": "It closed while you were away.",
+  "@liveBasketClosedNote": {},
+  "liveBasketBack": "Back",
+  "@liveBasketBack": {},
+  "liveBasketRemove": "Remove",
+  "@liveBasketRemove": {},
+  "countdownListFinal": "The list is final.",
+  "@countdownListFinal": {}
 }

@@ -459,6 +459,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'YOU'**
   String get homeYouTag;
+
+  /// No description provided for @homeBasketOpenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A basket is open'**
+  String get homeBasketOpenTitle;
+
+  /// No description provided for @homeBasketOpenNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is shopping. Add what you need.'**
+  String homeBasketOpenNote(String name);
+
+  /// No description provided for @homeBasketFrozenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'At checkout'**
+  String get homeBasketFrozenTitle;
+
+  /// No description provided for @homeBasketFrozenNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The list is final. {name} is paying.'**
+  String homeBasketFrozenNote(String name);
+
+  /// No description provided for @homeBasketSee.
+  ///
+  /// In en, this message translates to:
+  /// **'Open it'**
+  String get homeBasketSee;
+
+  /// No description provided for @openSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How long?'**
+  String get openSheetTitle;
+
+  /// No description provided for @openSheetBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'The basket closes itself when the time runs out. Everyone can add until then.'**
+  String get openSheetBlurb;
+
+  /// No description provided for @openSheetMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String openSheetMinutes(int count);
+
+  /// No description provided for @openSheetCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get openSheetCustom;
+
+  /// No description provided for @openSheetStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the basket'**
+  String get openSheetStart;
+
+  /// No description provided for @openSheetAlreadyOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone in your household already has a basket open.'**
+  String get openSheetAlreadyOpen;
+
+  /// No description provided for @liveBasketItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No items yet} =1{1 item} other{{count} items}}'**
+  String liveBasketItems(int count);
+
+  /// No description provided for @liveBasketClosesByItself.
+  ///
+  /// In en, this message translates to:
+  /// **'CLOSES BY ITSELF'**
+  String get liveBasketClosesByItself;
+
+  /// No description provided for @liveBasketAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an item'**
+  String get liveBasketAddHint;
+
+  /// No description provided for @liveBasketNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get liveBasketNoteHint;
+
+  /// No description provided for @liveBasketAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get liveBasketAdd;
+
+  /// No description provided for @liveBasketEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in the basket yet.'**
+  String get liveBasketEmpty;
+
+  /// No description provided for @liveBasketEmptyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Type what you need. Everyone else sees it as you type it.'**
+  String get liveBasketEmptyNote;
+
+  /// No description provided for @liveBasketExtend.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend once'**
+  String get liveBasketExtend;
+
+  /// No description provided for @liveBasketExtendUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Already extended'**
+  String get liveBasketExtendUsed;
+
+  /// No description provided for @liveBasketCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'At checkout'**
+  String get liveBasketCheckout;
+
+  /// No description provided for @liveBasketCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel the run'**
+  String get liveBasketCancel;
+
+  /// No description provided for @liveBasketCancelConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this run?'**
+  String get liveBasketCancelConfirm;
+
+  /// No description provided for @liveBasketCancelConfirmNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing gets priced and nobody owes anybody. The run shows up as cancelled.'**
+  String get liveBasketCancelConfirmNote;
+
+  /// No description provided for @liveBasketCancelKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep shopping'**
+  String get liveBasketCancelKeep;
+
+  /// No description provided for @liveBasketCancelYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel it'**
+  String get liveBasketCancelYes;
+
+  /// No description provided for @liveBasketReconnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting…'**
+  String get liveBasketReconnecting;
+
+  /// No description provided for @liveBasketClosedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This basket closed'**
+  String get liveBasketClosedTitle;
+
+  /// No description provided for @liveBasketClosedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'It closed while you were away.'**
+  String get liveBasketClosedNote;
+
+  /// No description provided for @liveBasketBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get liveBasketBack;
+
+  /// No description provided for @liveBasketRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get liveBasketRemove;
+
+  /// No description provided for @countdownListFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'The list is final.'**
+  String get countdownListFinal;
 }
 
 class _AppLocalizationsDelegate
