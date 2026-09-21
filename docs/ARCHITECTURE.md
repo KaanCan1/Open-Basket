@@ -399,3 +399,55 @@ more badly than half a second of waiting does.
 The keyboard is deliberately kept up after a successful add: a shopping list is typed in
 bursts, and making someone tap back into the field between "milk" and "eggs" is the
 difference between adding three things and adding one.
+
+---
+
+# Day 10, deploy
+
+## ADR-024: Serverpod Cloud, because it is what makes a judge able to sign in
+
+The server runs on Serverpod Cloud, project `open-basket`, starter plan:
+
+- api: `https://open-basket.api.serverpod.space/`
+- web: `https://open-basket.serverpod.space/`
+- insights: `https://open-basket.insights.serverpod.space/`
+
+The deciding reason was not convenience. Sign-in is a six-digit code by email, and in
+development the code only reaches the server console — so on a self-hosted box nobody
+without shell access could get past the first screen, including a hackathon judge. The
+rules require a working project judges can use free of charge until the judging period
+ends, and Serverpod Cloud manages `scloudAuthEmailKey` itself, which is exactly the
+password `SignInEmailSender` reaches for outside development. Deploying there turned the
+biggest submission risk into a solved problem without writing an email integration.
+
+Everything else auth needs is platform-managed too — `database`, `serviceSecret`,
+`emailSecretHashPepper`, `jwtHmacSha512PrivateKey`, `jwtRefreshTokenHashPepper` — so no
+secret is set by hand and none of them live anywhere near the repository.
+
+The Flutter app points at an environment rather than a constant:
+
+```bash
+flutter run --dart-define=SERVER_URL=https://open-basket.api.serverpod.space/
+```
+
+`getServerUrl()` reads `SERVER_URL` first and falls back to localhost, so a debug build
+against the laptop and a build for a judge differ only by that flag.
+
+**The CLI cannot deploy from a path containing a space.** This repository lives at
+`/Users/kaancankurt/dev/Open Basket`, and `serverpod cloud deploy` walks the workspace
+root, prints it as `Open%20Basket` and finds nothing to upload — it fails with "No files
+to upload", which reads like a `.gitignore` problem and is not one. A symlink does not
+help; the CLI resolves the physical path. Until the directory is renamed, deploy from a
+clone at a space-free path. Worth reporting upstream, and on the feedback list in
+`docs/SUBMISSION.md`.
+
+**A warning on every boot says the index is missing. It is not.** Startup logs:
+
+> WARNING: The database does not match the target database: Table "basket" ... Missing
+> Index "basket_one_open_per_household_idx".
+
+The live database was queried directly and the index is there, partial predicate and all.
+The comparison is against the migration's `definition.json`, which cannot describe a
+partial index and therefore does not list it — so the mismatch is the hand-written index
+of ADR-013 being invisible to the migration system, exactly as predicted. The wording
+points the wrong way. `basket_lifecycle_test` is what actually guards this, and it passes.

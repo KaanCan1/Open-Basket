@@ -91,7 +91,7 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — Day 10, 2026-09-22
+## Status — Day 10, 2026-09-22 — **deployed**
 
 Backend, Days 1-6, all merged:
 
@@ -157,16 +157,21 @@ The app, Day 10 (A is writing the screens; B has still not committed — ADR-020
 - Items are not applied optimistically: a row appears when the stream echoes it back
   (ADR-023).
 
-Open:
+Deployed (ADR-024):
 
-- **A judge cannot sign in yet.** The six-digit code is emailed, and the development sender
-  only writes to the console. Either production email works by the deploy, or the testing
-  instructions carry a working account. This is the biggest submission risk.
+- Serverpod Cloud, project `open-basket`, starter plan. API at
+  `https://open-basket.api.serverpod.space/`, web at `https://open-basket.serverpod.space/`.
+- **Judges can sign in.** Serverpod Cloud manages `scloudAuthEmailKey`, so the six-digit
+  code goes out as a real email — the single biggest submission risk, now closed.
+- Every auth password is platform-managed; none is set by hand or stored anywhere.
+- The CLI cannot deploy from a path with a space in it, so deploys run from a clone at a
+  space-free path until the checkout is renamed.
+
+Open:
 - Branch protection on `main` still not enabled.
 - Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
   the ETA suggestion depends on it.
 - **Everything B owns past the skeleton is unstarted**, and B has not worked on the repo yet.
-- **Nothing is deployed.** Everything above runs against a server on A's laptop.
 - Marking items, prices and settlement are not built, so the run ends at "At checkout".
 - Push notifications are not built, so "everyone is told" is currently only true for
   whoever has the app open.
