@@ -19,6 +19,10 @@ import 'package:open_basket_server/src/generated/basket_event.dart'
 import 'package:open_basket_server/src/generated/basket_item.dart' as _ig4uci2h;
 import 'package:open_basket_server/src/generated/device_token.dart'
     as _ioknvjgu;
+import 'package:open_basket_server/src/generated/future_calls.dart'
+    as _i875cjzu;
+import 'package:open_basket_server/src/generated/future_calls_generated_models/close_basket_future_call_close_model.dart'
+    as _irvuqfog;
 import 'package:open_basket_server/src/generated/greetings/greeting.dart'
     as _igdkecg6;
 import 'package:open_basket_server/src/generated/household.dart' as _ih69xi36;
@@ -160,6 +164,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _EmailIdpEndpoint emailIdp;
 
   late final _JwtRefreshEndpoint jwtRefresh;
@@ -241,6 +247,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final closeBasket = _CloseBasketFutureCall();
 }
 
 class _EmailIdpEndpoint {
@@ -1819,5 +1829,24 @@ class _GreetingEndpoint {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _CloseBasketFutureCall {
+  Future<void> close(
+    _ist.TestSessionBuilder sessionBuilder,
+    int basketId,
+  ) async {
+    var object = _irvuqfog.CloseBasketFutureCallCloseModel(basketId: basketId);
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _i875cjzu.CloseBasketCloseFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

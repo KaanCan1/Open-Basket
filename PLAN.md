@@ -69,15 +69,15 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ## Week 2 (Days 8-14): Live basket and auto-close
 
 ### Day 8: Basket lifecycle
-- [ ] **A** `basket_endpoint.dart`
+- [x] **A** `basket_endpoint.dart`
   - `open(householdId, storeId?, durationMinutes)` → error if the household already has an open basket; `closesAt = now + duration`; schedule future calls
   - `extend(basketId)` → shopper only, exactly one +5 min extension per basket (ADR-009)
   - `freeze(basketId)` → "At checkout"
   - `cancel(basketId)`
   - `getActive(householdId)`, `getServerTime()`
-- [ ] **A** Partial unique index `basket ("householdId") WHERE status = 'open'`, added by hand to the migration — `.spy.yaml` cannot express it and the transaction alone does not stop a race
-- [ ] **A** `close_basket_future_call.dart` + registration in `server.dart` + **startup sweep**
-- [ ] **A** `auto_close_test.dart`: a short basket becomes `frozen` on time; an extended basket does not close early
+- [x] **A** Partial unique index `basket ("householdId") WHERE status = 'open'`, added by hand to the migration — `.spy.yaml` cannot express it and the transaction alone does not stop a race
+- [x] **A** `close_basket_future_call.dart` + registration in `server.dart` + **startup sweep**
+- [x] **A** `auto_close_test.dart`: a short basket becomes `frozen` on time; an extended basket does not close early
 
 ### Day 9: Streaming
 - [ ] **A** `basket_stream_endpoint.dart`: `Stream<BasketEvent> watch(basketId)`
@@ -105,7 +105,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **B** `fcm_service.dart`: permission prompt, token upload, tap → deep link to the live basket
 
 ### Days 13-14: Resilience
-- [ ] **A** Race between two simultaneous `open` calls: transaction guarantees a single basket
+- [x] **A** Race between two simultaneous `open` calls: the partial unique index guarantees a single basket (done early on Day 8, with the index — ADR-013)
 - [ ] **A** `basket_stream_test.dart`: two clients, one adds, the other sees it
 - [ ] **B** Resync when returning from background, airplane mode test
 - [ ] **B** Items added offline are queued on the device and replayed on reconnect (ADR-011) — or change the error copy in the same PR

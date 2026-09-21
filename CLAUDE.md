@@ -196,6 +196,10 @@ cd open_basket_server
 serverpod generate
 serverpod create-migration
 dart bin/main.dart --apply-migrations
+
+# Integration tests need a separate PostgreSQL 16; the embedded one cannot
+# serve them (ADR-003). Start it once per machine boot, no Docker needed:
+./scripts/local_test_db.sh start
 dart test
 
 # flutter
@@ -204,6 +208,11 @@ flutter gen-l10n
 flutter run
 flutter test
 ```
+
+> **After `serverpod create-migration`, re-add the partial unique index by hand** to the new
+> migration's `definition.sql` *and* `migration.sql`. Rule 4 has no other enforcement and the
+> generator cannot express it (ADR-013). `basket_lifecycle_test` fails with instructions if you
+> forget.
 
 ## Basket state machine
 

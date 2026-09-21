@@ -91,12 +91,12 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — end of Day 6, 2026-09-19
+## Status — end of Day 8, 2026-09-21
 
 Backend, Days 1-6, all merged:
 
-- Serverpod 4 workspace; 14 models; migrations applied. `main` holds 59 server tests and 8 Flutter
-  tests, all green in CI.
+- Serverpod 4 workspace; 14 models; migrations applied. `main` holds 85 server tests and 8 Flutter
+  tests, all green.
 - **Sign-in** (ADR-004): six digits by email, no passwords. The bundled provider is password-only,
   so the flow is ours — `SignInService` for the policy, `SignInCodePolicy` for the hashing and
   normalisation, `SignInEmailSender` for delivery (console in development).
@@ -115,22 +115,34 @@ Flutter, the skeleton A built for B (ADR-012):
 
 Design: finished. 30 screens, light and dark, every contrast ratio measured and verified.
 
+Basket lifecycle, Day 8:
+
+- `BasketEndpoint`: `open`, `extend`, `freeze`, `cancel`, `getActive`, `getServerTime`. Every one
+  checks authorization; extend, freeze and cancel are shopper-only. An unknown basket id and
+  another household's basket id give the same error, so nothing can be enumerated.
+- **Rule 4 is enforced by a partial unique index** written by hand into the migration (ADR-013),
+  not by the transaction check alone. A real two-caller race is tested, and so is the index itself
+  — including the constraint name `open` matches on to turn a violation back into a friendly error.
+- **`CloseBasketFutureCall` closes a basket on the server**, whether or not any phone is awake.
+  Idempotent (rule 2), plus a startup sweep in `server.dart` for calls lost to a restart.
+- `ServerClock` over `package:clock` (ADR-014), so "a five minute basket closes on time" is a test
+  that runs in milliseconds rather than five minutes.
+
 Open:
 
 - Branch protection on `main` still not enabled.
 - Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
   the ETA suggestion depends on it.
 - **Everything B owns past the skeleton is unstarted**, and B has not worked on the repo yet.
-- Integration tests need Docker, which does not run on A's machine, so CI is what proves them.
+- No client touches the basket endpoints yet; the whole lifecycle is server-side and unused.
 - The Claude simulator panel only offers iOS 26.5 devices; anything booted on iOS 27 is invisible
   to it. The app runs on the iPhone 17 it can see.
 
 ## Next
 
-**Days 8-10 are the critical path and the part that justifies Serverpod.** Everything built so far
-is ordinary CRUD that any backend could do; the future call that closes a basket on the server and
-the stream that puts an item on every phone at once are what the pitch is actually about, and
-neither exists yet.
+**Days 9-10 are the critical path.** Day 8 delivered the first half of what justifies Serverpod —
+a basket that closes itself on the server. The second half, the stream that puts an item on every
+phone at once, does not exist yet, and nothing in the app calls any of it.
 
 `CLAUDE.md` calls Days 8-10 pair work for a reason: `basket_stream_endpoint` and
 `live_basket_controller` share event types, snapshot ordering and reconnect behaviour.

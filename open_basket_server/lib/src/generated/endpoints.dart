@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:open_basket_server/src/generated/future_calls.dart'
+    as _i875cjzu;
 import 'package:open_basket_server/src/generated/item_status.dart' as _i8v2xtko;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -28,6 +30,7 @@ import '../endpoints/sign_in_endpoint.dart' as _ihicvi3m;
 import '../endpoints/stats_endpoint.dart' as _ii1l42ti;
 import '../endpoints/store_endpoint.dart' as _iaxecmt0;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
+export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -1072,5 +1075,10 @@ class Endpoints extends _is.EndpointDispatch {
       ..initializeEndpoints(server);
     modules['serverpod_auth_idp'] = _iais.Endpoints()
       ..initializeEndpoints(server);
+  }
+
+  @override
+  _is.FutureCallDispatch? get futureCalls {
+    return _i875cjzu.FutureCalls();
   }
 }

@@ -30,6 +30,14 @@ enum BasketError implements _isc.SerializableModel {
 
   /// The six-character household code is wrong, or was rotated away.
   unknownHouseholdCode,
+
+  /// The basket id is unknown, or belongs to a household that is not the
+  /// caller's. Deliberately the same error for both: an id that answers
+  /// "not found" for one household and "not yours" for another is an oracle.
+  basketNotFound,
+
+  /// `durationMinutes` outside the range a shopping run can plausibly take.
+  invalidDuration,
   basketNotOpen,
   basketNotFrozen,
   basketAlreadySettled,
@@ -54,6 +62,10 @@ enum BasketError implements _isc.SerializableModel {
         return BasketError.alreadyInAHousehold;
       case 'unknownHouseholdCode':
         return BasketError.unknownHouseholdCode;
+      case 'basketNotFound':
+        return BasketError.basketNotFound;
+      case 'invalidDuration':
+        return BasketError.invalidDuration;
       case 'basketNotOpen':
         return BasketError.basketNotOpen;
       case 'basketNotFrozen':

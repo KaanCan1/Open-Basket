@@ -31,6 +31,8 @@ import 'basket_event_type.dart' as _i1f6eto5;
 import 'basket_item.dart' as _iqfe96ip;
 import 'basket_status.dart' as _iumwz8so;
 import 'device_token.dart' as _ilggw95u;
+import 'future_calls_generated_models/close_basket_future_call_close_model.dart'
+    as _itt3vjix;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'household.dart' as _ijonbu5t;
 import 'household_member.dart' as _iv10erpj;
@@ -833,6 +835,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ilggw95u.DeviceToken) {
       return _ilggw95u.DeviceToken.fromJson(data) as T;
     }
+    if (t == _itt3vjix.CloseBasketFutureCallCloseModel) {
+      return _itt3vjix.CloseBasketFutureCallCloseModel.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
@@ -885,6 +890,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_ilggw95u.DeviceToken?>()) {
       return (data != null ? _ilggw95u.DeviceToken.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_itt3vjix.CloseBasketFutureCallCloseModel?>()) {
+      return (data != null
+              ? _itt3vjix.CloseBasketFutureCallCloseModel.fromJson(data)
+              : null)
+          as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -976,6 +987,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       _iqfe96ip.BasketItem => 'BasketItem',
       _iumwz8so.BasketStatus => 'BasketStatus',
       _ilggw95u.DeviceToken => 'DeviceToken',
+      _itt3vjix.CloseBasketFutureCallCloseModel =>
+        'CloseBasketFutureCallCloseModel',
       _izw8z7ou.Greeting => 'Greeting',
       _ijonbu5t.Household => 'Household',
       _iv10erpj.HouseholdMember => 'HouseholdMember',
@@ -1015,6 +1028,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'BasketStatus';
       case _ilggw95u.DeviceToken():
         return 'DeviceToken';
+      case _itt3vjix.CloseBasketFutureCallCloseModel():
+        return 'CloseBasketFutureCallCloseModel';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _ijonbu5t.Household():
@@ -1082,6 +1097,11 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'DeviceToken') {
       return deserialize<_ilggw95u.DeviceToken>(data['data']);
+    }
+    if (dataClassName == 'CloseBasketFutureCallCloseModel') {
+      return deserialize<_itt3vjix.CloseBasketFutureCallCloseModel>(
+        data['data'],
+      );
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
