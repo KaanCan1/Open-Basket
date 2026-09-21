@@ -4,6 +4,7 @@ import '../generated/future_calls.dart';
 import '../generated/protocol.dart';
 import '../util/clock.dart';
 import 'analytics_service.dart';
+import 'basket_channels.dart';
 
 /// The basket lifecycle, in one place.
 ///
@@ -115,6 +116,15 @@ abstract final class BasketService {
       ),
     );
 
+    // Anyone watching sees the basket lock itself, with no polling and no
+    // push notification involved. This is posted from the future call's own
+    // session, which is the point: nothing on anyone's phone made it happen.
+    await BasketChannels.publish(
+      session,
+      basketId,
+      BasketEventType.basketFrozen,
+      basket: closed,
+    );
     await AnalyticsService.track(
       session,
       AnalyticsType.basketAutoClosed,

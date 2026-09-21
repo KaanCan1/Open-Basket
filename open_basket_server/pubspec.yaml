@@ -20,6 +20,8 @@ dependencies:
   serverpod_cloud_storage: 4.0.0
 
 dev_dependencies:
+  # StreamQueue, for pulling events off a live basket one at a time in tests.
+  async: ^2.11.0
   lints: '>=3.0.0 <7.0.0'
   serverpod_test: 4.0.0
   test: ^1.25.5

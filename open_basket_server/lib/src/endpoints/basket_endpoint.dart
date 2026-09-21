@@ -3,6 +3,7 @@ import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 import '../services/analytics_service.dart';
 import '../services/authz.dart';
+import '../services/basket_channels.dart';
 import '../services/basket_service.dart';
 import '../util/clock.dart';
 
@@ -127,6 +128,12 @@ class BasketEndpoint extends Endpoint {
     );
 
     await BasketService.scheduleClose(session, extended);
+    await BasketChannels.publish(
+      session,
+      extended.id!,
+      BasketEventType.timerExtended,
+      basket: extended,
+    );
     await AnalyticsService.track(
       session,
       AnalyticsType.basketExtended,
@@ -153,6 +160,12 @@ class BasketEndpoint extends Endpoint {
     );
 
     await BasketService.cancelScheduledClose(session, basketId);
+    await BasketChannels.publish(
+      session,
+      basketId,
+      BasketEventType.basketFrozen,
+      basket: frozen,
+    );
     await AnalyticsService.track(
       session,
       AnalyticsType.basketFrozen,
@@ -177,6 +190,12 @@ class BasketEndpoint extends Endpoint {
     );
 
     await BasketService.cancelScheduledClose(session, basketId);
+    await BasketChannels.publish(
+      session,
+      basketId,
+      BasketEventType.basketCancelled,
+      basket: cancelled,
+    );
     await AnalyticsService.track(
       session,
       AnalyticsType.basketCancelled,
@@ -196,14 +215,50 @@ class BasketEndpoint extends Endpoint {
   }
 
   /// Any member, while the basket is `open`.
+  ///
+  /// `quantity` is nullable rather than defaulted because Serverpod turns a
+  /// defaulted named parameter into a *required* one on the generated client —
+  /// `int quantity = 1` here becomes `required int quantity` there, and every
+  /// caller would have to spell out the common case. Null means one.
   Future<BasketItem> addItem(
     Session session,
     int basketId,
     String name, {
-    int quantity = 1,
+    int? quantity,
     String? note,
   }) async {
-    throw UnimplementedError('Day 9');
+    final basket = await _requireVisible(session, basketId);
+    final member = await Authz.requireMemberOf(session, basket.householdId);
+    _requireOpenBasket(basket);
+
+    final item = await BasketItem.db.insertRow(
+      session,
+      BasketItem(
+        basketId: basketId,
+        requesterMemberId: member.id!,
+        name: _requireItemName(name),
+        quantity: _requireQuantity(quantity ?? 1),
+        note: _cleanNote(note),
+        status: ItemStatus.requested,
+        addedAt: ServerClock.now(),
+      ),
+    );
+
+    await BasketChannels.publish(
+      session,
+      basketId,
+      BasketEventType.itemAdded,
+      item: item,
+    );
+    await AnalyticsService.track(
+      session,
+      AnalyticsType.itemAdded,
+      householdId: basket.householdId,
+      basketId: basketId,
+      memberId: member.id,
+      payload: {'quantity': item.quantity, 'hasNote': item.note != null},
+    );
+    return item;
   }
 
   /// Only the member who asked for the item, and only while `open`.
@@ -214,12 +269,43 @@ class BasketEndpoint extends Endpoint {
     int? quantity,
     String? note,
   }) async {
-    throw UnimplementedError('Day 9');
+    final (item, basket) = await _requireOwnItem(session, itemId);
+
+    final updated = await BasketItem.db.updateRow(
+      session,
+      item.copyWith(
+        name: name == null ? item.name : _requireItemName(name),
+        quantity: quantity == null ? item.quantity : _requireQuantity(quantity),
+        // An explicit empty string clears the note; leaving the argument out
+        // keeps it. copyWith cannot express "set to null", so this is written
+        // out rather than folded into the call above.
+        note: note == null ? item.note : _cleanNote(note),
+      ),
+    );
+
+    await BasketChannels.publish(
+      session,
+      basket.id!,
+      BasketEventType.itemUpdated,
+      item: updated,
+    );
+    return updated;
   }
 
   /// Only the member who asked for it, and only while `open`.
   Future<void> removeItem(Session session, int itemId) async {
-    throw UnimplementedError('Day 9');
+    final (item, basket) = await _requireOwnItem(session, itemId);
+
+    await BasketItem.db.deleteRow(session, item);
+    // The whole row goes out, not just the id: a client that missed the
+    // itemAdded has something to reconcile against, and the removed row is
+    // what the "undo" copy in the design needs.
+    await BasketChannels.publish(
+      session,
+      basket.id!,
+      BasketEventType.itemRemoved,
+      item: item,
+    );
   }
 
   /// Ticks an item off. Shopper only, allowed in **both** `open` and `frozen`
@@ -276,13 +362,83 @@ class BasketEndpoint extends Endpoint {
   }) async {
     final basket = await _requireVisible(session, basketId);
     if (shopperOnly) await Authz.requireShopper(session, basket);
+    _requireOpenBasket(basket);
+    return basket;
+  }
+
+  /// An item the caller asked for, in a basket that is still open, together
+  /// with that basket. Update and remove both want exactly this.
+  ///
+  /// Rule 3 in its narrowest form: being in the household lets you add items,
+  /// it does not let you edit someone else's. The shopper's own way of
+  /// touching another member's item is `markItem`, which is a different
+  /// verb with a different check.
+  Future<(BasketItem, Basket)> _requireOwnItem(
+    Session session,
+    int itemId,
+  ) async {
+    final member = await Authz.requireMember(session);
+    final item = await BasketItem.db.findById(session, itemId);
+    final basket = item == null
+        ? null
+        : await Basket.db.findById(session, item.basketId);
+
+    // An item in someone else's household must not be distinguishable from
+    // an item that never existed.
+    if (item == null ||
+        basket == null ||
+        basket.householdId != member.householdId) {
+      throw OpenBasketException(
+        error: BasketError.itemNotFound,
+        message: 'That item is not on one of your baskets.',
+      );
+    }
+    if (item.requesterMemberId != member.id) {
+      throw OpenBasketException(
+        error: BasketError.notYourItem,
+        message: 'Only the person who asked for it can change it.',
+      );
+    }
+    _requireOpenBasket(basket);
+    return (item, basket);
+  }
+
+  void _requireOpenBasket(Basket basket) {
     if (basket.status != BasketStatus.open) {
       throw OpenBasketException(
         error: BasketError.basketNotOpen,
-        message: 'This basket has already closed.',
+        message: 'This basket has closed, so the list is final.',
       );
     }
-    return basket;
+  }
+
+  String _requireItemName(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty || trimmed.length > 120) {
+      throw OpenBasketException(
+        error: BasketError.invalidItem,
+        message: 'Give the item a name.',
+      );
+    }
+    return trimmed;
+  }
+
+  int _requireQuantity(int quantity) {
+    if (quantity < 1 || quantity > 99) {
+      throw OpenBasketException(
+        error: BasketError.invalidItem,
+        message: 'Pick a quantity between 1 and 99.',
+      );
+    }
+    return quantity;
+  }
+
+  /// Empty and whitespace-only notes become null, so the client never has to
+  /// decide whether to render an empty second line.
+  String? _cleanNote(String? note) {
+    final trimmed = note?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+    return trimmed.length > 280 ? trimmed.substring(0, 280) : trimmed;
   }
 
   Duration _requireDuration(int minutes) {

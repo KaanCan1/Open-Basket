@@ -80,11 +80,11 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **A** `auto_close_test.dart`: a short basket becomes `frozen` on time; an extended basket does not close early
 
 ### Day 9: Streaming
-- [ ] **A** `basket_stream_endpoint.dart`: `Stream<BasketEvent> watch(basketId)`
+- [x] **A** `basket_stream_endpoint.dart`: `Stream<BasketEvent> watch(basketId)`
   - On connect, send a full `snapshot` first, then forward events
   - Events are published to the `basket:<id>` channel via `basket_channels.dart`
   - Event types: `snapshot`, `itemAdded`, `itemUpdated`, `itemRemoved`, `timerExtended`, `basketFrozen`, `basketSettled`, `basketCancelled`
-- [ ] **A** `addItem`, `updateItem` (only the requester, only while `open`), `removeItem`
+- [x] **A** `addItem`, `updateItem` (only the requester, only while `open`), `removeItem`
 - [ ] **B** `live_basket_controller.dart`: subscribe, apply events to state, reconnect with exponential backoff and resync from snapshot
 
 ### Day 10: Live screen + deploy
@@ -106,7 +106,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 
 ### Days 13-14: Resilience
 - [x] **A** Race between two simultaneous `open` calls: the partial unique index guarantees a single basket (done early on Day 8, with the index — ADR-013)
-- [ ] **A** `basket_stream_test.dart`: two clients, one adds, the other sees it
+- [x] **A** `basket_stream_test.dart`: two clients, one adds, the other sees it (done early on Day 9, with the endpoint)
 - [ ] **B** Resync when returning from background, airplane mode test
 - [ ] **B** Items added offline are queued on the device and replayed on reconnect (ADR-011) — or change the error copy in the same PR
 - [ ] **B** Reconnecting state on the live basket, and the "this basket closed while you were away" arrival state

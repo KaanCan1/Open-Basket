@@ -18,6 +18,13 @@ values:
   - basketNotFound
   ### `durationMinutes` outside the range a shopping run can plausibly take.
   - invalidDuration
+  ### The item id is unknown, or belongs to a basket outside the caller's
+  ### household. One error for both, for the same reason as basketNotFound.
+  - itemNotFound
+  ### Only the member who asked for an item may change or remove it.
+  - notYourItem
+  ### An empty name, or a quantity outside what a shopping list can hold.
+  - invalidItem
   - basketNotOpen
   - basketNotFrozen
   - basketAlreadySettled

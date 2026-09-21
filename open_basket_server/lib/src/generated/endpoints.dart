@@ -435,8 +435,8 @@ class Endpoints extends _is.EndpointDispatch {
             ),
             'quantity': _is.ParameterDescription(
               name: 'quantity',
-              type: _is.getType<int>(),
-              nullable: false,
+              type: _is.getType<int?>(),
+              nullable: true,
             ),
             'note': _is.ParameterDescription(
               name: 'note',

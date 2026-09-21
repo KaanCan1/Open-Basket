@@ -284,7 +284,8 @@ class EndpointBasket extends _isc.EndpointRef {
   /// succeed: the partial unique index noted in `basket.spy.yaml` is the real
   /// guarantee, the transaction alone is not.
   ///
-  /// Schedules the close and the "2 minutes left" future calls.
+  /// Schedules the close. The "2 minutes left" reminder is Day 11-12, when
+  /// there is a notification to send with it.
   _ida.Future<_ifmsley9.Basket> open({
     int? storeId,
     required int durationMinutes,
@@ -335,10 +336,15 @@ class EndpointBasket extends _isc.EndpointRef {
       );
 
   /// Any member, while the basket is `open`.
+  ///
+  /// `quantity` is nullable rather than defaulted because Serverpod turns a
+  /// defaulted named parameter into a *required* one on the generated client —
+  /// `int quantity = 1` here becomes `required int quantity` there, and every
+  /// caller would have to spell out the common case. Null means one.
   _ida.Future<_iuuhmcji.BasketItem> addItem(
     int basketId,
     String name, {
-    required int quantity,
+    int? quantity,
     String? note,
   }) => caller.callServerEndpoint<_iuuhmcji.BasketItem>(
     'basket',
@@ -410,6 +416,10 @@ class EndpointBasket extends _isc.EndpointRef {
 }
 
 /// The live basket.
+///
+/// This is the half of the product that a request/response API cannot do: an
+/// item typed on one phone appears on every other phone in the house before
+/// the person who typed it has put their phone down.
 /// {@category Endpoint}
 class EndpointBasketStream extends _isc.EndpointRef {
   EndpointBasketStream(_isc.EndpointCaller caller) : super(caller);
@@ -424,6 +434,17 @@ class EndpointBasketStream extends _isc.EndpointRef {
   /// itself and never needs a second call. Every event carries `serverTime`.
   ///
   /// Throws `notAMember` before yielding anything.
+  ///
+  /// **Events can arrive out of order with respect to the snapshot.** The
+  /// subscription opens before the snapshot is read, on purpose — the other
+  /// order would silently drop anything that happened while the read was in
+  /// flight. So an `itemAdded` for a row the snapshot already contains is
+  /// normal, and the client must apply events by item id rather than by
+  /// appending. Dropping events is unrecoverable; applying one twice is not.
+  ///
+  /// The stream completes on its own once the basket reaches a state nothing
+  /// more can happen in — `settled` or `cancelled`. A client that sees
+  /// `onDone` should go back to the household screen, not reconnect.
   _ida.Stream<_ivynb499.BasketEvent> watch(int basketId) =>
       caller.callStreamingServerEndpoint<
         _ida.Stream<_ivynb499.BasketEvent>,
