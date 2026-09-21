@@ -26,5 +26,12 @@ fields:
 # one basket ever. The real guarantee is a partial unique index,
 #   CREATE UNIQUE INDEX basket_one_open_per_household_idx
 #     ON basket ("householdId") WHERE status = 'open';
-# added by hand to the migration on Day 8. Until it exists, two simultaneous
-# `open` calls can both succeed, so the transaction check is not enough on its own.
+# written by hand into the migration on Day 8 (ADR-013). The transaction check
+# in BasketEndpoint.open is only the polite answer; two simultaneous calls can
+# both pass it, and this index is what stops the second one.
+#
+# IT HAS TO BE RE-ADDED BY HAND TO EVERY NEW MIGRATION, in both definition.sql
+# (a fresh database is built from that one) and migration.sql (an existing one
+# is upgraded with that one). `serverpod create-migration` regenerates
+# definition.sql from this file, which cannot describe the index.
+# basket_lifecycle_test fails with instructions if it goes missing.

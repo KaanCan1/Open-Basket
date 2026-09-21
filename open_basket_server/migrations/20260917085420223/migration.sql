@@ -35,6 +35,27 @@ CREATE TABLE "basket" (
 );
 
 --
+-- HAND-WRITTEN. NOT GENERATED. Rule 4: one open basket per household.
+--
+-- `.spy.yaml` has no partial index, and a plain unique index on "householdId"
+-- would allow a household exactly one basket ever. The transaction check in
+-- BasketEndpoint.open is only the polite answer; two concurrent calls can both
+-- read "no open basket" before either inserts. This index is what actually
+-- stops the second one, and `open` turns the violation back into
+-- householdAlreadyHasOpenBasket by matching on this name.
+--
+-- A fresh database is built from THIS file (definition.sql), not from the
+-- migration.sql files, so the index has to live in both. `serverpod
+-- create-migration` regenerates definition.sql from the models, which do not
+-- know about this index -- so it must be re-added by hand to every new
+-- migration. `basket_lifecycle_test` asserts the index exists, and fails the
+-- build if a regeneration drops it.
+--
+CREATE UNIQUE INDEX IF NOT EXISTS "basket_one_open_per_household_idx"
+    ON "basket" ("householdId")
+    WHERE "status" = 'open';
+
+--
 -- ACTION CREATE TABLE
 --
 CREATE TABLE "basket_item" (

@@ -10,6 +10,10 @@ resolution: workspace
 
 dependencies:
   serverpod: 4.0.0
+  # Rule 1: the server owns time. `withClock` lets a test decide what now
+  # means without a global the next test inherits. Already here transitively
+  # via serverpod; named explicitly because our own code imports it.
+  clock: ^1.1.2
   crypto: ^3.0.0
   serverpod_auth_core_server: 4.0.0
   serverpod_auth_idp_server: 4.0.0

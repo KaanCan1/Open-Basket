@@ -6,6 +6,7 @@ import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 import 'src/auth_setup.dart';
 import 'src/cache_busting.dart';
 import 'src/generated/serverpod.dart';
+import 'src/services/basket_service.dart';
 import 'src/web/routes/app_config_route.dart';
 
 /// The starting point of the Serverpod server.
@@ -91,4 +92,22 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  // Rule 2: sweep expired baskets on startup.
+  //
+  // Serverpod keeps future calls in the database, so a scheduled close
+  // normally survives a restart on its own. This is for what it cannot cover:
+  // a basket that opened during a window when scheduling failed, and a call
+  // whose time passed while the process was down and which therefore fires
+  // late or not at all. Closing is idempotent, so doing this on every boot
+  // costs nothing when there is nothing to do.
+  await pod.withSession((session) async {
+    final closed = await BasketService.sweepExpired(session);
+    if (closed > 0) {
+      session.log(
+        'startup sweep closed $closed overdue basket(s)',
+        level: LogLevel.info,
+      );
+    }
+  });
 }

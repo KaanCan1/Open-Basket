@@ -31,8 +31,26 @@ deleted and no postgres process alive, so it is not a stale lock we can clear. `
 now has no `dataPath`, which points it at the container `docker-compose.yaml` already starts on
 port 9090, exactly where CI runs it.
 
-The cost is honest: integration tests need Docker locally, so on a machine without it only the
-unit tests run and CI is what proves the rest. Development is untouched and still needs nothing.
+**Amended again on Day 8: the cause is known, and local integration tests work again.**
+The failure is not a stale lock. `serverpod_test` brings the embedded postmaster up twice per
+test group — once in `EphemeralTestDatabase.create` to make the group's database, once when the
+pod itself starts — and the second attempt cannot attach to the first, because
+`embedded_postgres_resolver.dart` starts it with `detach: false` and `AttachedSupervisor.tryAttach`
+then refuses. The second start finds the live `postmaster.pid` and reports "Another process is
+using the local database". It is a framework limitation in Serverpod 4.0.0, not something this
+project can configure around, and it is why `config/test.yaml` has no `dataPath`.
+
+What we did instead is `scripts/local_test_db.sh`: a PostgreSQL 16 cluster of our own, under the
+gitignored `.serverpod/`, listening on port 9090 — the port `config/test.yaml` already names, so
+**nothing in the committed configuration changes**. `./scripts/local_test_db.sh start` and
+`dart test` runs the whole suite on a machine with no Docker. CI is untouched and still uses the
+container from `docker-compose.yaml` on the same port.
+
+Two things worth knowing if it ever has to be rebuilt: PostgreSQL must be **15 or newer**, because
+Serverpod 4 reads `pg_index.indnullsnotdistinct` while applying migrations and PostgreSQL 14 fails
+with `column "indnullsnotdistinct" does not exist`; and `initdb` needs `LC_ALL=C` on macOS or the
+postmaster dies at startup with "postmaster became multithreaded during startup". The script sets
+both.
 
 ---
 
@@ -192,3 +210,64 @@ Two things fell out of doing it:
 - **CI now covers the Flutter app.** It only ever ran `dart analyze`, `dart format` and `dart test`
   against `open_basket_server`, so the half of the codebase B owns was completely unchecked.
   Analyze, format and `flutter test` now run against both.
+
+---
+
+# Day 8
+
+## ADR-013: Rule 4 is enforced by a hand-written partial unique index
+
+A household gets one open basket at a time. The check at the top of `BasketEndpoint.open` is only
+the polite answer: two calls can both read "no open basket" before either inserts, and the
+transaction does not stop that. The guarantee is
+
+```sql
+CREATE UNIQUE INDEX "basket_one_open_per_household_idx"
+    ON "basket" ("householdId")
+    WHERE "status" = 'open';
+```
+
+`.spy.yaml` cannot express a partial index, and a plain unique index on `householdId` would give a
+household one basket *ever*. So it is written by hand into the migration, and `open` catches
+`DatabaseUniqueViolationException` and converts it back into `householdAlreadyHasOpenBasket` by
+matching on the constraint name — the loser of a race sees the same friendly error as someone who
+simply tapped too late.
+
+**This needs re-adding by hand to every new migration.** A fresh database is built from the latest
+migration's `definition.sql`, not from the `migration.sql` files, so the index has to live in
+*both*; and `serverpod create-migration` regenerates `definition.sql` from the models, which know
+nothing about it. Two tests guard this: one asserts the index exists in the live database and
+fails with instructions when it does not, and one asserts that a second open basket is refused
+with exactly the constraint name `open` matches on. If those two drift apart, a real race reaches
+the shopper as a 500 instead of a sentence.
+
+## ADR-014: The server's clock is `package:clock`, not a global of ours
+
+Rule 1 says the server owns time, which means tests have to be able to say what time it is —
+otherwise "a five minute basket closes on time" is a test that takes five minutes. `ServerClock` in
+`util/clock.dart` is a one-line wrapper over `package:clock`, so a test uses `withClock` and the
+override is scoped to the zone it wraps. A mutable global of our own would have done the same job
+until the first test forgot its `tearDown` and quietly poisoned the rest of the suite.
+
+The wrapper is there so the UTC rule lives in one place: `closesAt` is stored and compared in UTC,
+and a server answering `getServerTime` in local time would hand the client a drift correction
+wrong by the timezone offset.
+
+One practical consequence in tests: the frozen clock is set to **2030**, deliberately far ahead of
+real time. The test server's future call manager is real, and a basket scheduled to close in the
+real past would fire in the background halfway through an assertion.
+
+## ADR-015: Auto-close freezes; it does not settle
+
+When the timer runs out the basket becomes `frozen`, not `settled` — the same state the shopper
+reaches by tapping "At checkout". The run is not over at that point: the shopper still has to mark
+what they found and enter what it cost. `closedAutomatically` records which of the two got there
+first, so the history screen can say "the timer closed this" and the settlement screen can word
+itself accordingly.
+
+Closing is idempotent (rule 2): `closeIfDue` reloads the basket and does nothing unless it is
+still `open` and genuinely overdue. That one guard covers every way it gets called twice — a
+future call superseded by an extension, a call firing while the shopper is tapping "At checkout",
+and the startup sweep racing a future call that is already handling the same basket. Extending
+therefore does not need the old call to be cancelled to be correct; cancelling it is tidiness, and
+the startup sweep is the safety net for the case where scheduling failed altogether.
