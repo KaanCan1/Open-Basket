@@ -360,3 +360,42 @@ Two things found the moment the first screen ran, both from Day 5's theme:
 - **`surfaceContainerHighest` was never defined**, so the tonal panel behind the household
   code came out the same colour as the page. It is in the scheme now, which means a widget
   asking Material for a raised surface gets the palette's answer rather than Material's.
+
+## ADR-021: The client corrects for clock drift, and never counts down locally
+
+`ServerClock` holds the offset between this device and the server and hands out a
+corrected now. Every countdown is `closesAt - serverNow`, recomputed on each tick, and
+nothing ever counts down from a number it was handed.
+
+Both halves matter. A phone whose clock is two minutes fast would show a basket closing
+two minutes early, which looks exactly like the server losing the basket. And a phone that
+sleeps for four minutes would wake up four minutes ahead of the basket if it had been
+decrementing locally; recomputing means it simply shows the right number on the next frame.
+
+The offset is seeded by the stream's first event and refreshed by every event after it,
+because each one carries `serverTime` for this purpose. Nothing seeds it at startup: the
+only screen with a countdown shows a spinner until that first event arrives, so the clock
+is always reconciled before a countdown is drawn. Round-trip latency is not corrected for,
+which makes the client run a few tens of milliseconds slow — the right direction to err,
+since showing one second left is better than showing a basket closed that is still open.
+
+## ADR-022: A basket that is not open shows no countdown at all
+
+`closesAt` stays on a frozen basket as a record of when the run was booked to end. The
+first version rendered it anyway, so checking out early left a number ticking down under
+the word FROZEN — which reads as "still counting" when the list is already final. Found by
+freezing a basket on the simulator and watching the digits keep moving.
+
+Now a basket that is not open shows the label and "The list is final.", and the ticker is
+cancelled rather than left running behind a widget nobody is watching.
+
+## ADR-023: Items are not applied optimistically
+
+An item appears when the server has accepted it and the stream has echoed it back, not
+when the person taps Add. The whole promise of the product is that everyone is looking at
+the same list, and a row that exists on one phone and nowhere else breaks that promise
+more badly than half a second of waiting does.
+
+The keyboard is deliberately kept up after a successful add: a shopping list is typed in
+bursts, and making someone tap back into the field between "milk" and "eggs" is the
+difference between adding three things and adding one.

@@ -85,12 +85,12 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
   - Events are published to the `basket:<id>` channel via `basket_channels.dart`
   - Event types: `snapshot`, `itemAdded`, `itemUpdated`, `itemRemoved`, `timerExtended`, `basketFrozen`, `basketSettled`, `basketCancelled`
 - [x] **A** `addItem`, `updateItem` (only the requester, only while `open`), `removeItem`
-- [ ] **B** `live_basket_controller.dart`: subscribe, apply events to state, reconnect with exponential backoff and resync from snapshot
+- [x] **A for B** `live_basket_controller.dart`: subscribe, apply events to state, reconnect with exponential backoff and resync from snapshot (ADR-020)
 
 ### Day 10: Live screen + deploy
-- [ ] **B** `live_basket_screen.dart`, `add_item_bar.dart` (name + quantity + note), requester avatar on each item
-- [ ] **B** `countdown_banner.dart`: based on server time, color change in the last 2 minutes, locks on `frozen`
-- [ ] **B** `open_basket_sheet.dart`: quick picks 5 / 10 / 15 / 20 min + custom
+- [x] **A for B** `live_basket_screen.dart`, `add_item_bar.dart` (name + note; **quantity is not in the bar yet**), requester chip in that member's tone on each item
+- [x] **A for B** `countdown_banner.dart`: based on server time, Signal fill in the last 2 minutes, and no ticking number once `frozen`
+- [x] **A for B** `open_basket_sheet.dart`: quick picks 5 / 10 / 15 / 20 min + custom
 - [ ] **A** Deploy (Serverpod Cloud or VPS + Docker), production config, HTTPS
 - [ ] **B** Ship the Android build to both homes (Firebase App Distribution or direct APK)
 - ✅ **M2: real usage starts.** Keep notes in `docs/usage_log.md`

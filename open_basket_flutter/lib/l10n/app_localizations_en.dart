@@ -211,4 +211,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeYouTag => 'YOU';
+
+  @override
+  String get homeBasketOpenTitle => 'A basket is open';
+
+  @override
+  String homeBasketOpenNote(String name) {
+    return '$name is shopping. Add what you need.';
+  }
+
+  @override
+  String get homeBasketFrozenTitle => 'At checkout';
+
+  @override
+  String homeBasketFrozenNote(String name) {
+    return 'The list is final. $name is paying.';
+  }
+
+  @override
+  String get homeBasketSee => 'Open it';
+
+  @override
+  String get openSheetTitle => 'How long?';
+
+  @override
+  String get openSheetBlurb =>
+      'The basket closes itself when the time runs out. Everyone can add until then.';
+
+  @override
+  String openSheetMinutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get openSheetCustom => 'Custom';
+
+  @override
+  String get openSheetStart => 'Open the basket';
+
+  @override
+  String get openSheetAlreadyOpen =>
+      'Someone in your household already has a basket open.';
+
+  @override
+  String liveBasketItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+      zero: 'No items yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get liveBasketClosesByItself => 'CLOSES BY ITSELF';
+
+  @override
+  String get liveBasketAddHint => 'Add an item';
+
+  @override
+  String get liveBasketNoteHint => 'Note (optional)';
+
+  @override
+  String get liveBasketAdd => 'Add';
+
+  @override
+  String get liveBasketEmpty => 'Nothing in the basket yet.';
+
+  @override
+  String get liveBasketEmptyNote =>
+      'Type what you need. Everyone else sees it as you type it.';
+
+  @override
+  String get liveBasketExtend => 'Extend once';
+
+  @override
+  String get liveBasketExtendUsed => 'Already extended';
+
+  @override
+  String get liveBasketCheckout => 'At checkout';
+
+  @override
+  String get liveBasketCancel => 'Cancel the run';
+
+  @override
+  String get liveBasketCancelConfirm => 'Cancel this run?';
+
+  @override
+  String get liveBasketCancelConfirmNote =>
+      'Nothing gets priced and nobody owes anybody. The run shows up as cancelled.';
+
+  @override
+  String get liveBasketCancelKeep => 'Keep shopping';
+
+  @override
+  String get liveBasketCancelYes => 'Cancel it';
+
+  @override
+  String get liveBasketReconnecting => 'Reconnecting…';
+
+  @override
+  String get liveBasketClosedTitle => 'This basket closed';
+
+  @override
+  String get liveBasketClosedNote => 'It closed while you were away.';
+
+  @override
+  String get liveBasketBack => 'Back';
+
+  @override
+  String get liveBasketRemove => 'Remove';
+
+  @override
+  String get countdownListFinal => 'The list is final.';
 }

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
+import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../basket/basket_controller.dart';
+import '../basket/open_basket_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import 'create_or_join_screen.dart';
 import 'household_controller.dart';
@@ -69,6 +73,8 @@ class _Home extends ConsumerWidget {
                 l10n.homeMembersOne(members.value?.length ?? 0),
                 style: OpenBasketText.meta(theme.textTheme.bodySmall!.color!),
               ),
+              const SizedBox(height: 28),
+              const _BasketSection(),
               const SizedBox(height: 32),
               _CodeCard(code: household.code),
               const SizedBox(height: 32),
@@ -220,6 +226,73 @@ class _Retry extends StatelessWidget {
             OutlinedButton(onPressed: onRetry, child: Text(l10n.commonRetry)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The basket, or the way to open one. The first thing on the home screen
+/// because it is the only thing anyone opens the app to do.
+class _BasketSection extends ConsumerWidget {
+  const _BasketSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final active = ref.watch(activeBasketProvider);
+    final members = ref.watch(membersProvider).value ?? const [];
+
+    final basket = active.value;
+    if (basket == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.homeNoBasket, style: theme.textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(l10n.homeNoBasketNote, style: theme.textTheme.bodySmall),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () async {
+              final opened = await OpenBasketSheet.show(context);
+              if (opened == null || !context.mounted) return;
+              context.push('${Routes.basket}/${opened.id}');
+            },
+            child: Text(l10n.homeOpenBasket),
+          ),
+        ],
+      );
+    }
+
+    final shopper = members
+        .where((final m) => m.id == basket.shopperMemberId)
+        .map((final m) => m.displayName)
+        .firstOrNull;
+    final open = basket.status == BasketStatus.open;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            open ? l10n.homeBasketOpenTitle : l10n.homeBasketFrozenTitle,
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            open
+                ? l10n.homeBasketOpenNote(shopper ?? '')
+                : l10n.homeBasketFrozenNote(shopper ?? ''),
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () => context.push('${Routes.basket}/${basket.id}'),
+            child: Text(l10n.homeBasketSee),
+          ),
+        ],
       ),
     );
   }

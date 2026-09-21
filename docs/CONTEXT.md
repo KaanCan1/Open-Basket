@@ -91,12 +91,12 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — end of Day 9, 2026-09-21
+## Status — Day 10, 2026-09-22
 
 Backend, Days 1-6, all merged:
 
-- Serverpod 4 workspace; 14 models; migrations applied. `main` holds 96 server tests and 8 Flutter
-  tests, all green.
+- Serverpod 4 workspace; 14 models; migrations applied. `main` holds 96 server tests and 27
+  Flutter tests, all green.
 - **Sign-in** (ADR-004): six digits by email, no passwords. The bundled provider is password-only,
   so the flow is ours — `SignInService` for the policy, `SignInCodePolicy` for the hashing and
   normalisation, `SignInEmailSender` for delivery (console in development).
@@ -145,6 +145,18 @@ CEST with no extensions, the demo video must be under **two** minutes rather tha
 the BuilderBase page shows, AI-tool use must be disclosed in the description, and judges
 must be able to run the app free of charge until 2026-10-20 17:00.
 
+The app, Day 10 (A is writing the screens; B has still not committed — ADR-020):
+
+- **The core loop runs end to end on a phone.** Sign in, create or join a household, open a
+  basket for a chosen duration, add items, watch them arrive over the stream, extend once,
+  check out. Walked on the simulator, not inferred from tests.
+- `ServerClock` corrects for device clock drift from the stream's own `serverTime`, and the
+  countdown is always recomputed rather than decremented locally (ADR-021).
+- A basket that is not open shows no countdown at all, because a ticking number under the
+  word FROZEN reads as "still counting" (ADR-022).
+- Items are not applied optimistically: a row appears when the stream echoes it back
+  (ADR-023).
+
 Open:
 
 - **A judge cannot sign in yet.** The six-digit code is emailed, and the development sender
@@ -154,8 +166,10 @@ Open:
 - Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
   the ETA suggestion depends on it.
 - **Everything B owns past the skeleton is unstarted**, and B has not worked on the repo yet.
-- **No client touches any of this yet.** The whole lifecycle and the whole stream are
-  server-side and unused; `live_basket_controller.dart` and the screens are B's and unstarted.
+- **Nothing is deployed.** Everything above runs against a server on A's laptop.
+- Marking items, prices and settlement are not built, so the run ends at "At checkout".
+- Push notifications are not built, so "everyone is told" is currently only true for
+  whoever has the app open.
 - The Claude simulator panel only offers iOS 26.5 devices; anything booted on iOS 27 is invisible
   to it. The app runs on the iPhone 17 it can see.
 

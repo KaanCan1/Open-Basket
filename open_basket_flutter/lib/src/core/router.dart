@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/code_entry_screen.dart';
 import '../features/auth/sign_in_screen.dart';
+import '../features/basket/live_basket_screen.dart';
 import '../features/household/create_household_screen.dart';
 import '../features/household/household_home_screen.dart';
 import '../features/household/join_household_screen.dart';
@@ -14,6 +15,7 @@ abstract final class Routes {
   static const home = '/';
   static const createHousehold = '/household/new';
   static const joinHousehold = '/household/join';
+  static const basket = '/basket';
 }
 
 final routerProvider = Provider<GoRouter>((final ref) {
@@ -46,6 +48,12 @@ final routerProvider = Provider<GoRouter>((final ref) {
             path: 'household/join',
             builder: (final context, final state) =>
                 const JoinHouseholdScreen(),
+          ),
+          GoRoute(
+            path: 'basket/:id',
+            builder: (final context, final state) => LiveBasketScreen(
+              basketId: int.parse(state.pathParameters['id']!),
+            ),
           ),
         ],
       ),
