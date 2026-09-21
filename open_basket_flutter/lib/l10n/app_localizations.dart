@@ -279,6 +279,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your items are saved on this phone and will sync the moment you\'re back.'**
   String get commonOfflineNote;
+
+  /// No description provided for @householdChoiceHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Who are you\nshopping with?'**
+  String get householdChoiceHeadline;
+
+  /// No description provided for @householdChoiceBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a household, or join one with the six characters someone already in it can read out.'**
+  String get householdChoiceBlurb;
+
+  /// No description provided for @householdChoiceCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a household'**
+  String get householdChoiceCreate;
+
+  /// No description provided for @householdChoiceJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'I have a code'**
+  String get householdChoiceJoin;
+
+  /// No description provided for @createHouseholdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your household'**
+  String get createHouseholdTitle;
+
+  /// No description provided for @createHouseholdBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone in it will see this name. You can change it later.'**
+  String get createHouseholdBlurb;
+
+  /// No description provided for @createHouseholdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NAME'**
+  String get createHouseholdLabel;
+
+  /// No description provided for @createHouseholdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Kaya household'**
+  String get createHouseholdHint;
+
+  /// No description provided for @createHouseholdAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create it'**
+  String get createHouseholdAction;
+
+  /// No description provided for @createHouseholdEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Give it a name first.'**
+  String get createHouseholdEmpty;
+
+  /// No description provided for @joinHouseholdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code'**
+  String get joinHouseholdTitle;
+
+  /// No description provided for @joinHouseholdBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'Six characters from someone already in the household. Case does not matter.'**
+  String get joinHouseholdBlurb;
+
+  /// No description provided for @joinHouseholdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CODE'**
+  String get joinHouseholdLabel;
+
+  /// No description provided for @joinHouseholdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'K7Q2M4'**
+  String get joinHouseholdHint;
+
+  /// No description provided for @joinHouseholdAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get joinHouseholdAction;
+
+  /// No description provided for @joinHouseholdUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'No household with that code.'**
+  String get joinHouseholdUnknown;
+
+  /// No description provided for @joinHouseholdAlreadyIn.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already in a household.'**
+  String get joinHouseholdAlreadyIn;
+
+  /// No description provided for @homeMembersOne.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person} other{{count} people}}'**
+  String homeMembersOne(int count);
+
+  /// No description provided for @homeCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HOUSEHOLD CODE'**
+  String get homeCodeLabel;
+
+  /// No description provided for @homeCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied'**
+  String get homeCodeCopied;
+
+  /// No description provided for @homeCodeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone with these six characters can join.'**
+  String get homeCodeNote;
+
+  /// No description provided for @homeOpenBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a basket'**
+  String get homeOpenBasket;
+
+  /// No description provided for @homeBasketRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'A basket is already open'**
+  String get homeBasketRunning;
+
+  /// No description provided for @homeBasketRunningNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is shopping. Tap to add what you need.'**
+  String homeBasketRunningNote(String name);
+
+  /// No description provided for @homeNoBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'No basket is open.'**
+  String get homeNoBasket;
+
+  /// No description provided for @homeNoBasketNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Open one when you are heading out, and the house has until it closes to add things.'**
+  String get homeNoBasketNote;
+
+  /// No description provided for @homeSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get homeSignOut;
+
+  /// No description provided for @homeMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'IN THIS HOUSEHOLD'**
+  String get homeMembersTitle;
+
+  /// No description provided for @homeOwnerTag.
+  ///
+  /// In en, this message translates to:
+  /// **'OWNER'**
+  String get homeOwnerTag;
+
+  /// No description provided for @homeYouTag.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU'**
+  String get homeYouTag;
 }
 
 class _AppLocalizationsDelegate

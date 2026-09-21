@@ -14,6 +14,10 @@ abstract final class OpenBasketColors {
   static const signal = Color(0xFFE2FB33);
   static const ink = Color(0xFF0F0F0E);
 
+  /// Hairlines between rows and around quiet controls.
+  static const rule = Color(0xFFE0E0DC);
+  static const ruleDark = Color(0xFF262623);
+
   /// 6.0:1 on paper.
   static const meta = Color(0xFF5F5F5A);
 
@@ -124,6 +128,12 @@ ThemeData buildOpenBasketTheme(Brightness brightness) {
       onSecondary: ground,
       surface: ground,
       onSurface: onGround,
+      // Tonal: the quiet panel a code or a total sits on. Named here rather
+      // than hardcoded in a screen, so a widget that asks Material for a
+      // raised surface gets the palette's answer instead of Material's.
+      surfaceContainerHighest: isDark
+          ? const Color(0xFF1C1C1A)
+          : OpenBasketColors.tonal,
       error: const Color(0xFFB3261E),
       onError: OpenBasketColors.paper,
     ),
@@ -133,6 +143,36 @@ ThemeData buildOpenBasketTheme(Brightness brightness) {
       bodyMedium: OpenBasketText.body(onGround),
       bodySmall: OpenBasketText.meta(muted),
       labelSmall: OpenBasketText.label(muted),
+    ),
+    // Material falls back to colorScheme.primary for the foreground of
+    // anything it has no theme for -- outlined and text buttons, progress
+    // indicators, text selection. Primary here is Signal, so without these
+    // every one of them came out lime on paper: about 1.6:1, and against the
+    // one rule the palette has, which is that Signal is a fill and never a
+    // text colour. Found on screen 04, where "I have a code" was unreadable.
+    dividerColor: isDark ? OpenBasketColors.ruleDark : OpenBasketColors.rule,
+    appBarTheme: AppBarTheme(
+      backgroundColor: ground,
+      foregroundColor: onGround,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: onGround),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: onGround,
+        minimumSize: const Size.fromHeight(52),
+        side: BorderSide(color: onGround),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: OpenBasketText.item(onGround),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: muted,
+        minimumSize: const Size.fromHeight(kMinTapTarget),
+        textStyle: OpenBasketText.body(muted),
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

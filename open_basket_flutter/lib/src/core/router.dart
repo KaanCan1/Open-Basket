@@ -3,13 +3,17 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/code_entry_screen.dart';
 import '../features/auth/sign_in_screen.dart';
-import '../features/home/home_placeholder_screen.dart';
+import '../features/household/create_household_screen.dart';
+import '../features/household/household_home_screen.dart';
+import '../features/household/join_household_screen.dart';
 import 'client_provider.dart';
 
 abstract final class Routes {
   static const signIn = '/sign-in';
   static const codeEntry = '/sign-in/code';
   static const home = '/';
+  static const createHousehold = '/household/new';
+  static const joinHousehold = '/household/join';
 }
 
 final routerProvider = Provider<GoRouter>((final ref) {
@@ -31,7 +35,19 @@ final routerProvider = Provider<GoRouter>((final ref) {
     routes: [
       GoRoute(
         path: Routes.home,
-        builder: (final context, final state) => const HomePlaceholderScreen(),
+        builder: (final context, final state) => const HouseholdHomeScreen(),
+        routes: [
+          GoRoute(
+            path: 'household/new',
+            builder: (final context, final state) =>
+                const CreateHouseholdScreen(),
+          ),
+          GoRoute(
+            path: 'household/join',
+            builder: (final context, final state) =>
+                const JoinHouseholdScreen(),
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.signIn,

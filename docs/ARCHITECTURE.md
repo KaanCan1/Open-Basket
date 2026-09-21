@@ -331,3 +331,32 @@ This is not a preference: Serverpod's generator turns a defaulted named paramete
 is the only shape that survives the client boundary as optional.
 
 Worth reporting upstream — see the feedback list in `docs/SUBMISSION.md`.
+
+## ADR-020: A is building the screens too
+
+B has still not committed to the repository. ADR-012 recorded A building the Flutter
+skeleton once, on Day 5, with ownership reverting immediately; that has not held, because
+there was nobody to revert it to. On Day 10 Kaan decided A writes the screens and B joins
+later.
+
+What this changes in practice: `CLAUDE.md`'s ownership table no longer describes reality
+for `open_basket_flutter/**`. It stays in the table because it is still where B picks up,
+and because the contract-first rule it exists to protect — models and endpoint signatures
+frozen on day two — is what made the app buildable at all.
+
+The order the screens are being built in follows the scoring rather than the plan's day
+numbers: the hackathon puts 30% on "does it work -- the core flow completes, nothing
+critical is faked", and it is also the tie-breaker. So the one loop a judge will try comes
+first, and anything off it waits.
+
+Two things found the moment the first screen ran, both from Day 5's theme:
+
+- **Signal was being painted as a foreground.** `colorScheme.primary` is Signal, and
+  Material falls back to primary for the foreground of anything it has no theme for. With
+  no `outlinedButtonTheme`, "I have a code" rendered lime on paper at roughly 1.6:1 —
+  against the one rule the palette has, which is that Signal is a fill and never a text
+  colour. The existing contrast test passed throughout, because it measures tokens and
+  every token was right. `theme_test` now also measures what Material actually resolves.
+- **`surfaceContainerHighest` was never defined**, so the tonal panel behind the household
+  code came out the same colour as the page. It is in the scheme now, which means a widget
+  asking Material for a raised surface gets the palette's answer rather than Material's.
