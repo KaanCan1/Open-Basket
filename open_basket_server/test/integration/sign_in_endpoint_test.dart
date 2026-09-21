@@ -217,7 +217,9 @@ void main() {
       await expectLater(
         endpoints.signIn.requestSignInCode(sessionBuilder, 'not-an-address'),
         throwsA(
-          predicate((final e) => _errorOf(e) == BasketError.invalidSignInCode),
+          predicate(
+            (final e) => _errorOf(e) == BasketError.invalidEmailAddress,
+          ),
         ),
       );
       expect(SignInEmailSender.lastCodeForTesting, isNull);

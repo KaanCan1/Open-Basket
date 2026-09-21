@@ -103,6 +103,14 @@ Decisions worth knowing:
 - Codes are consumed before the session is minted, so two requests arriving together cannot
   redeem the same code twice.
 
+**Amended on Day 9: a malformed address has its own error.** It used to share
+`invalidSignInCode` with a wrong six-digit code, which meant the sign-in screen could never
+show "that does not look like an email address" — every bad address became the generic
+"Something went wrong", and the specific copy sat in `app_en.arb` as dead string. Found by
+running the app, not by a test: both halves type-checked and both were individually
+reasonable. `invalidEmailAddress` now exists precisely because the two failures are worded
+differently on screen.
+
 ## ADR-005: The shopper marks items while the basket is still open
 
 `markItem(itemId, status: picked | unavailable, priceMinor?)` is allowed in **both** `open` and
