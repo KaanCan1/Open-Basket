@@ -54,6 +54,11 @@ enum BasketError implements _is.SerializableModel {
 
   /// One +5 min extension per basket (ADR-009).
   extensionAlreadyUsed,
+
+  /// The address is not an address. Separate from invalidSignInCode on
+  /// purpose: the sign-in screen words them differently, and folding them
+  /// together left the "that is not an email address" copy unreachable.
+  invalidEmailAddress,
   invalidSignInCode,
   signInCodeExpired,
   tooManySignInAttempts;
@@ -90,6 +95,8 @@ enum BasketError implements _is.SerializableModel {
         return BasketError.basketAlreadySettled;
       case 'extensionAlreadyUsed':
         return BasketError.extensionAlreadyUsed;
+      case 'invalidEmailAddress':
+        return BasketError.invalidEmailAddress;
       case 'invalidSignInCode':
         return BasketError.invalidSignInCode;
       case 'signInCodeExpired':

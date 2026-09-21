@@ -23,6 +23,7 @@ SignInFailure failureFrom(Object error) {
       BasketError.signInCodeExpired => SignInFailure.expiredCode,
       BasketError.tooManySignInAttempts => SignInFailure.tooManyAttempts,
       BasketError.invalidSignInCode => SignInFailure.wrongCode,
+      BasketError.invalidEmailAddress => SignInFailure.badEmail,
       _ => SignInFailure.offline,
     };
   }

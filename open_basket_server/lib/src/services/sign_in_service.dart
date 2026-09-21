@@ -41,7 +41,7 @@ abstract final class SignInService {
   static Future<void> requestCode(Session session, String email) async {
     if (!SignInCodePolicy.looksLikeEmail(email)) {
       throw OpenBasketException(
-        error: BasketError.invalidSignInCode,
+        error: BasketError.invalidEmailAddress,
         message: 'That does not look like an email address.',
       );
     }
