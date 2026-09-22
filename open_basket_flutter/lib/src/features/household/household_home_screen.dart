@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
+import '../../core/formatters.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../basket/basket_controller.dart';
@@ -42,6 +43,7 @@ class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
       onResume: () {
         ref.invalidate(myHouseholdProvider);
         ref.invalidate(activeBasketProvider);
+        ref.invalidate(lastSettledRunProvider);
       },
     );
   }
@@ -93,6 +95,7 @@ class _Home extends ConsumerWidget {
             // The basket too: pulling down is what someone does when a
             // basket they were told about is not on the screen.
             ref.invalidate(activeBasketProvider);
+            ref.invalidate(lastSettledRunProvider);
             await ref.read(membersProvider.future);
           },
           child: ListView(
@@ -286,9 +289,14 @@ class _BasketSection extends ConsumerWidget {
 
     final basket = active.value;
     if (basket == null) {
+      final lastRun = ref.watch(lastSettledRunProvider).value;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (lastRun != null) ...[
+            _LastRunCard(basket: lastRun.basket, lines: lastRun.lines),
+            const SizedBox(height: 28),
+          ],
           Text(l10n.homeNoBasket, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(l10n.homeNoBasketNote, style: theme.textTheme.bodySmall),
@@ -337,6 +345,72 @@ class _BasketSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [card, const SizedBox(height: 16), openButton],
+    );
+  }
+}
+
+/// The last run, settled: what this member owes or is owed, and the way to
+/// the full settlement. Without it a member who was not watching the live
+/// basket had no way to find out (ADR-031).
+class _LastRunCard extends ConsumerWidget {
+  const _LastRunCard({required this.basket, required this.lines});
+
+  final Basket basket;
+  final List<SettlementLine> lines;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final me = ref.watch(myMembershipProvider).value;
+    final members = ref.watch(membersProvider).value ?? const [];
+    String name(int id) =>
+        members.where((m) => m.id == id).firstOrNull?.displayName ?? '';
+    String money(int minor) => MoneyFormat.format(minor, basket.currencyCode);
+
+    final iOwe = lines.where((l) => l.fromMemberId == me?.id).toList();
+    final owedToMe = lines.where((l) => l.toMemberId == me?.id).toList();
+    final String summary;
+    if (iOwe.isNotEmpty) {
+      summary = iOwe
+          .map(
+            (l) => l10n.homeLastRunYouOwe(
+              name(l.toMemberId),
+              money(l.amountMinor),
+            ),
+          )
+          .join('\n');
+    } else if (owedToMe.length == 1) {
+      summary = l10n.homeLastRunOwesYou(
+        name(owedToMe.single.fromMemberId),
+        money(owedToMe.single.amountMinor),
+      );
+    } else if (owedToMe.length > 1) {
+      summary = l10n.homeLastRunManyOweYou(
+        owedToMe.length,
+        money(owedToMe.fold(0, (sum, l) => sum + l.amountMinor)),
+      );
+    } else {
+      summary = l10n.homeLastRunClear;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.homeLastRunTitle, style: theme.textTheme.labelSmall),
+          const SizedBox(height: 8),
+          Text(summary, style: theme.textTheme.titleMedium),
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () =>
+                context.push('${Routes.basket}/${basket.id}/settlement'),
+            child: Text(l10n.liveBasketSeeSettlement),
+          ),
+        ],
+      ),
     );
   }
 }

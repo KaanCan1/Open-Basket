@@ -501,8 +501,14 @@ class EndpointHistory extends _isc.EndpointRef {
   @override
   String get name => 'history';
 
-  /// Newest first. Settled and cancelled runs both appear.
-  _ida.Future<List<_ifmsley9.Basket>> list({required int limit}) =>
+  /// The household's finished runs, newest first. Settled and cancelled runs
+  /// both appear; a run that is still open or frozen is not history yet and
+  /// is `basket.getActive`'s to answer.
+  ///
+  /// `limit` is clamped to 1..[maxLimit]. It is nullable for the same reason
+  /// as `addItem`'s quantity: a defaulted named parameter becomes a required
+  /// one on the generated client.
+  _ida.Future<List<_ifmsley9.Basket>> list({int? limit}) =>
       caller.callServerEndpoint<List<_ifmsley9.Basket>>(
         'history',
         'list',

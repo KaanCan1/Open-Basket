@@ -903,6 +903,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Someone new'**
   String get checkoutSomeone;
+
+  /// No description provided for @homeLastRunTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'LAST RUN · SETTLED'**
+  String get homeLastRunTitle;
+
+  /// No description provided for @homeLastRunYouOwe.
+  ///
+  /// In en, this message translates to:
+  /// **'You owe {name} {amount}'**
+  String homeLastRunYouOwe(String name, String amount);
+
+  /// No description provided for @homeLastRunOwesYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} owes you {amount}'**
+  String homeLastRunOwesYou(String name, String amount);
+
+  /// No description provided for @homeLastRunManyOweYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} people owe you {amount} in total'**
+  String homeLastRunManyOweYou(int count, String amount);
+
+  /// No description provided for @homeLastRunClear.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t owe anything on this one.'**
+  String get homeLastRunClear;
 }
 
 class _AppLocalizationsDelegate

@@ -590,3 +590,22 @@ Decisions made while building screens 14 and 15, and the bugs that forced some o
 Still open: once a run is settled the home screen no longer shows it, so a member who was not
 watching the live basket has no way to their settlement. `history.list` (Day 21) or the Day 11-12
 "settlement is ready" push closes it.
+
+## ADR-031: The last settled run stays on the home screen
+
+Once a run was settled, `getActive` stopped returning it, and a member who was not watching the
+live basket at that moment had no way to learn what they owed — the settlement screen existed but
+nothing led to it. Found by settling on one simulator and opening the app on the other.
+
+The home screen now shows a "last run · settled" card when no basket is open or frozen: "You owe
+Kaan ₺60.15", "Ayşe owes you …", or "You don't owe anything on this one", with the way to the
+full settlement. It reads `history.list(limit: 1)` — pulled forward from Day 21 — and the stored
+lines. A cancelled last run shows nothing, because it owes nobody anything. The card gives way to
+the open basket as soon as the next run starts; older runs belong to the history screen.
+
+`history.list` returns settled and cancelled runs only, newest first by `openedAt`. Open and frozen
+runs are `getActive`'s. There is no `settledAt`, and a frozen run can overlap the next (ADR-025), so
+this is shopping order rather than strict finish order — the order the house thinks in.
+
+This is the pull half. The Day 11-12 "settlement is ready" push is the other half, for a member
+who does not open the app.

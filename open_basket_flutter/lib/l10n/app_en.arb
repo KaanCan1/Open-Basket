@@ -395,5 +395,42 @@
   "settlementDone": "Done",
   "@settlementDone": {},
   "checkoutSomeone": "Someone new",
-  "@checkoutSomeone": {}
+  "@checkoutSomeone": {},
+  "homeLastRunTitle": "LAST RUN · SETTLED",
+  "@homeLastRunTitle": {},
+  "homeLastRunYouOwe": "You owe {name} {amount}",
+  "@homeLastRunYouOwe": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homeLastRunOwesYou": "{name} owes you {amount}",
+  "@homeLastRunOwesYou": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homeLastRunManyOweYou": "{count} people owe you {amount} in total",
+  "@homeLastRunManyOweYou": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homeLastRunClear": "You don't owe anything on this one.",
+  "@homeLastRunClear": {}
 }

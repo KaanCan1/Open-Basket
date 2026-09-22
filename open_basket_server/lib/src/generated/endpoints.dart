@@ -652,8 +652,8 @@ class Endpoints extends _is.EndpointDispatch {
           params: {
             'limit': _is.ParameterDescription(
               name: 'limit',
-              type: _is.getType<int>(),
-              nullable: false,
+              type: _is.getType<int?>(),
+              nullable: true,
             ),
           },
           call:

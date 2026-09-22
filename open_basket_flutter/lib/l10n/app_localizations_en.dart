@@ -516,4 +516,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkoutSomeone => 'Someone new';
+
+  @override
+  String get homeLastRunTitle => 'LAST RUN · SETTLED';
+
+  @override
+  String homeLastRunYouOwe(String name, String amount) {
+    return 'You owe $name $amount';
+  }
+
+  @override
+  String homeLastRunOwesYou(String name, String amount) {
+    return '$name owes you $amount';
+  }
+
+  @override
+  String homeLastRunManyOweYou(int count, String amount) {
+    return '$count people owe you $amount in total';
+  }
+
+  @override
+  String get homeLastRunClear => 'You don\'t owe anything on this one.';
 }

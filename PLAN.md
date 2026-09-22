@@ -133,7 +133,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
   - Everything is already in minor units, so no rounding
 - [x] **A** `settlement_endpoint.dart`: `settle(basketId)` → writes `SettlementLine` rows + `status = settled`, errors if called twice; `getSettlement(basketId)`. Plus `preview`; settle refuses a basket with unpriced items (ADR-029)
 - [x] **A** `settlement_calc_test.dart`: single member, three members, nothing picked, shopper's own items, a member with no items at all, a gap that does not divide evenly, a zero-decimal currency
-- [x] **A for B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary (copied to the clipboard; the share sheet is not wired). **A member has no way back to it from the home screen once the run is settled** — needs `history.list` (Day 21) or the Day 11-12 push
+- [x] **A for B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary (copied to the clipboard; the share sheet is not wired). A member reaches it from the "last run" card on the home screen (ADR-031)
 
 ### Days 19-20: ETA suggestion
 - [ ] **B** In `open_basket_sheet.dart`: pick store → read location once → "Estimated 12 min" suggestion, user can change it
@@ -141,7 +141,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **B** If location permission is denied, fall back silently to manual duration
 
 ### Day 21: History + review
-- [ ] **A** `getHistory(householdId, limit)`
+- [ ] **A** `getHistory(householdId, limit)` — `history.list` done early for the last-run card (ADR-031); `history.get` still to do
 - [ ] **B** `history_screen.dart`: past baskets, totals, who asked for what, plus the detail view for one past run (screens 29-30)
 - [ ] **Both** Review usage notes; the last big change decision is made here
 - ✅ **M4**

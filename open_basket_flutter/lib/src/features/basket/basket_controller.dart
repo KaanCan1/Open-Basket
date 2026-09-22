@@ -71,10 +71,33 @@ class BasketController {
   Future<List<SettlementLine>> settle(int basketId) async {
     final lines = await _client.settlement.settle(basketId);
     _ref.invalidate(activeBasketProvider);
+    _ref.invalidate(lastSettledRunProvider);
     _ref.invalidate(settlementProvider(basketId));
     return lines;
   }
 }
+
+/// The household's most recent finished run, but only when it was settled,
+/// with its lines. Null when there is none, or when the last run was
+/// cancelled — a cancelled run owes nobody anything and has nothing to show.
+///
+/// This is how a member who was not watching the live basket finds out what
+/// they owe: the home screen shows it until the next run opens.
+final lastSettledRunProvider =
+    FutureProvider<({Basket basket, List<SettlementLine> lines})?>((
+      final ref,
+    ) async {
+      final client = ref.watch(clientProvider);
+      final runs = await client.history.list(limit: 1);
+      if (runs.isEmpty || runs.single.status != BasketStatus.settled) {
+        return null;
+      }
+      final basket = runs.single;
+      return (
+        basket: basket,
+        lines: await client.settlement.get(basket.id!),
+      );
+    });
 
 /// The stored lines of a settled basket; empty for any other.
 final settlementProvider = FutureProvider.autoDispose
