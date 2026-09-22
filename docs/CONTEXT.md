@@ -165,9 +165,26 @@ Deployed (ADR-024):
   code goes out as a real email — the single biggest submission risk, now closed.
 - Every auth password is platform-managed; none is set by hand or stored anywhere.
 - The CLI cannot deploy from a path with a space in it, so deploys run from a clone at a
-  space-free path until the checkout is renamed.
+  space-free path until the checkout is renamed. Deploy from `main`, after merging, so
+  what is live is what is on `main`.
+
+Verified on production, 2026-09-22, on the iOS simulator:
+
+- The emailed code arrives and signs in.
+- **A basket closes itself on Serverpod Cloud** with the app in the background — twice. The
+  pod had not restarted, so it was the future call and not the startup sweep.
+- The stream works through Cloud's ingress: an added item comes back over the WebSocket.
+- Not yet on production: two clients watching one basket (covered by `basket_stream_test`).
+
+That walk found three bugs, all fixed and deployed: a frozen basket locked the household out
+of ever opening another (ADR-025), the home screen went stale after a freeze, and a server
+slower than two seconds left the app on a permanent white screen (ADR-026).
 
 Open:
+
+- On the web build, pressing Return in the email field did not send a code on 2026-09-22,
+  though it did the day before. Root cause not found yet. Judges are pointed at the web build
+  first, so this matters.
 - Branch protection on `main` still not enabled.
 - Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
   the ETA suggestion depends on it.
