@@ -33,7 +33,41 @@ abstract final class BasketService {
 
   /// The household's basket that is still going: `open`, or `frozen` and
   /// waiting for prices. A `settled` or `cancelled` one is history.
+  ///
+  /// Prefers the open one. A household can have one open basket and any
+  /// number of frozen ones waiting to be settled — Tuesday's run should not
+  /// have to wait for Monday's receipt — so when there is no open basket this
+  /// answers with the most recent frozen one, which is the one the home screen
+  /// shows as "at checkout". Without the ordering, which frozen basket came
+  /// back was up to the database.
   static Future<Basket?> activeFor(
+    Session session,
+    int householdId, {
+    Transaction? transaction,
+  }) async {
+    return await openFor(session, householdId, transaction: transaction) ??
+        await Basket.db.findFirstRow(
+          session,
+          where: (final t) =>
+              t.householdId.equals(householdId) &
+              t.status.equals(BasketStatus.frozen),
+          // Serverpod 4 dropped `orderDescending`; direction is on the
+          // column now.
+          orderBy: (final t) => t.openedAt.desc(),
+          transaction: transaction,
+        );
+  }
+
+  /// The household's open basket, or null. This — not [activeFor] — is what
+  /// gates opening a new one.
+  ///
+  /// Rule 4 is one **open** basket per household, and the partial unique
+  /// index enforces exactly that. The check used to count frozen baskets too,
+  /// which was stricter than the rule: with settlement not yet built and
+  /// cancel only allowed while open, the first run to freeze locked the
+  /// household out of ever opening another. Found on the deployed server,
+  /// by opening a second basket after the first closed itself.
+  static Future<Basket?> openFor(
     Session session,
     int householdId, {
     Transaction? transaction,
@@ -42,7 +76,7 @@ abstract final class BasketService {
       session,
       where: (final t) =>
           t.householdId.equals(householdId) &
-          t.status.inSet({BasketStatus.open, BasketStatus.frozen}),
+          t.status.equals(BasketStatus.open),
       transaction: transaction,
     );
   }

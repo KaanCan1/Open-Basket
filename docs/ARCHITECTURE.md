@@ -451,3 +451,28 @@ The comparison is against the migration's `definition.json`, which cannot descri
 partial index and therefore does not list it — so the mismatch is the hand-written index
 of ADR-013 being invisible to the migration system, exactly as predicted. The wording
 points the wrong way. `basket_lifecycle_test` is what actually guards this, and it passes.
+
+## ADR-025: A frozen basket does not block the next run
+
+Rule 4 is one **open** basket per household, and the partial unique index enforces exactly
+that. The check at the top of `open()` counted frozen baskets as well, which was stricter
+than the rule — and with settlement not built yet and cancel only allowed while a basket is
+open, it meant **the first run to freeze locked the household out of ever opening another.**
+
+Found on the deployed server, not by a test: a one-minute basket closed itself in the
+background exactly as designed, and then the household could not start a second one. A
+judge following `docs/TESTING.md` would have hit it on their second basket; both test homes
+would have hit it after their first shop.
+
+`open()` now asks `BasketService.openFor`, which counts only open baskets. `activeFor` still
+answers with an open-or-frozen basket for the home screen, but prefers the open one and
+otherwise returns the most recent frozen one — it used to have no ordering at all, so with
+two frozen baskets which one came back was the database's choice.
+
+The product reading is the same as the rule's: Tuesday's run should not wait for Monday's
+receipt. The home screen now shows a frozen basket as "at checkout" with *Open a basket*
+underneath it.
+
+A second bug surfaced in the same walk: the home screen kept saying "a basket is open" after
+the basket had frozen, because it reads through its own provider, fetched once. The live
+controller now invalidates it on every basket-level event.

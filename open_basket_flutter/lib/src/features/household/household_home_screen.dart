@@ -243,6 +243,15 @@ class _BasketSection extends ConsumerWidget {
     final active = ref.watch(activeBasketProvider);
     final members = ref.watch(membersProvider).value ?? const [];
 
+    final openButton = FilledButton(
+      onPressed: () async {
+        final opened = await OpenBasketSheet.show(context);
+        if (opened == null || !context.mounted) return;
+        context.push('${Routes.basket}/${opened.id}');
+      },
+      child: Text(l10n.homeOpenBasket),
+    );
+
     final basket = active.value;
     if (basket == null) {
       return Column(
@@ -252,14 +261,7 @@ class _BasketSection extends ConsumerWidget {
           const SizedBox(height: 4),
           Text(l10n.homeNoBasketNote, style: theme.textTheme.bodySmall),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () async {
-              final opened = await OpenBasketSheet.show(context);
-              if (opened == null || !context.mounted) return;
-              context.push('${Routes.basket}/${opened.id}');
-            },
-            child: Text(l10n.homeOpenBasket),
-          ),
+          openButton,
         ],
       );
     }
@@ -270,7 +272,7 @@ class _BasketSection extends ConsumerWidget {
         .firstOrNull;
     final open = basket.status == BasketStatus.open;
 
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(20),
       color: theme.colorScheme.surfaceContainerHighest,
       child: Column(
@@ -294,6 +296,15 @@ class _BasketSection extends ConsumerWidget {
           ),
         ],
       ),
+    );
+
+    // A frozen basket is waiting for prices, not blocking the next run.
+    // Rule 4 is one *open* basket, so the way to start another stays on
+    // screen underneath it.
+    if (open) return card;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [card, const SizedBox(height: 16), openButton],
     );
   }
 }

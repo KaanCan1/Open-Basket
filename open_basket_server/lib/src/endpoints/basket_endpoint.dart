@@ -57,7 +57,7 @@ class BasketEndpoint extends Endpoint {
     // Checked here so the common case gets the right error rather than a
     // constraint violation. The index below is what actually enforces rule 4;
     // this is only the polite answer.
-    final running = await BasketService.activeFor(session, member.householdId);
+    final running = await BasketService.openFor(session, member.householdId);
     if (running != null) throw _alreadyOpen();
 
     // One reading, used for both: two calls can land on either side of a

@@ -5,6 +5,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
 import '../../core/server_clock.dart';
+import 'basket_controller.dart';
 import 'live_basket_state.dart';
 
 /// Subscribes to one basket and keeps the screen in step with it.
@@ -114,6 +115,16 @@ class LiveBasketController extends Notifier<LiveBasketState> {
 
     if (_isOver(state.basket?.status)) {
       state = state.copyWith(connection: LiveConnection.over);
+    }
+
+    // The home screen reads the basket through its own provider, fetched
+    // once. Without this it kept saying "a basket is open" after the stream
+    // had reported the basket frozen — found by letting a basket close itself
+    // in the background and then going back.
+    if (event.type != BasketEventType.itemAdded &&
+        event.type != BasketEventType.itemUpdated &&
+        event.type != BasketEventType.itemRemoved) {
+      ref.invalidate(activeBasketProvider);
     }
   }
 
