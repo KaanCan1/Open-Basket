@@ -25,6 +25,9 @@ values:
   - notYourItem
   ### An empty name, or a quantity outside what a shopping list can hold.
   - invalidItem
+  ### A negative price, a price on an item that was not picked, or a total
+  ### beyond what one shopping run can cost.
+  - invalidPrice
   - basketNotOpen
   - basketNotFrozen
   - basketAlreadySettled

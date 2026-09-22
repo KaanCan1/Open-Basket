@@ -48,6 +48,10 @@ enum BasketError implements _isc.SerializableModel {
 
   /// An empty name, or a quantity outside what a shopping list can hold.
   invalidItem,
+
+  /// A negative price, a price on an item that was not picked, or a total
+  /// beyond what one shopping run can cost.
+  invalidPrice,
   basketNotOpen,
   basketNotFrozen,
   basketAlreadySettled,
@@ -87,6 +91,8 @@ enum BasketError implements _isc.SerializableModel {
         return BasketError.notYourItem;
       case 'invalidItem':
         return BasketError.invalidItem;
+      case 'invalidPrice':
+        return BasketError.invalidPrice;
       case 'basketNotOpen':
         return BasketError.basketNotOpen;
       case 'basketNotFrozen':

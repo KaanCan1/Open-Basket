@@ -520,3 +520,24 @@ Distribution, given what is available: Android households get the APK directly. 
 installed over a cable from this Mac with a **free** Apple Development identity, which means
 the app **stops launching after seven days** and has to be reinstalled — at least twice over
 the usage period. No TestFlight without the paid program.
+
+## ADR-028: What marking an item may and may not do to its price
+
+`markItem` has one price rule per case, so the checkout screen never has to guess:
+
+- A price is only accepted on a `picked` item in a `frozen` basket. Anything else is
+  `invalidPrice` or `basketNotFrozen`; something that was not bought has no price.
+- Leaving `priceMinor` out **keeps** the price the item already has. Tapping "Got it" again at the
+  till must not wipe what was typed a second ago.
+- Marking an item `unavailable` or `requested` **clears** its price, and marking it `picked` again
+  does not bring the old one back. `requested` is the undo for a mis-tap.
+- Zero is a valid price (a free sample was still picked up); a receipt total of zero is not, because
+  it would make every member owe a negative share of the item sum.
+- Both amounts are capped at 100,000,000 minor units. That catches a slipped thumb, not a budget.
+
+Marking is refused once the basket is `settled` (`basketAlreadySettled`, rule 6) or `cancelled`.
+
+Entering the receipt total publishes a new `basketUpdated` event carrying the basket, so every member
+sees the same total the split will use. It is a new event type rather than a reuse of
+`timerExtended`: an event whose name lies about what happened is the kind of thing the next
+person to touch the reducer gets wrong.
