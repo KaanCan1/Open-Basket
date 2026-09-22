@@ -23,8 +23,11 @@ Status: in development. See `PLAN.md` for the build plan and `CLAUDE.md` for pro
 | API | https://open-basket.api.serverpod.space/ |
 | Web | https://open-basket.serverpod.space/ |
 
-Point a build at it with
+The web address serves the Flutter app itself, so it can be tried in a browser with
+nothing installed. Point a phone build at the same server with
 `flutter run --dart-define=SERVER_URL=https://open-basket.api.serverpod.space/`.
+
+`docs/TESTING.md` is the walkthrough, written for someone seeing it for the first time.
 
 ---
 
