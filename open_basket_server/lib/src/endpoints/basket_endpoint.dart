@@ -360,6 +360,18 @@ class BasketEndpoint extends Endpoint {
       BasketEventType.itemUpdated,
       item: marked,
     );
+    await AnalyticsService.track(
+      session,
+      AnalyticsType.itemMarked,
+      householdId: basket.householdId,
+      basketId: basket.id,
+      memberId: basket.shopperMemberId,
+      payload: {
+        'status': status.name,
+        'whileOpen': basket.status == BasketStatus.open,
+        'hasPrice': marked.priceMinor != null,
+      },
+    );
     return marked;
   }
 

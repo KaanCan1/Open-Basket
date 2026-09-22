@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:clock/clock.dart';
 import 'package:open_basket_server/src/auth_setup.dart';
 import 'package:open_basket_server/src/generated/protocol.dart';
+import 'package:open_basket_server/src/services/analytics_service.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
@@ -223,6 +224,20 @@ void main() {
           endpoints.basket.markItem(shopper, milk.id!, ItemStatus.unavailable),
           _fails(BasketError.basketAlreadySettled),
         );
+      });
+
+      test('marking is written to analytics (rule 8)', () async {
+        final (shopper, _, basket, milk) = await aBasketWithMilk();
+
+        await endpoints.basket.markItem(shopper, milk.id!, ItemStatus.picked);
+
+        final events = await AnalyticsEvent.db.find(
+          sessionBuilder.build(),
+          where: (final t) =>
+              t.basketId.equals(basket.id) &
+              t.type.equals(AnalyticsType.itemMarked),
+        );
+        expect(events, hasLength(1));
       });
 
       test('the house sees it ticked off live', () async {
