@@ -1,15 +1,15 @@
 # App icons, generated from the brand master. Run `dart run flutter_launcher_icons`
 # after replacing the master; never edit the generated files by hand.
 #
-# The master is white on black with no alpha, which is what iOS requires. Android's
-# adaptive icon gets the white mark on an ink background, inset so the launcher's
-# circle or squircle mask never clips the vessel — the full-bleed master would lose
-# its corners.
+# The master is the ink mark on Signal with no alpha, which is what iOS requires.
+# Android's adaptive icon gets the same ink mark on a Signal background, inset so
+# the launcher's circle or squircle mask never clips the vessel — the full-bleed
+# master would lose its corners.
 flutter_launcher_icons:
   image_path: "../docs/brand/open-basket-app-icon-1024.png"
   ios: true
   remove_alpha_ios: true
   android: true
-  adaptive_icon_background: "#0F0F0E"
-  adaptive_icon_foreground: "../docs/brand/open-basket-emblem-white-transparent.png"
+  adaptive_icon_background: "#E2FB33"
+  adaptive_icon_foreground: "../docs/brand/open-basket-emblem-black-transparent.png"
   adaptive_icon_foreground_inset: 22

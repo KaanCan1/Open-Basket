@@ -509,7 +509,9 @@ phone in someone's hand depends on. Before handing an APK to the test households
 - **The app was called `open_basket_flutter` on Android and "Open Basket Flutter" on iOS.**
 - **The launcher icon was Flutter's default.** Generated now from
   `docs/brand/open-basket-app-icon-1024.png` by `flutter_launcher_icons`; Android gets an
-  adaptive icon with the white mark inset on ink so the launcher mask never clips it.
+  adaptive icon with the mark inset so the launcher mask never clips it. The logo is the ink
+  mark on Signal (`#0F0F0E` on `#E2FB33`, the theme's own tokens), chosen by Kaan on
+  2026-09-22; it replaced a white-on-black first cut the same day.
 - **The app id was `com.example.…`**, a placeholder Apple does not register for installing on
   a physical iPhone. It is `com.kaancankurt.openbasket` on both platforms now — changed
   before anyone installed it, so nobody loses a session to the rename.
