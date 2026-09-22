@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -40,6 +41,10 @@ class LiveBasketScreen extends ConsumerWidget {
       );
     }
 
+    // With the keyboard up there is room for the add bar and a few rows, not
+    // for the full countdown card, the strip and the shopper's buttons too:
+    // together they overflowed the screen and left the list no height at all.
+    final typing = MediaQuery.viewInsetsOf(context).bottom > 0;
     final isShopper = basket.shopperMemberId == me?.id;
     final isOpen = basket.status == BasketStatus.open;
     final isFrozen = basket.status == BasketStatus.frozen;
@@ -49,32 +54,43 @@ class LiveBasketScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          l10n.liveBasketItems(state.items.length),
+          state.queued.isEmpty
+              ? l10n.liveBasketItems(state.items.length)
+              : '${l10n.liveBasketItems(state.items.length)} · '
+                    '${l10n.liveBasketQueuedCount(state.queued.length)}',
           style: Theme.of(context).textTheme.labelSmall,
         ),
-        actions: [
-          if (state.connection == LiveConnection.reconnecting)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(
-                child: Text(
-                  l10n.liveBasketReconnecting,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-              ),
-            ),
-        ],
       ),
       body: Column(
         children: [
-          CountdownBanner(basket: basket),
+          CountdownBanner(basket: basket, compact: typing),
+          // Screen 25: the countdown stays at full strength while offline,
+          // because it is the server's clock and not this phone's; the strip
+          // says why the list may be behind.
+          if (state.connection == LiveConnection.reconnecting)
+            _Strip(
+              title: l10n.liveBasketReconnecting,
+              note: typing ? null : l10n.liveBasketReconnectingNote,
+              meta: state.lastSyncedAt == null
+                  ? null
+                  : l10n.liveBasketLastSynced(
+                      DateFormat.Hm().format(state.lastSyncedAt!),
+                    ),
+            )
+          else if (state.report != null)
+            _ReportStrip(report: state.report!),
           Expanded(
-            child: state.items.isEmpty
+            child: state.items.isEmpty && state.queued.isEmpty
                 ? _Empty(isOpen: isOpen)
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: state.items.length,
+                    itemCount: state.items.length + state.queued.length,
                     itemBuilder: (final context, final index) {
+                      if (index >= state.items.length) {
+                        return _QueuedRow(
+                          item: state.queued[index - state.items.length],
+                        );
+                      }
                       final item = state.items[index];
                       return _ItemRow(
                         item: item,
@@ -105,7 +121,7 @@ class LiveBasketScreen extends ConsumerWidget {
           else if (state.connection == LiveConnection.over)
             _Closed(onBack: () => context.pop())
           else if (isOpen) ...[
-            if (isShopper) _ShopperActions(basket: basket),
+            if (isShopper && !typing) _ShopperActions(basket: basket),
             AddItemBar(basketId: basketId),
           ] else if (isFrozen && isShopper)
             _BottomAction(
@@ -462,6 +478,129 @@ class _Waiting extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// A quiet ink strip under the countdown: why the screen may be behind, or
+/// what happened while it was.
+class _Strip extends StatelessWidget {
+  const _Strip({required this.title, this.note, this.meta});
+
+  final String title;
+  final String? note;
+  final String? meta;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onInk = theme.scaffoldBackgroundColor;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: theme.textTheme.bodyLarge!.color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: OpenBasketText.item(onInk).copyWith(fontSize: 14),
+                ),
+              ),
+              if (meta != null)
+                Text(
+                  meta!,
+                  style: OpenBasketText.meta(onInk.withValues(alpha: 0.7)),
+                ),
+            ],
+          ),
+          if (note != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              note!,
+              style: OpenBasketText.meta(onInk.withValues(alpha: 0.85)),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Screen 26: the queue went out, or could not.
+class _ReportStrip extends StatelessWidget {
+  const _ReportStrip({required this.report});
+
+  final QueueReport report;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (report.dropped.isNotEmpty) {
+      return _Strip(
+        title: l10n.liveBasketClosedTitle,
+        note: l10n.liveBasketDropped(report.dropped.join(', ')),
+      );
+    }
+    return _Strip(
+      title: l10n.liveBasketBackOnline(report.sent.length),
+      note: l10n.liveBasketBackOnlineNote(report.sent.join(', ')),
+    );
+  }
+}
+
+/// An item that exists only on this phone so far: dashed, greyed, and saying
+/// so. It never looks like a row everyone else can see.
+class _QueuedRow extends StatelessWidget {
+  const _QueuedRow({required this.item});
+
+  final QueuedItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodySmall!.color!;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: muted.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(CupertinoIcons.clock, size: 18, color: muted),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.quantity != null && item.quantity! > 1
+                      ? '${item.name}  ×${item.quantity}'
+                      : item.name,
+                  style: OpenBasketText.item(muted),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.liveBasketQueuedRow,
+                  style: OpenBasketText.meta(muted),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

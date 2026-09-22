@@ -432,5 +432,51 @@
     }
   },
   "homeLastRunClear": "You don't owe anything on this one.",
-  "@homeLastRunClear": {}
+  "@homeLastRunClear": {},
+  "liveBasketReconnectingNote": "The countdown is right — the server keeps the clock, not this phone.",
+  "@liveBasketReconnectingNote": {},
+  "liveBasketLastSynced": "last synced {time}",
+  "@liveBasketLastSynced": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketQueuedRow": "Queued on this phone · sends when you're back",
+  "@liveBasketQueuedRow": {},
+  "liveBasketQueuedCount": "{count} queued",
+  "@liveBasketQueuedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketOfflineHint": "Offline — anything you add is kept here and sent the moment you're back.",
+  "@liveBasketOfflineHint": {},
+  "liveBasketBackOnline": "{count, plural, =1{Back online · 1 item sent} other{Back online · {count} items sent}}",
+  "@liveBasketBackOnline": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketBackOnlineNote": "Now on everyone's list: {names}.",
+  "@liveBasketBackOnlineNote": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketDropped": "The basket closed before these could be sent: {names}.",
+  "@liveBasketDropped": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  }
 }

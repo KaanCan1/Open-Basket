@@ -16,9 +16,17 @@ import '../../core/theme.dart';
 /// Every tick recomputes from the corrected clock, so sleeping simply shows
 /// the right number on the next frame.
 class CountdownBanner extends ConsumerStatefulWidget {
-  const CountdownBanner({required this.basket, super.key});
+  const CountdownBanner({
+    required this.basket,
+    this.compact = false,
+    super.key,
+  });
 
   final Basket basket;
+
+  /// One line instead of the full card, for when the keyboard is up and the
+  /// list needs the room. The number is still the server's (rule 1).
+  final bool compact;
 
   /// When the banner turns urgent. The server tells everyone at this point
   /// too, so the colour and the notification agree.
@@ -98,6 +106,31 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
     final remaining = left.isNegative ? Duration.zero : left;
     final urgent = remaining <= CountdownBanner.lastCall;
     final label = urgent ? l10n.countdownLastCall : l10n.countdownCheckoutIn;
+    if (widget.compact) {
+      return Container(
+        width: double.infinity,
+        color: urgent ? OpenBasketColors.signal : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: theme.textTheme.labelSmall!.copyWith(
+                  color: urgent ? OpenBasketColors.ink : null,
+                ),
+              ),
+            ),
+            Text(
+              _format(remaining),
+              style: OpenBasketText.countdown(
+                urgent ? OpenBasketColors.ink : ink,
+              ).copyWith(fontSize: 28),
+            ),
+          ],
+        ),
+      );
+    }
     return Container(
       width: double.infinity,
       // Signal is a fill, never a text colour: at last call the whole block

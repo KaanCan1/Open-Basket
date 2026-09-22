@@ -107,9 +107,9 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ### Days 13-14: Resilience
 - [x] **A** Race between two simultaneous `open` calls: the partial unique index guarantees a single basket (done early on Day 8, with the index — ADR-013)
 - [x] **A** `basket_stream_test.dart`: two clients, one adds, the other sees it (done early on Day 9, with the endpoint)
-- [ ] **B** Resync when returning from background, airplane mode test
-- [ ] **B** Items added offline are queued on the device and replayed on reconnect (ADR-011) — or change the error copy in the same PR
-- [ ] **B** Reconnecting state on the live basket, and the "this basket closed while you were away" arrival state
+- [x] **A for B** Resync when returning from background, airplane mode test — resubscribes on resume; offline tested by stopping the server under a live simulator (ADR-032)
+- [x] **A for B** Items added offline are queued on the device and replayed on reconnect (ADR-011) — in memory, so a queue does not survive the app being killed (ADR-032)
+- [ ] **B** Reconnecting state on the live basket (done, ADR-032), and the "this basket closed while you were away" arrival state
 - [ ] **A/B** Second `open` on a household that already has one: clear error, and the screen that shows it
 - [ ] **Both** Fix the top 3 issues from the first week of real use
 
