@@ -541,3 +541,24 @@ Entering the receipt total publishes a new `basketUpdated` event carrying the ba
 sees the same total the split will use. It is a new event type rather than a reuse of
 `timerExtended`: an event whose name lies about what happened is the kind of thing the next
 person to touch the reducer gets wrong.
+
+## ADR-029: Settling is strict, previewing is not
+
+`settle` refuses (`basketNotFullyPriced`) while any item is still `requested`, or `picked` without a
+price. Counting those as zero would quietly make somebody's shopping free, and a settled basket can
+never be corrected (rule 6). The checkout screen keeps its button disabled until every row is priced
+or marked not available, so the error is a backstop, not a flow.
+
+`preview` runs on a half-priced basket and counts the gaps as zero, so the numbers fill in as the
+shopper types. On a settled basket it returns the stored lines rather than recomputing, so the two
+can never disagree after a member joins or leaves.
+
+The split is across the household's members **at the moment of settling**, shopper included. A
+member whose total comes out at zero gets no line. A member whose total comes out negative — a till
+discount bigger than their items — is owed money, so their line runs from the shopper to them with
+every figure negated; `amountMinor` is always positive and always equals `itemsMinor +
+receiptGapMinor`.
+
+Two taps on "Work out who owes what" cannot write the lines twice: the status check and the move to
+`settled` are one conditional `UPDATE` inside the transaction that inserts the lines, and the loser
+sees `basketAlreadySettled`. `settlement_test` races two calls to prove it.

@@ -56,6 +56,11 @@ enum BasketError implements _isc.SerializableModel {
   basketNotFrozen,
   basketAlreadySettled,
 
+  /// Settling needs every item either priced or marked not available. An
+  /// item left as requested, or picked with no price, would silently count
+  /// as free.
+  basketNotFullyPriced,
+
   /// One +5 min extension per basket (ADR-009).
   extensionAlreadyUsed,
 
@@ -99,6 +104,8 @@ enum BasketError implements _isc.SerializableModel {
         return BasketError.basketNotFrozen;
       case 'basketAlreadySettled':
         return BasketError.basketAlreadySettled;
+      case 'basketNotFullyPriced':
+        return BasketError.basketNotFullyPriced;
       case 'extensionAlreadyUsed':
         return BasketError.extensionAlreadyUsed;
       case 'invalidEmailAddress':
