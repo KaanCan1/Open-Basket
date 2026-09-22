@@ -107,7 +107,8 @@ class LiveBasketController extends Notifier<LiveBasketState> {
       BasketEventType.timerExtended ||
       BasketEventType.basketFrozen ||
       BasketEventType.basketSettled ||
-      BasketEventType.basketCancelled => state.copyWith(
+      BasketEventType.basketCancelled ||
+      BasketEventType.basketUpdated => state.copyWith(
         connection: LiveConnection.live,
         basket: event.basket,
       ),

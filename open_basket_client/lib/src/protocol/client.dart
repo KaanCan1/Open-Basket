@@ -383,7 +383,12 @@ class EndpointBasket extends _isc.EndpointRef {
 
   /// Ticks an item off. Shopper only, allowed in **both** `open` and `frozen`
   /// (ADR-005) — the shopper marks things as they walk the aisles. `priceMinor`
-  /// is only accepted once the basket is `frozen`.
+  /// is only accepted once the basket is `frozen`, and only on a `picked`
+  /// item: something that was not bought has no price.
+  ///
+  /// Leaving `priceMinor` out keeps the price an item already has, so tapping
+  /// "Got it" again at the till does not wipe what was typed. Marking an item
+  /// anything other than `picked` clears its price. `requested` is the undo.
   ///
   /// Publishes an `itemUpdated` event, so members watching see it live.
   _ida.Future<_iuuhmcji.BasketItem> markItem(
@@ -402,6 +407,9 @@ class EndpointBasket extends _isc.EndpointRef {
 
   /// The till total, in minor units. Any difference from the item sum is split
   /// across every member at settlement (ADR-007); this only records it.
+  ///
+  /// Shopper only, `frozen` only. Publishes `basketUpdated` so the members
+  /// watching see the same total the split will use.
   _ida.Future<_ifmsley9.Basket> setReceiptTotal(
     int basketId,
     int receiptTotalMinor,

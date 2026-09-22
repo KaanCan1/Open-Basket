@@ -8,3 +8,6 @@ values:
   - basketFrozen
   - basketSettled
   - basketCancelled
+  ### Something about the basket itself changed that is not a lifecycle step:
+  ### today, the shopper entering the receipt total. Carries the basket.
+  - basketUpdated

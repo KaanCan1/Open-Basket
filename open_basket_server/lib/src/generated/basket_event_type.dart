@@ -20,7 +20,11 @@ enum BasketEventType implements _is.SerializableModel {
   timerExtended,
   basketFrozen,
   basketSettled,
-  basketCancelled;
+  basketCancelled,
+
+  /// Something about the basket itself changed that is not a lifecycle step:
+  /// today, the shopper entering the receipt total. Carries the basket.
+  basketUpdated;
 
   static BasketEventType fromJson(String name) {
     switch (name) {
@@ -40,6 +44,8 @@ enum BasketEventType implements _is.SerializableModel {
         return BasketEventType.basketSettled;
       case 'basketCancelled':
         return BasketEventType.basketCancelled;
+      case 'basketUpdated':
+        return BasketEventType.basketUpdated;
       default:
         throw ArgumentError(
           'Value "$name" cannot be converted to "BasketEventType"',

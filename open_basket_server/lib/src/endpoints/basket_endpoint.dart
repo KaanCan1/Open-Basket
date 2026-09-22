@@ -310,7 +310,12 @@ class BasketEndpoint extends Endpoint {
 
   /// Ticks an item off. Shopper only, allowed in **both** `open` and `frozen`
   /// (ADR-005) — the shopper marks things as they walk the aisles. `priceMinor`
-  /// is only accepted once the basket is `frozen`.
+  /// is only accepted once the basket is `frozen`, and only on a `picked`
+  /// item: something that was not bought has no price.
+  ///
+  /// Leaving `priceMinor` out keeps the price an item already has, so tapping
+  /// "Got it" again at the till does not wipe what was typed. Marking an item
+  /// anything other than `picked` clears its price. `requested` is the undo.
   ///
   /// Publishes an `itemUpdated` event, so members watching see it live.
   Future<BasketItem> markItem(
@@ -319,17 +324,75 @@ class BasketEndpoint extends Endpoint {
     ItemStatus status, {
     int? priceMinor,
   }) async {
-    throw UnimplementedError('Day 15-16');
+    final (item, basket) = await _requireVisibleItem(session, itemId);
+    await Authz.requireShopper(session, basket);
+    _requireMarkable(basket);
+
+    if (priceMinor != null) {
+      if (basket.status != BasketStatus.frozen) {
+        throw OpenBasketException(
+          error: BasketError.basketNotFrozen,
+          message: 'Prices go in once you are at the checkout.',
+        );
+      }
+      if (status != ItemStatus.picked) {
+        throw OpenBasketException(
+          error: BasketError.invalidPrice,
+          message: 'Only something you picked up has a price.',
+        );
+      }
+      _requireAmount(priceMinor, allowZero: true);
+    }
+
+    final marked = await BasketItem.db.updateRow(
+      session,
+      item.copyWith(
+        status: status,
+        priceMinor: status == ItemStatus.picked
+            ? priceMinor ?? item.priceMinor
+            : null,
+      ),
+    );
+
+    await BasketChannels.publish(
+      session,
+      basket.id!,
+      BasketEventType.itemUpdated,
+      item: marked,
+    );
+    return marked;
   }
 
   /// The till total, in minor units. Any difference from the item sum is split
   /// across every member at settlement (ADR-007); this only records it.
+  ///
+  /// Shopper only, `frozen` only. Publishes `basketUpdated` so the members
+  /// watching see the same total the split will use.
   Future<Basket> setReceiptTotal(
     Session session,
     int basketId,
     int receiptTotalMinor,
   ) async {
-    throw UnimplementedError('Day 15-16');
+    final basket = await _requireVisible(session, basketId);
+    await Authz.requireShopper(session, basket);
+    _requireFrozen(basket);
+    // Zero is refused on purpose. A run where nothing was bought has no
+    // receipt; recording one of zero would make every member owe a negative
+    // share of the item sum.
+    _requireAmount(receiptTotalMinor, allowZero: false);
+
+    final updated = await Basket.db.updateRow(
+      session,
+      basket.copyWith(receiptTotalMinor: receiptTotalMinor),
+    );
+
+    await BasketChannels.publish(
+      session,
+      basketId,
+      BasketEventType.basketUpdated,
+      basket: updated,
+    );
+    return updated;
   }
 
   // ---------------------------------------------------------------------
@@ -366,6 +429,30 @@ class BasketEndpoint extends Endpoint {
     return basket;
   }
 
+  /// An item on one of the caller's household's baskets, with that basket.
+  ///
+  /// An item in someone else's household must not be distinguishable from an
+  /// item that never existed.
+  Future<(BasketItem, Basket)> _requireVisibleItem(
+    Session session,
+    int itemId,
+  ) async {
+    final member = await Authz.requireMember(session);
+    final item = await BasketItem.db.findById(session, itemId);
+    final basket = item == null
+        ? null
+        : await Basket.db.findById(session, item.basketId);
+    if (item == null ||
+        basket == null ||
+        basket.householdId != member.householdId) {
+      throw OpenBasketException(
+        error: BasketError.itemNotFound,
+        message: 'That item is not on one of your baskets.',
+      );
+    }
+    return (item, basket);
+  }
+
   /// An item the caller asked for, in a basket that is still open, together
   /// with that basket. Update and remove both want exactly this.
   ///
@@ -378,21 +465,7 @@ class BasketEndpoint extends Endpoint {
     int itemId,
   ) async {
     final member = await Authz.requireMember(session);
-    final item = await BasketItem.db.findById(session, itemId);
-    final basket = item == null
-        ? null
-        : await Basket.db.findById(session, item.basketId);
-
-    // An item in someone else's household must not be distinguishable from
-    // an item that never existed.
-    if (item == null ||
-        basket == null ||
-        basket.householdId != member.householdId) {
-      throw OpenBasketException(
-        error: BasketError.itemNotFound,
-        message: 'That item is not on one of your baskets.',
-      );
-    }
+    final (item, basket) = await _requireVisibleItem(session, itemId);
     if (item.requesterMemberId != member.id) {
       throw OpenBasketException(
         error: BasketError.notYourItem,
@@ -402,6 +475,52 @@ class BasketEndpoint extends Endpoint {
     _requireOpenBasket(basket);
     return (item, basket);
   }
+
+  /// Marking works while the shopper walks the aisles and at the till, and
+  /// stops the moment the money is split (rule 6: a settled basket is
+  /// immutable).
+  void _requireMarkable(Basket basket) {
+    switch (basket.status) {
+      case BasketStatus.open:
+      case BasketStatus.frozen:
+        return;
+      case BasketStatus.settled:
+        throw _alreadySettled();
+      case BasketStatus.cancelled:
+        throw OpenBasketException(
+          error: BasketError.basketNotOpen,
+          message: 'This basket was cancelled.',
+        );
+    }
+  }
+
+  void _requireFrozen(Basket basket) {
+    if (basket.status == BasketStatus.settled) throw _alreadySettled();
+    if (basket.status != BasketStatus.frozen) {
+      throw OpenBasketException(
+        error: BasketError.basketNotFrozen,
+        message: 'The receipt total goes in once you are at the checkout.',
+      );
+    }
+  }
+
+  /// One run's money, in minor units. The ceiling is there to catch a slipped
+  /// thumb — 1,000,000.00 in a two-decimal currency — not to model a budget.
+  static const maxAmountMinor = 100000000;
+
+  void _requireAmount(int minor, {required bool allowZero}) {
+    if (minor < 0 || (!allowZero && minor == 0) || minor > maxAmountMinor) {
+      throw OpenBasketException(
+        error: BasketError.invalidPrice,
+        message: 'That amount does not look right.',
+      );
+    }
+  }
+
+  OpenBasketException _alreadySettled() => OpenBasketException(
+    error: BasketError.basketAlreadySettled,
+    message: 'This basket has been settled, so it can no longer change.',
+  );
 
   void _requireOpenBasket(Basket basket) {
     if (basket.status != BasketStatus.open) {

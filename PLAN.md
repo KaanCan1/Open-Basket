@@ -91,7 +91,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **A for B** `live_basket_screen.dart`, `add_item_bar.dart` (name + note; **quantity is not in the bar yet**), requester chip in that member's tone on each item
 - [x] **A for B** `countdown_banner.dart`: based on server time, Signal fill in the last 2 minutes, and no ticking number once `frozen`
 - [x] **A for B** `open_basket_sheet.dart`: quick picks 5 / 10 / 15 / 20 min + custom
-- [ ] **A** Deploy (Serverpod Cloud or VPS + Docker), production config, HTTPS
+- [x] **A** Deploy (Serverpod Cloud or VPS + Docker), production config, HTTPS — Serverpod Cloud, `open-basket` project (ADR-024)
 - [ ] **A for B** Ship the build to both homes. **APK ready and verified against production** (ADR-027); installing it on the actual phones is still to do, and iPhones need a cable install that expires every 7 days
 - ✅ **M2: real usage starts.** Keep notes in `docs/usage_log.md`
 
@@ -118,8 +118,8 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ## Week 3 (Days 15-21): Checkout and settlement
 
 ### Days 15-16: Checkout flow
-- [ ] **A** Shopper-only `markItem(itemId, status: picked | unavailable, priceMinor?)`, allowed in **both** `open` and `frozen`; prices only in `frozen` (ADR-005). Marking publishes an item event on the stream
-- [ ] **A** Optional "receipt total" field; the difference from the item sum is split evenly across every member (ADR-007), shown before settling
+- [x] **A** Shopper-only `markItem(itemId, status: picked | unavailable, priceMinor?)`, allowed in **both** `open` and `frozen`; prices only in `frozen` (ADR-005). Marking publishes an item event on the stream. Also `requested` as the undo; ADR-028
+- [x] **A** Optional "receipt total" field; the difference from the item sum is split evenly across every member (ADR-007), shown before settling. `setReceiptTotal` records it and publishes `basketUpdated`; the split itself is `settlement_service` on Days 17-18
 - [ ] **B** `checkout_screen.dart`: items grouped by person, price field per row, "Not available" button
 - ✅ **M3**
 
