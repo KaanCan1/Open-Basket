@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The Flutter template only grants INTERNET in the debug and profile
+         manifests, so a release build could not reach the server at all: the
+         first APK built for the test households would have failed at sign-in.
+         Found by reading the manifests before handing the APK over, not by
+         running it. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="open_basket_flutter"
+        android:label="Open Basket"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

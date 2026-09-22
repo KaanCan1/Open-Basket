@@ -1,8 +1,9 @@
 # Brand assets
 
-Monochrome only. The mark is three solid masses forming an open vessel, cut by two diagonal
-negative-space slices; the wordmark is lowercase `open basket`. Do not recolour, outline, rotate,
-stretch or add effects to either.
+The mark is three solid masses forming an open vessel, cut by two diagonal
+negative-space slices; the wordmark is lowercase `open basket`. Two colours only: ink
+`#0F0F0E` and Signal `#E2FB33`, the same tokens as `open_basket_flutter/lib/src/core/theme.dart`.
+The app logo is the ink mark on Signal. Do not outline, rotate, stretch or add effects.
 
 ## Supplied originals
 
@@ -22,15 +23,15 @@ same style rather than redrawn.
 | `open-basket-emblem-white-transparent.png` | White mark, alpha background — in-app on dark surfaces |
 | `open-basket-emblem-black-transparent.png` | Black mark, alpha background — in-app on light surfaces |
 | `open-basket-black-emblem.png` | Black mark on opaque white |
-| `open-basket-app-icon-1024.png` | 1024x1024 launcher/store icon master, white on black |
+| `open-basket-app-icon-1024.png` | 1024x1024 launcher/store icon master, ink on Signal |
+| `open-basket-logo-signal-1254.png` | The app logo at the original's size, ink on Signal |
 
 These were thresholded out of the original at luminance 128, which also removed the generation
 grain — that is why they are about 10 KB where the originals are several hundred. Regenerate them
 the same way if the emblem is ever replaced.
 
-## Still to do
+## Launcher icons
 
-The launcher icons themselves are not wired up yet: Android adaptive icons and the iOS icon set
-still need generating from `open-basket-app-icon-1024.png`, and that touches
-`open_basket_flutter/` and its platform folders. It belongs to B, and `PLAN.md` schedules it for
-Day 22.
+`open_basket_flutter/flutter_launcher_icons.yaml` generates the iOS icon set and the Android
+adaptive icon from the master above (ADR-027). Replace the master, then run
+`dart run flutter_launcher_icons` in `open_basket_flutter/`.
