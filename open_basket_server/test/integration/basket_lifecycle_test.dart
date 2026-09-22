@@ -303,6 +303,52 @@ void main() {
       expect(next.id, isNot(basket.id));
     });
 
+    test('a frozen basket does not stop the next run', () async {
+      // Found on the deployed server: the first basket closed itself, and the
+      // household could never open another. Rule 4 is one *open* basket; a
+      // frozen one is waiting for prices, and with settlement not built yet
+      // and cancel only allowed while open, counting it locked the household
+      // out for good.
+      final owner = await aHousehold();
+      final first = await endpoints.basket.open(owner, durationMinutes: 10);
+      await endpoints.basket.freeze(owner, first.id!);
+
+      final second = await endpoints.basket.open(owner, durationMinutes: 10);
+
+      expect(second.id, isNot(first.id));
+      expect(second.status, BasketStatus.open);
+    });
+
+    test('the active basket is the open one when there is one', () async {
+      final owner = await aHousehold();
+      final first = await endpoints.basket.open(owner, durationMinutes: 10);
+      await endpoints.basket.freeze(owner, first.id!);
+      final second = await endpoints.basket.open(owner, durationMinutes: 10);
+
+      expect((await endpoints.basket.getActive(owner))!.id, second.id);
+    });
+
+    test(
+      'with nothing open, the active basket is the latest frozen one',
+      () async {
+        final owner = await aHousehold();
+        final first = await withClock(
+          Clock.fixed(_noon),
+          () => endpoints.basket.open(owner, durationMinutes: 10),
+        );
+        await endpoints.basket.freeze(owner, first.id!);
+        final second = await withClock(
+          Clock.fixed(_noon.add(const Duration(hours: 1))),
+          () => endpoints.basket.open(owner, durationMinutes: 10),
+        );
+        await endpoints.basket.freeze(owner, second.id!);
+
+        // Without ordering, which of the two came back was the database's
+        // choice.
+        expect((await endpoints.basket.getActive(owner))!.id, second.id);
+      },
+    );
+
     test('someone with no household cannot open anything', () async {
       await expectLater(
         endpoints.basket.open(asUser(mert), durationMinutes: 10),
