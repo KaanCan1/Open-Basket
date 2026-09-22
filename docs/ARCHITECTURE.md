@@ -562,3 +562,31 @@ receiptGapMinor`.
 Two taps on "Work out who owes what" cannot write the lines twice: the status check and the move to
 `settled` are one conditional `UPDATE` inside the transaction that inserts the lines, and the loser
 sees `basketAlreadySettled`. `settlement_test` races two calls to prove it.
+
+## ADR-030: The checkout, as it behaved on two simulators
+
+Decisions made while building screens 14 and 15, and the bugs that forced some of them:
+
+- **Marking is an iOS action sheet**, not buttons on every row: tapping an item on the live basket
+  (shopper, while open) offers Got it / Not available / Put it back. On the checkout, tapping an
+  item's name offers Not available; its price field is on the right.
+- **A price saves when the field is left**, not on every keystroke, and a price arriving from the
+  stream never overwrites a field someone is typing in. iOS's decimal pad has no return key, so a
+  tap outside the field is what leaves it. A comma is accepted as the decimal mark.
+- **The totals panel steps aside while the keyboard is up for an item's price.** Pinned, it rode up
+  on the keyboard and hid every row but one.
+- **Cupertino widgets are tinted ink.** They take their tint from Material's primary, which is
+  Signal, so the first action sheet read lime on white — the same fallback that broke screen 04's
+  buttons. `theme_test` now checks what the action sheet actually resolves to.
+- **The member list refreshes itself.** It was fetched once, so a phone that was open when someone
+  joined never learned about them — and the checkout, grouping by member, would have hidden the new
+  member's items, left them unpriced and kept the settle button disabled with nothing on screen to
+  fix. The live basket now refetches members when an item arrives from a requester it does not
+  know, the checkout groups by requester id so an unknown requester still gets rows, and the home
+  screen refetches on resume and on pull-down (which now refetches the basket too).
+- **The gap line on the checkout is display arithmetic** with the same truncating division the
+  server uses; the stored lines are the only numbers anybody owes (rule 6).
+
+Still open: once a run is settled the home screen no longer shows it, so a member who was not
+watching the live basket has no way to their settlement. `history.list` (Day 21) or the Day 11-12
+"settlement is ready" push closes it.

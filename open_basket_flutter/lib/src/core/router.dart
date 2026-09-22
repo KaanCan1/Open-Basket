@@ -3,10 +3,12 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/code_entry_screen.dart';
 import '../features/auth/sign_in_screen.dart';
+import '../features/basket/checkout_screen.dart';
 import '../features/basket/live_basket_screen.dart';
 import '../features/household/create_household_screen.dart';
 import '../features/household/household_home_screen.dart';
 import '../features/household/join_household_screen.dart';
+import '../features/settlement/settlement_screen.dart';
 import 'client_provider.dart';
 
 abstract final class Routes {
@@ -54,6 +56,20 @@ final routerProvider = Provider<GoRouter>((final ref) {
             builder: (final context, final state) => LiveBasketScreen(
               basketId: int.parse(state.pathParameters['id']!),
             ),
+            routes: [
+              GoRoute(
+                path: 'checkout',
+                builder: (final context, final state) => CheckoutScreen(
+                  basketId: int.parse(state.pathParameters['id']!),
+                ),
+              ),
+              GoRoute(
+                path: 'settlement',
+                builder: (final context, final state) => SettlementScreen(
+                  basketId: int.parse(state.pathParameters['id']!),
+                ),
+              ),
+            ],
           ),
         ],
       ),

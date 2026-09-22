@@ -120,7 +120,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ### Days 15-16: Checkout flow
 - [x] **A** Shopper-only `markItem(itemId, status: picked | unavailable, priceMinor?)`, allowed in **both** `open` and `frozen`; prices only in `frozen` (ADR-005). Marking publishes an item event on the stream. Also `requested` as the undo; ADR-028
 - [x] **A** Optional "receipt total" field; the difference from the item sum is split evenly across every member (ADR-007), shown before settling. `setReceiptTotal` records it and publishes `basketUpdated`; the split itself is `settlement_service` on Days 17-18
-- [ ] **B** `checkout_screen.dart`: items grouped by person, price field per row, "Not available" button
+- [x] **A for B** `checkout_screen.dart`: items grouped by person, price field per row, "Not available" button. Also ticking items off on the live basket while it is open (ADR-030)
 - ✅ **M3**
 
 ### Days 17-18: Settlement
@@ -133,7 +133,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
   - Everything is already in minor units, so no rounding
 - [x] **A** `settlement_endpoint.dart`: `settle(basketId)` → writes `SettlementLine` rows + `status = settled`, errors if called twice; `getSettlement(basketId)`. Plus `preview`; settle refuses a basket with unpriced items (ADR-029)
 - [x] **A** `settlement_calc_test.dart`: single member, three members, nothing picked, shopper's own items, a member with no items at all, a gap that does not divide evenly, a zero-decimal currency
-- [ ] **B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary
+- [x] **A for B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary (copied to the clipboard; the share sheet is not wired). **A member has no way back to it from the home screen once the run is settled** — needs `history.list` (Day 21) or the Day 11-12 push
 
 ### Days 19-20: ETA suggestion
 - [ ] **B** In `open_basket_sheet.dart`: pick store → read location once → "Estimated 12 min" suggestion, user can change it

@@ -651,6 +651,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The list is final.'**
   String get countdownListFinal;
+
+  /// No description provided for @itemGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get itemGotIt;
+
+  /// No description provided for @itemNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get itemNotAvailable;
+
+  /// No description provided for @itemGotBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} got it'**
+  String itemGotBy(String name);
+
+  /// No description provided for @itemMarkBackOnList.
+  ///
+  /// In en, this message translates to:
+  /// **'Put it back on the list'**
+  String get itemMarkBackOnList;
+
+  /// No description provided for @itemMarkCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get itemMarkCancel;
+
+  /// No description provided for @liveBasketTickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an item when it is in your basket.'**
+  String get liveBasketTickHint;
+
+  /// No description provided for @liveBasketEnterPrices.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the prices'**
+  String get liveBasketEnterPrices;
+
+  /// No description provided for @liveBasketWaitingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to settle yet'**
+  String get liveBasketWaitingTitle;
+
+  /// No description provided for @liveBasketWaitingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} hasn\'t typed the prices in yet. Your share appears here when they do.'**
+  String liveBasketWaitingNote(String name);
+
+  /// No description provided for @liveBasketSeeSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'See who owes what'**
+  String get liveBasketSeeSettlement;
+
+  /// No description provided for @checkoutLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'BASKET LOCKED'**
+  String get checkoutLocked;
+
+  /// No description provided for @checkoutFrozen.
+  ///
+  /// In en, this message translates to:
+  /// **'FROZEN'**
+  String get checkoutFrozen;
+
+  /// No description provided for @checkoutItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item} other{{count} items}}'**
+  String checkoutItems(int count);
+
+  /// No description provided for @checkoutClosedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'closed {time}'**
+  String checkoutClosedAt(String time);
+
+  /// No description provided for @checkoutHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type what each thing cost. Tap anything that wasn\'t there.'**
+  String get checkoutHint;
+
+  /// No description provided for @checkoutUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get checkoutUndo;
+
+  /// No description provided for @checkoutItemsAddUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Items add up to'**
+  String get checkoutItemsAddUp;
+
+  /// No description provided for @checkoutReceiptTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt total'**
+  String get checkoutReceiptTotal;
+
+  /// No description provided for @checkoutGapMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt is {gap} more than the items.{count, plural, =1{} other{ Split evenly across all {count} — {each} each.}}'**
+  String checkoutGapMore(String gap, int count, String each);
+
+  /// No description provided for @checkoutGapLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt is {gap} less than the items.{count, plural, =1{} other{ Split evenly across all {count} — {each} off each.}}'**
+  String checkoutGapLess(String gap, int count, String each);
+
+  /// No description provided for @checkoutSettle.
+  ///
+  /// In en, this message translates to:
+  /// **'Work out who owes what'**
+  String get checkoutSettle;
+
+  /// No description provided for @checkoutUnfinished.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item still needs a price} other{{count} items still need a price}}'**
+  String checkoutUnfinished(int count);
+
+  /// No description provided for @checkoutNotAPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'That doesn\'t look like a price.'**
+  String get checkoutNotAPrice;
+
+  /// No description provided for @checkoutDidNotSave.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t save. Try again.'**
+  String get checkoutDidNotSave;
+
+  /// No description provided for @settlementBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'SETTLED'**
+  String get settlementBadge;
+
+  /// No description provided for @settlementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled up'**
+  String get settlementTitle;
+
+  /// No description provided for @settlementSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{items}{unavailable, plural, =0{} other{ · {unavailable} unavailable}} · receipt {total}'**
+  String settlementSummary(String items, int unavailable, String total);
+
+  /// No description provided for @settlementWhoOwes.
+  ///
+  /// In en, this message translates to:
+  /// **'WHO OWES WHOM'**
+  String get settlementWhoOwes;
+
+  /// No description provided for @settlementOwes.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} owes {to}'**
+  String settlementOwes(String from, String to);
+
+  /// No description provided for @settlementBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'{items} items + {gap} gap'**
+  String settlementBreakdown(String items, String gap);
+
+  /// No description provided for @settlementBreakdownCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'{items} items − {gap} off'**
+  String settlementBreakdownCredit(String items, String gap);
+
+  /// No description provided for @settlementNobody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody owes anybody'**
+  String get settlementNobody;
+
+  /// No description provided for @settlementNobodyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone\'s share came to nothing, or to what the shopper bought for themselves.'**
+  String get settlementNobodyNote;
+
+  /// No description provided for @settlementGapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'THE RECEIPT GAP'**
+  String get settlementGapTitle;
+
+  /// No description provided for @settlementItemsPriced.
+  ///
+  /// In en, this message translates to:
+  /// **'Items priced'**
+  String get settlementItemsPriced;
+
+  /// No description provided for @settlementReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get settlementReceipt;
+
+  /// No description provided for @settlementGapAcross.
+  ///
+  /// In en, this message translates to:
+  /// **'{gap} across {count, plural, =1{1 member} other{{count} members}}'**
+  String settlementGapAcross(String gap, int count);
+
+  /// No description provided for @settlementCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the summary'**
+  String get settlementCopy;
+
+  /// No description provided for @settlementCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied. Paste it wherever the house talks.'**
+  String get settlementCopied;
+
+  /// No description provided for @settlementShareLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} owes {to} {amount}'**
+  String settlementShareLine(String from, String to, String amount);
+
+  /// No description provided for @settlementDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get settlementDone;
+
+  /// No description provided for @checkoutSomeone.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone new'**
+  String get checkoutSomeone;
 }
 
 class _AppLocalizationsDelegate

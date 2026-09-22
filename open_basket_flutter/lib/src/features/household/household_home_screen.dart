@@ -20,11 +20,40 @@ import 'household_controller.dart';
 /// first frame or flash the wrong screen. So this screen owns the three
 /// states — loading, no household, a household — and the router only ever asks
 /// "signed in or not".
-class HouseholdHomeScreen extends ConsumerWidget {
+class HouseholdHomeScreen extends ConsumerStatefulWidget {
   const HouseholdHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HouseholdHomeScreen> createState() =>
+      _HouseholdHomeScreenState();
+}
+
+class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    // Everything on this screen is fetched once. Coming back to the app is
+    // when it is most likely to be stale — someone joined, a basket opened
+    // or closed — so that is when it refetches, without anyone having to
+    // know that pulling down refreshes.
+    _lifecycle = AppLifecycleListener(
+      onResume: () {
+        ref.invalidate(myHouseholdProvider);
+        ref.invalidate(activeBasketProvider);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final household = ref.watch(myHouseholdProvider);
 
@@ -61,6 +90,9 @@ class _Home extends ConsumerWidget {
         child: RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(myHouseholdProvider);
+            // The basket too: pulling down is what someone does when a
+            // basket they were told about is not on the screen.
+            ref.invalidate(activeBasketProvider);
             await ref.read(membersProvider.future);
           },
           child: ListView(

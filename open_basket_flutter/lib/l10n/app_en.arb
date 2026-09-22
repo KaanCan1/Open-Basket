@@ -197,5 +197,203 @@
   "liveBasketRemove": "Remove",
   "@liveBasketRemove": {},
   "countdownListFinal": "The list is final.",
-  "@countdownListFinal": {}
+  "@countdownListFinal": {},
+  "itemGotIt": "Got it",
+  "@itemGotIt": {},
+  "itemNotAvailable": "Not available",
+  "@itemNotAvailable": {},
+  "itemGotBy": "{name} got it",
+  "@itemGotBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemMarkBackOnList": "Put it back on the list",
+  "@itemMarkBackOnList": {},
+  "itemMarkCancel": "Cancel",
+  "@itemMarkCancel": {},
+  "liveBasketTickHint": "Tap an item when it is in your basket.",
+  "@liveBasketTickHint": {},
+  "liveBasketEnterPrices": "Enter the prices",
+  "@liveBasketEnterPrices": {},
+  "liveBasketWaitingTitle": "Nothing to settle yet",
+  "@liveBasketWaitingTitle": {},
+  "liveBasketWaitingNote": "{name} hasn't typed the prices in yet. Your share appears here when they do.",
+  "@liveBasketWaitingNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketSeeSettlement": "See who owes what",
+  "@liveBasketSeeSettlement": {},
+  "checkoutLocked": "BASKET LOCKED",
+  "@checkoutLocked": {},
+  "checkoutFrozen": "FROZEN",
+  "@checkoutFrozen": {},
+  "checkoutItems": "{count, plural, =1{1 item} other{{count} items}}",
+  "@checkoutItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkoutClosedAt": "closed {time}",
+  "@checkoutClosedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutHint": "Type what each thing cost. Tap anything that wasn't there.",
+  "@checkoutHint": {},
+  "checkoutUndo": "Undo",
+  "@checkoutUndo": {},
+  "checkoutItemsAddUp": "Items add up to",
+  "@checkoutItemsAddUp": {},
+  "checkoutReceiptTotal": "Receipt total",
+  "@checkoutReceiptTotal": {},
+  "checkoutGapMore": "Receipt is {gap} more than the items.{count, plural, =1{} other{ Split evenly across all {count} — {each} each.}}",
+  "@checkoutGapMore": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "each": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutGapLess": "Receipt is {gap} less than the items.{count, plural, =1{} other{ Split evenly across all {count} — {each} off each.}}",
+  "@checkoutGapLess": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "each": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutSettle": "Work out who owes what",
+  "@checkoutSettle": {},
+  "checkoutUnfinished": "{count, plural, =1{1 item still needs a price} other{{count} items still need a price}}",
+  "@checkoutUnfinished": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkoutNotAPrice": "That doesn't look like a price.",
+  "@checkoutNotAPrice": {},
+  "checkoutDidNotSave": "That didn't save. Try again.",
+  "@checkoutDidNotSave": {},
+  "settlementBadge": "SETTLED",
+  "@settlementBadge": {},
+  "settlementTitle": "Settled up",
+  "@settlementTitle": {},
+  "settlementSummary": "{items}{unavailable, plural, =0{} other{ · {unavailable} unavailable}} · receipt {total}",
+  "@settlementSummary": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      },
+      "unavailable": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementWhoOwes": "WHO OWES WHOM",
+  "@settlementWhoOwes": {},
+  "settlementOwes": "{from} owes {to}",
+  "@settlementOwes": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementBreakdown": "{items} items + {gap} gap",
+  "@settlementBreakdown": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      },
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementBreakdownCredit": "{items} items − {gap} off",
+  "@settlementBreakdownCredit": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      },
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementNobody": "Nobody owes anybody",
+  "@settlementNobody": {},
+  "settlementNobodyNote": "Everyone's share came to nothing, or to what the shopper bought for themselves.",
+  "@settlementNobodyNote": {},
+  "settlementGapTitle": "THE RECEIPT GAP",
+  "@settlementGapTitle": {},
+  "settlementItemsPriced": "Items priced",
+  "@settlementItemsPriced": {},
+  "settlementReceipt": "Receipt",
+  "@settlementReceipt": {},
+  "settlementGapAcross": "{gap} across {count, plural, =1{1 member} other{{count} members}}",
+  "@settlementGapAcross": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settlementCopy": "Copy the summary",
+  "@settlementCopy": {},
+  "settlementCopied": "Copied. Paste it wherever the house talks.",
+  "@settlementCopied": {},
+  "settlementShareLine": "{from} owes {to} {amount}",
+  "@settlementShareLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementDone": "Done",
+  "@settlementDone": {},
+  "checkoutSomeone": "Someone new",
+  "@checkoutSomeone": {}
 }

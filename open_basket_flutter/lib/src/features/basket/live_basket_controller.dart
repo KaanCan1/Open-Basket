@@ -5,6 +5,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
 import '../../core/server_clock.dart';
+import '../household/household_controller.dart';
 import 'basket_controller.dart';
 import 'live_basket_state.dart';
 
@@ -118,6 +119,8 @@ class LiveBasketController extends Notifier<LiveBasketState> {
       state = state.copyWith(connection: LiveConnection.over);
     }
 
+    _refreshMembersIfSomeoneIsNew();
+
     // The home screen reads the basket through its own provider, fetched
     // once. Without this it kept saying "a basket is open" after the stream
     // had reported the basket frozen — found by letting a basket close itself
@@ -127,6 +130,29 @@ class LiveBasketController extends Notifier<LiveBasketState> {
         event.type != BasketEventType.itemRemoved) {
       ref.invalidate(activeBasketProvider);
     }
+  }
+
+  /// Requesters this controller has already asked the member list about, so
+  /// a requester who really is gone does not refetch on every event.
+  final _askedAbout = <int>{};
+
+  /// The member list is fetched once. Someone who joined after that shows up
+  /// here first, as the requester of an item nobody on this phone has heard
+  /// of — and every screen that groups or labels by member would otherwise
+  /// drop or mislabel that item. Found by joining a second phone while the
+  /// first was on the home screen: its checkout would have hidden the new
+  /// member's items and never let the shopper settle.
+  void _refreshMembersIfSomeoneIsNew() {
+    final members = ref.read(membersProvider).value;
+    if (members == null) return;
+    final known = {for (final m in members) m.id};
+    final unknown = {
+      for (final item in state.items)
+        if (!known.contains(item.requesterMemberId)) item.requesterMemberId,
+    }.difference(_askedAbout);
+    if (unknown.isEmpty) return;
+    _askedAbout.addAll(unknown);
+    ref.invalidate(membersProvider);
   }
 
   static bool _isOver(BasketStatus? status) =>

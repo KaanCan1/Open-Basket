@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../household/household_controller.dart';
 import 'add_item_bar.dart';
@@ -40,6 +42,9 @@ class LiveBasketScreen extends ConsumerWidget {
 
     final isShopper = basket.shopperMemberId == me?.id;
     final isOpen = basket.status == BasketStatus.open;
+    final isFrozen = basket.status == BasketStatus.frozen;
+    final isSettled = basket.status == BasketStatus.settled;
+    final shopperName = _nameFor(members, basket.shopperMemberId);
 
     return Scaffold(
       appBar: AppBar(
@@ -74,6 +79,12 @@ class LiveBasketScreen extends ConsumerWidget {
                       return _ItemRow(
                         item: item,
                         requester: _nameFor(members, item.requesterMemberId),
+                        shopper: shopperName,
+                        // ADR-005: the shopper ticks things off while walking
+                        // the aisles. Prices wait for the checkout screen.
+                        onTap: isOpen && isShopper
+                            ? () => _markItem(context, ref, item)
+                            : null,
                         // Rule 3 in its narrowest form: your own item, and
                         // only while the list is still open.
                         onRemove: isOpen && item.requesterMemberId == me?.id
@@ -85,15 +96,77 @@ class LiveBasketScreen extends ConsumerWidget {
                     },
                   ),
           ),
-          if (state.connection == LiveConnection.over)
+          if (isSettled)
+            _BottomAction(
+              label: l10n.liveBasketSeeSettlement,
+              onPressed: () =>
+                  context.push('${Routes.basket}/$basketId/settlement'),
+            )
+          else if (state.connection == LiveConnection.over)
             _Closed(onBack: () => context.pop())
           else if (isOpen) ...[
             if (isShopper) _ShopperActions(basket: basket),
             AddItemBar(basketId: basketId),
-          ],
+          ] else if (isFrozen && isShopper)
+            _BottomAction(
+              label: l10n.liveBasketEnterPrices,
+              onPressed: () =>
+                  context.push('${Routes.basket}/$basketId/checkout'),
+            )
+          else if (isFrozen)
+            _Waiting(shopper: shopperName),
         ],
       ),
     );
+  }
+
+  /// An iOS action sheet rather than three buttons on every row: the row
+  /// stays readable, and the thumb that tapped it is already where the sheet
+  /// appears.
+  static Future<void> _markItem(
+    BuildContext context,
+    WidgetRef ref,
+    BasketItem item,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showCupertinoModalPopup<ItemStatus>(
+      context: context,
+      builder: (final context) => CupertinoActionSheet(
+        title: Text(item.name),
+        actions: [
+          if (item.status != ItemStatus.picked)
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(context).pop(ItemStatus.picked),
+              child: Text(l10n.itemGotIt),
+            ),
+          if (item.status != ItemStatus.unavailable)
+            CupertinoActionSheetAction(
+              onPressed: () =>
+                  Navigator.of(context).pop(ItemStatus.unavailable),
+              child: Text(l10n.itemNotAvailable),
+            ),
+          if (item.status != ItemStatus.requested)
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(context).pop(ItemStatus.requested),
+              child: Text(l10n.itemMarkBackOnList),
+            ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.itemMarkCancel),
+        ),
+      ),
+    );
+    if (choice == null) return;
+    try {
+      await ref.read(basketControllerProvider).markItem(item.id!, choice);
+    } on Exception {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.checkoutDidNotSave)));
+    }
   }
 
   static String _nameFor(List<HouseholdMember> members, int memberId) {
@@ -108,11 +181,15 @@ class _ItemRow extends StatelessWidget {
   const _ItemRow({
     required this.item,
     required this.requester,
+    required this.shopper,
+    required this.onTap,
     required this.onRemove,
   });
 
   final BasketItem item;
   final String requester;
+  final String shopper;
+  final VoidCallback? onTap;
   final VoidCallback? onRemove;
 
   @override
@@ -123,7 +200,13 @@ class _ItemRow extends StatelessWidget {
       theme.brightness,
     );
 
-    return Container(
+    final l10n = AppLocalizations.of(context);
+    final muted = theme.textTheme.bodySmall!.color!;
+    final ink = theme.textTheme.bodyLarge!.color!;
+    final gone = item.status == ItemStatus.unavailable;
+    final got = item.status == ItemStatus.picked;
+
+    final row = Container(
       constraints: const BoxConstraints(minHeight: kMinTapTarget),
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
@@ -140,9 +223,20 @@ class _ItemRow extends StatelessWidget {
                   item.quantity > 1
                       ? '${item.name}  ×${item.quantity}'
                       : item.name,
-                  style: OpenBasketText.item(theme.textTheme.bodyLarge!.color!),
+                  style: gone
+                      ? OpenBasketText.item(
+                          muted,
+                        ).copyWith(decoration: TextDecoration.lineThrough)
+                      : OpenBasketText.item(ink),
                 ),
-                if (item.note != null) ...[
+                if (gone || got) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    gone ? l10n.itemNotAvailable : l10n.itemGotBy(shopper),
+                    style: OpenBasketText.meta(muted),
+                  ),
+                ],
+                if (item.note != null && !gone) ...[
                   const SizedBox(height: 2),
                   Text(
                     item.note!,
@@ -155,6 +249,13 @@ class _ItemRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
+          // The tick is ink, not signal: got items are settled business, and
+          // the signal belongs to time. A 32px glyph in a 44px box.
+          if (got)
+            SizedBox.square(
+              dimension: kMinTapTarget,
+              child: Icon(CupertinoIcons.checkmark_alt, size: 24, color: ink),
+            ),
           // The person chip, in that member's tone for life. People learn
           // their colour, which is why it never changes.
           Container(
@@ -176,6 +277,9 @@ class _ItemRow extends StatelessWidget {
         ],
       ),
     );
+
+    if (onTap == null) return row;
+    return InkWell(onTap: onTap, child: row);
   }
 }
 
@@ -297,6 +401,67 @@ class _Closed extends StatelessWidget {
           const SizedBox(height: 16),
           FilledButton(onPressed: onBack, child: Text(l10n.liveBasketBack)),
         ],
+      ),
+    );
+  }
+}
+
+/// One full-width primary action where the add-item bar would be.
+class _BottomAction extends StatelessWidget {
+  const _BottomAction({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        child: SizedBox(
+          width: double.infinity,
+          child: FilledButton(onPressed: onPressed, child: Text(label)),
+        ),
+      ),
+    );
+  }
+}
+
+/// Screen 23: a member looking at a frozen basket the shopper has not priced
+/// yet. The stream is still up, so this turns into the settlement button by
+/// itself when the shopper settles.
+class _Waiting extends StatelessWidget {
+  const _Waiting({required this.shopper});
+
+  final String shopper;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        padding: const EdgeInsets.all(16),
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.liveBasketWaitingTitle,
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              l10n.liveBasketWaitingNote(shopper),
+              style: theme.textTheme.bodySmall,
+            ),
+          ],
+        ),
       ),
     );
   }
