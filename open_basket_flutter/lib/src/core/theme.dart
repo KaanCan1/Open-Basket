@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -158,6 +159,15 @@ ThemeData buildOpenBasketTheme(Brightness brightness) {
       scrolledUnderElevation: 0,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(color: onGround),
+    // The same fallback, one level down. Cupertino widgets take their tint
+    // from Material's primary when nothing overrides it, so the iOS action
+    // sheet for marking an item came out with lime "Got it" on frosted white.
+    // Ink is what iOS itself would use for a neutral sheet.
+    cupertinoOverrideTheme: CupertinoThemeData(
+      brightness: brightness,
+      primaryColor: onGround,
+      primaryContrastingColor: ground,
+    ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: onGround,

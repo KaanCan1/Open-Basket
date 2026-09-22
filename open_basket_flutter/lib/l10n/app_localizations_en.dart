@@ -326,4 +326,194 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countdownListFinal => 'The list is final.';
+
+  @override
+  String get itemGotIt => 'Got it';
+
+  @override
+  String get itemNotAvailable => 'Not available';
+
+  @override
+  String itemGotBy(String name) {
+    return '$name got it';
+  }
+
+  @override
+  String get itemMarkBackOnList => 'Put it back on the list';
+
+  @override
+  String get itemMarkCancel => 'Cancel';
+
+  @override
+  String get liveBasketTickHint => 'Tap an item when it is in your basket.';
+
+  @override
+  String get liveBasketEnterPrices => 'Enter the prices';
+
+  @override
+  String get liveBasketWaitingTitle => 'Nothing to settle yet';
+
+  @override
+  String liveBasketWaitingNote(String name) {
+    return '$name hasn\'t typed the prices in yet. Your share appears here when they do.';
+  }
+
+  @override
+  String get liveBasketSeeSettlement => 'See who owes what';
+
+  @override
+  String get checkoutLocked => 'BASKET LOCKED';
+
+  @override
+  String get checkoutFrozen => 'FROZEN';
+
+  @override
+  String checkoutItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String checkoutClosedAt(String time) {
+    return 'closed $time';
+  }
+
+  @override
+  String get checkoutHint =>
+      'Type what each thing cost. Tap anything that wasn\'t there.';
+
+  @override
+  String get checkoutUndo => 'Undo';
+
+  @override
+  String get checkoutItemsAddUp => 'Items add up to';
+
+  @override
+  String get checkoutReceiptTotal => 'Receipt total';
+
+  @override
+  String checkoutGapMore(String gap, int count, String each) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: ' Split evenly across all $count — $each each.',
+      one: '',
+    );
+    return 'Receipt is $gap more than the items.$_temp0';
+  }
+
+  @override
+  String checkoutGapLess(String gap, int count, String each) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: ' Split evenly across all $count — $each off each.',
+      one: '',
+    );
+    return 'Receipt is $gap less than the items.$_temp0';
+  }
+
+  @override
+  String get checkoutSettle => 'Work out who owes what';
+
+  @override
+  String checkoutUnfinished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items still need a price',
+      one: '1 item still needs a price',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkoutNotAPrice => 'That doesn\'t look like a price.';
+
+  @override
+  String get checkoutDidNotSave => 'That didn\'t save. Try again.';
+
+  @override
+  String get settlementBadge => 'SETTLED';
+
+  @override
+  String get settlementTitle => 'Settled up';
+
+  @override
+  String settlementSummary(String items, int unavailable, String total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      unavailable,
+      locale: localeName,
+      other: ' · $unavailable unavailable',
+      zero: '',
+    );
+    return '$items$_temp0 · receipt $total';
+  }
+
+  @override
+  String get settlementWhoOwes => 'WHO OWES WHOM';
+
+  @override
+  String settlementOwes(String from, String to) {
+    return '$from owes $to';
+  }
+
+  @override
+  String settlementBreakdown(String items, String gap) {
+    return '$items items + $gap gap';
+  }
+
+  @override
+  String settlementBreakdownCredit(String items, String gap) {
+    return '$items items − $gap off';
+  }
+
+  @override
+  String get settlementNobody => 'Nobody owes anybody';
+
+  @override
+  String get settlementNobodyNote =>
+      'Everyone\'s share came to nothing, or to what the shopper bought for themselves.';
+
+  @override
+  String get settlementGapTitle => 'THE RECEIPT GAP';
+
+  @override
+  String get settlementItemsPriced => 'Items priced';
+
+  @override
+  String get settlementReceipt => 'Receipt';
+
+  @override
+  String settlementGapAcross(String gap, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+    );
+    return '$gap across $_temp0';
+  }
+
+  @override
+  String get settlementCopy => 'Copy the summary';
+
+  @override
+  String get settlementCopied => 'Copied. Paste it wherever the house talks.';
+
+  @override
+  String settlementShareLine(String from, String to, String amount) {
+    return '$from owes $to $amount';
+  }
+
+  @override
+  String get settlementDone => 'Done';
+
+  @override
+  String get checkoutSomeone => 'Someone new';
 }

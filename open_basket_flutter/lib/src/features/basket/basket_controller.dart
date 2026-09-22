@@ -55,7 +55,32 @@ class BasketController {
   }
 
   Future<void> removeItem(int itemId) => _client.basket.removeItem(itemId);
+
+  /// Shopper only. Like extend and freeze, the result reaches this screen
+  /// through the stream, so nothing is invalidated here.
+  Future<BasketItem> markItem(
+    int itemId,
+    ItemStatus status, {
+    int? priceMinor,
+  }) => _client.basket.markItem(itemId, status, priceMinor: priceMinor);
+
+  Future<Basket> setReceiptTotal(int basketId, int totalMinor) =>
+      _client.basket.setReceiptTotal(basketId, totalMinor);
+
+  /// Settling ends the run, so the home screen's basket goes too.
+  Future<List<SettlementLine>> settle(int basketId) async {
+    final lines = await _client.settlement.settle(basketId);
+    _ref.invalidate(activeBasketProvider);
+    _ref.invalidate(settlementProvider(basketId));
+    return lines;
+  }
 }
+
+/// The stored lines of a settled basket; empty for any other.
+final settlementProvider = FutureProvider.autoDispose
+    .family<List<SettlementLine>, int>((final ref, final basketId) async {
+      return ref.watch(clientProvider).settlement.get(basketId);
+    });
 
 final basketControllerProvider = Provider<BasketController>(
   BasketController.new,

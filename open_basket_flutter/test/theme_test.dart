@@ -138,6 +138,15 @@ void main() {
         );
       });
 
+      test('the iOS action sheet is readable in $name', () {
+        // What CupertinoActionSheet actually tints its actions with.
+        final tint = MaterialBasedCupertinoThemeData(
+          materialTheme: theme,
+        ).primaryColor;
+        expect(tint, isNot(OpenBasketColors.signal));
+        expect(_contrast(tint, ground), greaterThanOrEqualTo(4.5));
+      });
+
       test('Signal is never a foreground in $name', () {
         // The one rule the palette has.
         for (final style in [
