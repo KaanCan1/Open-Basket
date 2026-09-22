@@ -182,9 +182,12 @@ slower than two seconds left the app on a permanent white screen (ADR-026).
 
 Open:
 
-- On the web build, pressing Return in the email field did not send a code on 2026-09-22,
-  though it did the day before. Root cause not found yet. Judges are pointed at the web build
-  first, so this matters.
+- ~~Return in the web build's email field does not send a code~~ — **not a bug.** The
+  browser automation used for testing delivers Enter as a trusted keydown with `keyCode: 0`,
+  and Flutter web submits on `keyCode == 13`, which every real keyboard sends. A synthetic
+  event with keyCode 13 submits normally. Recorded so nobody chases it again.
+- The web build is a secondary, no-install way to try the app; **the product is the phone
+  app** (decided 2026-09-22).
 - Branch protection on `main` still not enabled.
 - Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
   the ETA suggestion depends on it.
