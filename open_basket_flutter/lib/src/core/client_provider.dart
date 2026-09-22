@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_basket_client/open_basket_client.dart';
@@ -17,8 +19,36 @@ Future<Client> createClient() async {
   final client = Client(await getServerUrl())
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
-  await client.auth.initialize();
+
+  // Local only: whatever session this device last had. The first frame must
+  // never wait on the network.
+  await client.auth.restore();
+  unawaited(_validateSession(client));
   return client;
+}
+
+/// Checks the restored session with the server, off the startup path.
+///
+/// This used to be `auth.initialize()`, awaited before `runApp`. It asks the
+/// server with a two-second timeout, and although its own documentation says
+/// a timeout returns false without signing anyone out, it only catches
+/// `ServerpodClientException` — the `TimeoutException` escapes. So a server
+/// that took longer than two seconds to answer, which is exactly what a
+/// freshly deployed or long-idle one does, left an unhandled exception in
+/// `main`, `runApp` never ran, and the app was a white screen for good.
+/// Found by relaunching against production a minute after a deploy.
+///
+/// Offline, a cold server, a timeout: all of them keep the stored session.
+/// If it really has expired, validation signs the device out, the auth
+/// listenable fires, and the router sends the user to sign in.
+Future<void> _validateSession(Client client) async {
+  try {
+    await client.auth.validateAuthentication(
+      timeout: const Duration(seconds: 15),
+    );
+  } catch (_) {
+    // Deliberately quiet. See above.
+  }
 }
 
 /// Signs this device out. Kept here so screens never have to import the auth
