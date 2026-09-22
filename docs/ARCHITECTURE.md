@@ -495,3 +495,26 @@ runs in the background with a longer timeout and swallows failure. Offline, a co
 and a timeout all keep the stored session. If the session really has expired, validation
 signs the device out, the auth listenable fires, and the router sends the user to sign in —
 the same path as before, just not in front of the first frame.
+
+## ADR-027: The debug build was hiding four release problems
+
+Every run until Day 10 was a debug build on a simulator, which never exercises the things a
+phone in someone's hand depends on. Before handing an APK to the test households:
+
+- **The release Android manifest had no `INTERNET` permission.** The Flutter template only
+  grants it in the debug and profile manifests, so the first APK built for the households
+  could not reach the server at all — sign-in would simply have failed. Found by reading the
+  manifests before handing the APK over, then confirmed by installing the rebuilt APK on an
+  Android 10 emulator and requesting a code from production.
+- **The app was called `open_basket_flutter` on Android and "Open Basket Flutter" on iOS.**
+- **The launcher icon was Flutter's default.** Generated now from
+  `docs/brand/open-basket-app-icon-1024.png` by `flutter_launcher_icons`; Android gets an
+  adaptive icon with the white mark inset on ink so the launcher mask never clips it.
+- **The app id was `com.example.…`**, a placeholder Apple does not register for installing on
+  a physical iPhone. It is `com.kaancankurt.openbasket` on both platforms now — changed
+  before anyone installed it, so nobody loses a session to the rename.
+
+Distribution, given what is available: Android households get the APK directly. iPhones are
+installed over a cable from this Mac with a **free** Apple Development identity, which means
+the app **stops launching after seven days** and has to be reinstalled — at least twice over
+the usage period. No TestFlight without the paid program.
