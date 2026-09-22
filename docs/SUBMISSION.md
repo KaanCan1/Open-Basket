@@ -103,7 +103,9 @@ coding assistant, for implementation, review and documentation, and Claude Desig
 interface design. All architectural decisions, the product rules and the final code are
 the team's own and were reviewed by us.
 
-Live: https://open-basket.serverpod.space/
+**Try it in a browser:** https://open-basket.serverpod.space — no install, no password.
+Sign in with any address you can read mail at. Full walkthrough in `docs/TESTING.md`.
+
 Source: https://github.com/KaanCan1/Open-Basket
 
 ---
@@ -116,8 +118,9 @@ Source: https://github.com/KaanCan1/Open-Basket
 - [x] **A judge can actually sign in.** Deployed to Serverpod Cloud on 2026-09-22, which
       manages `scloudAuthEmailKey`, so the six-digit code is delivered by real email.
       Verified end to end against production.
-- [ ] Testing instructions written: the API URL, and the fact that any email address works
-      because there is no password and no approval step.
+- [x] **Testing instructions written** — `docs/TESTING.md`. Paste it, or its link, into
+      the submission's testing field. It leads with the browser build, so a judge needs
+      nothing installed.
 - [x] **Build and run instructions in the repository.** In `README.md`, including how to
       point a build at production.
 - [ ] GitHub repository description filled in (currently empty).
