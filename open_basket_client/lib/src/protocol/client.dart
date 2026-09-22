@@ -650,6 +650,11 @@ class EndpointSettlement extends _isc.EndpointRef {
 
   /// What settling would produce, without writing anything. Lets the checkout
   /// screen show the split before the shopper commits.
+  ///
+  /// Any member may ask. Runs on a half-priced basket too — unpriced items
+  /// count as nothing — so the numbers fill in as the shopper types. On a
+  /// basket that is already settled it answers the stored lines, which is the
+  /// only answer that can never disagree with `get`.
   _ida.Future<List<_i27lt87a.SettlementLine>> preview(int basketId) =>
       caller.callServerEndpoint<List<_i27lt87a.SettlementLine>>(
         'settlement',
@@ -664,8 +669,9 @@ class EndpointSettlement extends _isc.EndpointRef {
   /// who asked for nothing. The remainder goes to the shopper so the lines
   /// always sum to exactly what they paid (ADR-007).
   ///
-  /// Throws `basketNotFrozen` too early and `basketAlreadySettled` twice: the
-  /// result is immutable.
+  /// Throws `basketNotFrozen` too early, `basketNotFullyPriced` while any item
+  /// is neither priced nor marked not available, and `basketAlreadySettled`
+  /// twice: the result is immutable.
   _ida.Future<List<_i27lt87a.SettlementLine>> settle(int basketId) =>
       caller.callServerEndpoint<List<_i27lt87a.SettlementLine>>(
         'settlement',
@@ -673,6 +679,8 @@ class EndpointSettlement extends _isc.EndpointRef {
         {'basketId': basketId},
       );
 
+  /// The stored lines for a settled basket, and an empty list for any other.
+  /// Any member may read them.
   _ida.Future<List<_i27lt87a.SettlementLine>> get(int basketId) =>
       caller.callServerEndpoint<List<_i27lt87a.SettlementLine>>(
         'settlement',

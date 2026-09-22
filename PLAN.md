@@ -124,15 +124,15 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - ✅ **M3**
 
 ### Days 17-18: Settlement
-- [ ] **A** `settlement_service.dart` (pure Dart function, testable without DB)
+- [x] **A** `settlement_service.dart` (pure Dart function, testable without DB)
   - The shopper paid
   - Each member owes the sum of their own `picked` items, plus an even share of the receipt gap
   - Members who asked for nothing still owe their share of the gap
   - The remainder after dividing goes to the shopper, so the lines sum exactly to what they paid
   - The shopper's own items create no debt
   - Everything is already in minor units, so no rounding
-- [ ] **A** `settlement_endpoint.dart`: `settle(basketId)` → writes `SettlementLine` rows + `status = settled`, errors if called twice; `getSettlement(basketId)`
-- [ ] **A** `settlement_calc_test.dart`: single member, three members, nothing picked, shopper's own items, a member with no items at all, a gap that does not divide evenly, a zero-decimal currency
+- [x] **A** `settlement_endpoint.dart`: `settle(basketId)` → writes `SettlementLine` rows + `status = settled`, errors if called twice; `getSettlement(basketId)`. Plus `preview`; settle refuses a basket with unpriced items (ADR-029)
+- [x] **A** `settlement_calc_test.dart`: single member, three members, nothing picked, shopper's own items, a member with no items at all, a gap that does not divide evenly, a zero-decimal currency
 - [ ] **B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary
 
 ### Days 19-20: ETA suggestion
