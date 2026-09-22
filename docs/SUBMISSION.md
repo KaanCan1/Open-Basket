@@ -142,5 +142,10 @@ Source: https://github.com/KaanCan1/Open-Basket
       5. The startup schema check reports a hand-written index as **Missing** when the
          live database is the side that has it. The wording points the wrong way and sends
          you looking for a migration that did not fail (ADR-024).
+      6. `ClientAuthSessionManager.initialize()` documents that a timeout "returns false
+         but does not sign out the user", yet only catches `ServerpodClientException`. The
+         `TimeoutException` from its own `.timeout()` escapes, so awaiting it before
+         `runApp` — the obvious way to use it — turns a slow server into a permanently
+         white app (ADR-026).
 - [ ] A public post about the project, tagging Serverpod, during the event period
       (Best Hackathon Post, $500 in credits).

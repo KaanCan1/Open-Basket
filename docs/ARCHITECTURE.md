@@ -476,3 +476,22 @@ underneath it.
 A second bug surfaced in the same walk: the home screen kept saying "a basket is open" after
 the basket had frozen, because it reads through its own provider, fetched once. The live
 controller now invalidates it on every basket-level event.
+
+## ADR-026: The first frame never waits on the network
+
+`createClient` used to await `client.auth.initialize()` before `runApp`. That call asks the
+server to validate the stored session with a two-second timeout — and although its own
+documentation says a timeout returns false without signing anyone out, it only catches
+`ServerpodClientException`, so the `TimeoutException` escapes. A server that took longer
+than two seconds to answer left an unhandled exception in `main`; `runApp` never ran and the
+app was a **white screen for good**.
+
+That is exactly what a freshly deployed or long-idle server does, which makes it the first
+thing a judge would see after the project sat quiet for a day. Found by relaunching against
+production a minute after a deploy.
+
+Now `createClient` only restores the stored session from the device and returns; validation
+runs in the background with a longer timeout and swallows failure. Offline, a cold server
+and a timeout all keep the stored session. If the session really has expired, validation
+signs the device out, the auth listenable fires, and the router sends the user to sign in —
+the same path as before, just not in front of the first frame.
