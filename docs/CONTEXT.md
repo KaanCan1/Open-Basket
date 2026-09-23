@@ -119,11 +119,11 @@ What works, walked on simulators and deployed:
 - Checked on an iPhone SE-sized frame in dark mode (ADR-039). Installed on Kaan's iPhone by
   cable; the free provisioning profile expires 2026-09-29 22:05 Turkey time.
 
-Tests: 191 server, 61 Flutter, CI on every PR to `main`.
+Tests: 210 server, 61 Flutter, CI on every PR to `main`.
 
 Open:
 
-- **Push notifications are not built** (Days 11-12). A free Apple account cannot push to an
+- **Push notifications: the server half is built** (ADR-043) and off until a Firebase service account is set; the app half is not built (Days 11-12). A free Apple account cannot push to an
   iPhone; the decision — a paid developer account, or Android-only push — is Kaan's.
 - **Real household use has not started**, and the report (Day 26) depends on it.
 - A refresh of the session token takes 3-4 s on Cloud (Serverpod feedback finding 8); access

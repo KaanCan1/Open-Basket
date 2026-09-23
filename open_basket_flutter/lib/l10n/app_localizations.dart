@@ -1725,6 +1725,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'YOU'**
   String get settingsYou;
+
+  /// No description provided for @errorInvalidDeviceToken.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone couldn\'t sign up for notifications.'**
+  String get errorInvalidDeviceToken;
 }
 
 class _AppLocalizationsDelegate

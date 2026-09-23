@@ -40,6 +40,8 @@ values:
   - invalidCurrency
   ### An empty or overlong name for yourself (ADR-041).
   - invalidMemberName
+  ### An empty or absurdly long FCM token (ADR-043).
+  - invalidDeviceToken
   ### The shopper of a basket that is still open or at the checkout cannot
   ### leave: nobody else could finish or settle it.
   - shopperCannotLeave

@@ -959,5 +959,7 @@
   "errorInvalidMemberName": "Names are 1 to 40 characters.",
   "@errorInvalidMemberName": {},
   "settingsYou": "YOU",
-  "@settingsYou": {}
+  "@settingsYou": {},
+  "errorInvalidDeviceToken": "This phone couldn't sign up for notifications.",
+  "@errorInvalidDeviceToken": {}
 }

@@ -4,6 +4,7 @@ import '../generated/protocol.dart';
 import '../services/analytics_service.dart';
 import '../services/authz.dart';
 import '../services/basket_channels.dart';
+import '../services/notification_service.dart';
 import '../services/settlement_service.dart';
 
 /// Working out who owes whom. The arithmetic lives in
@@ -104,6 +105,7 @@ class SettlementEndpoint extends Endpoint {
         'hasReceiptTotal': basket.receiptTotalMinor != null,
       },
     );
+    await NotificationService.settlementReady(session, settled, saved);
     return saved;
   }
 

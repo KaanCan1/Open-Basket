@@ -15,6 +15,13 @@ dependencies:
   # via serverpod; named explicitly because our own code imports it.
   clock: ^1.1.2
   crypto: ^3.0.0
+  # FCM HTTP v1 wants an OAuth token minted from a service account
+  # (ADR-043). Both already in the workspace lock via serverpod's GCP storage.
+  googleapis_auth: ^2.0.0
+  http: ^1.2.0
+  # Push copy prints money exactly as the app does ("₺84.50"), with the same
+  # NumberFormat the client uses.
+  intl: ^0.20.2
   serverpod_auth_core_server: 4.0.0
   serverpod_auth_idp_server: 4.0.0
   serverpod_cloud_storage: 4.0.0

@@ -481,7 +481,7 @@ class EndpointBasketStream extends _isc.EndpointRef {
 
 /// FCM registration tokens. Which of the three notification types actually go
 /// out is a per-member preference on `HouseholdMember` (ADR-010), checked on
-/// the server before sending.
+/// the server before sending (ADR-043).
 /// {@category Endpoint}
 class EndpointDevice extends _isc.EndpointRef {
   EndpointDevice(_isc.EndpointCaller caller) : super(caller);
@@ -489,7 +489,10 @@ class EndpointDevice extends _isc.EndpointRef {
   @override
   String get name => 'device';
 
-  /// Idempotent: re-registering an existing token refreshes it.
+  /// Idempotent: re-registering an existing token refreshes it. A token that
+  /// belonged to someone else moves to the caller — one phone, one person
+  /// signed in, and the previous person must stop getting this phone's
+  /// notifications the moment someone else signs in on it.
   _ida.Future<_i06kh2mj.DeviceToken> registerToken(String token) =>
       caller.callServerEndpoint<_i06kh2mj.DeviceToken>(
         'device',
@@ -498,7 +501,8 @@ class EndpointDevice extends _isc.EndpointRef {
       );
 
   /// Called on sign-out, so a shared phone stops receiving another member's
-  /// notifications.
+  /// notifications. Only the caller's own token can be removed; anything else
+  /// is quietly nothing.
   _ida.Future<void> removeToken(String token) =>
       caller.callServerEndpoint<void>(
         'device',
