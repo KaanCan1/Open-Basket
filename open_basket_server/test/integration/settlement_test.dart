@@ -249,6 +249,37 @@ void main() {
       expect(basket!.status, BasketStatus.settled);
     });
 
+    test('a run nobody added to still settles, and closes', () async {
+      final shopper = asUser(kaan);
+      final household = await endpoints.household.create(shopper, 'Kaya');
+      await endpoints.household.joinWithCode(asUser(ayse), household.code);
+      final basket = await endpoints.basket.open(shopper, durationMinutes: 10);
+      await endpoints.basket.freeze(shopper, basket.id!);
+
+      expect(await endpoints.settlement.settle(shopper, basket.id!), isEmpty);
+      final settled = await Basket.db.findById(
+        sessionBuilder.build(),
+        basket.id!,
+      );
+      expect(settled!.status, BasketStatus.settled);
+    });
+
+    test('with nothing added, a receipt is split evenly (rule 6)', () async {
+      final shopper = asUser(kaan);
+      final household = await endpoints.household.create(shopper, 'Kaya');
+      await endpoints.household.joinWithCode(asUser(ayse), household.code);
+      final basket = await endpoints.basket.open(shopper, durationMinutes: 10);
+      await endpoints.basket.freeze(shopper, basket.id!);
+      await endpoints.basket.setReceiptTotal(shopper, basket.id!, 1001);
+
+      final lines = await endpoints.settlement.settle(shopper, basket.id!);
+
+      expect(lines, hasLength(1));
+      final ayseMember = await memberFor(ayse);
+      expect(lines.single.fromMemberId, ayseMember.id);
+      expect(lines.single.amountMinor, 500);
+    });
+
     test('settling twice is refused: the result is immutable', () async {
       final run = await _aFrozenRun(asUser, endpoints);
       await _priceEverything(endpoints, run);

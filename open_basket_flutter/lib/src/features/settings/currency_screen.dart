@@ -8,6 +8,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../core/formatters.dart';
 import '../../core/theme.dart';
 import '../household/household_controller.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 20. One currency for the whole household (rule 5, ADR-008).
 ///
@@ -44,11 +45,11 @@ class _CurrencyScreenState extends ConsumerState<CurrencyScreen> {
       await ref.read(householdControllerProvider).setCurrency(code);
       if (!mounted) return;
       context.pop();
-    } catch (_) {
+    } on Exception catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

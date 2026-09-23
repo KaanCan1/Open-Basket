@@ -16,6 +16,7 @@ import 'basket_controller.dart';
 import 'countdown_banner.dart';
 import 'live_basket_controller.dart';
 import 'live_basket_state.dart';
+import '../../core/failure_message.dart';
 
 /// Screens 08 and 09. The live basket, for the shopper and for everyone else.
 ///
@@ -218,11 +219,11 @@ class LiveBasketScreen extends ConsumerWidget {
     if (choice == null) return;
     try {
       await ref.read(basketControllerProvider).markItem(item.id!, choice);
-    } on Exception {
+    } on Exception catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.checkoutDidNotSave)));
+      ).showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     }
   }
 
@@ -383,18 +384,10 @@ class _ShopperActions extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     try {
       await action(controller);
-    } on OpenBasketException catch (e) {
+    } on Exception catch (e) {
       messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            e.error == BasketError.basketNotOpen
-                ? l10n.liveBasketClosedTitle
-                : l10n.commonSomethingWentWrong,
-          ),
-        ),
+        SnackBar(content: Text(failureMessage(l10n, e))),
       );
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.commonOffline)));
     }
   }
 

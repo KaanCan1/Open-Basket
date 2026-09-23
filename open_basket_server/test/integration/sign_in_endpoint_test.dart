@@ -35,6 +35,22 @@ void main() {
       expect(success.authUserId, isNotNull);
     });
 
+    test('a session lasts an hour between refreshes (ADR-039)', () async {
+      await endpoints.signIn.requestSignInCode(sessionBuilder, 'kaan@kaya.co');
+      final before = DateTime.now();
+
+      final success = await endpoints.signIn.verifySignInCode(
+        sessionBuilder,
+        'kaan@kaya.co',
+        _sentCode,
+      );
+
+      final lifetime = success.tokenExpiresAt!.difference(before);
+      expect(lifetime, greaterThan(const Duration(minutes: 59)));
+      expect(lifetime, lessThanOrEqualTo(AuthSetup.accessTokenLifetime));
+      expect(success.refreshToken, isNotNull);
+    });
+
     test('the same address signs in to the same account twice', () async {
       await endpoints.signIn.requestSignInCode(sessionBuilder, 'ayse@kaya.co');
       final first = await endpoints.signIn.verifySignInCode(

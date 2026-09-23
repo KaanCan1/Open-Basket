@@ -13,9 +13,24 @@ abstract final class AuthSetup {
   /// Shown to recipients of the emails the bundled provider sends.
   static const appDisplayName = 'open_basket';
 
-  /// JWT for authentication keys towards the server.
+  /// JWT for authentication keys towards the server (ADR-039).
+  ///
+  /// The defaults are ten minutes and fourteen days. On Serverpod Cloud a
+  /// refresh takes three to four seconds, and the client makes the next call
+  /// wait for it, so ten minutes put a stall in the middle of most shopping
+  /// runs. An hour covers a run; a signed-out session stays usable for at
+  /// most that long, which a shopping list can live with.
+  static const accessTokenLifetime = Duration(hours: 1);
+
+  /// Sliding: every refresh restarts it. A house that shops fortnightly
+  /// should not be signed out between runs.
+  static const refreshTokenLifetime = Duration(days: 90);
+
   static List<TokenManagerBuilder> tokenManagerBuilders() => [
-    JwtConfigFromPasswords(),
+    JwtConfigFromPasswords(
+      accessTokenLifetime: accessTokenLifetime,
+      refreshTokenLifetime: refreshTokenLifetime,
+    ),
   ];
 
   /// The bundled email provider stays wired up even though our own sign-in is

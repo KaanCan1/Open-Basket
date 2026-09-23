@@ -7,6 +7,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../core/location.dart';
 import '../../core/theme.dart';
 import 'stores_controller.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 07. The household's stores, and adding one.
 ///
@@ -67,12 +68,9 @@ class _StoresScreenState extends ConsumerState<StoresScreen> {
       _name.clear();
       setState(() => _pinned = null);
       FocusScope.of(context).unfocus();
-    } on OpenBasketException catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
-      setState(() => _message = e.message);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _message = l10n.commonSomethingWentWrong);
+      setState(() => _message = failureMessage(l10n, e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -102,11 +100,11 @@ class _StoresScreenState extends ConsumerState<StoresScreen> {
     if (remove != true) return;
     try {
       await ref.read(storesControllerProvider).remove(store.id!);
-    } catch (_) {
+    } on Exception catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     }
   }
 

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import 'household_controller.dart';
-import 'household_failure.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 05a.
 class CreateHouseholdScreen extends ConsumerStatefulWidget {
@@ -48,7 +48,7 @@ class _CreateHouseholdScreenState extends ConsumerState<CreateHouseholdScreen> {
       context.pop();
     } catch (error) {
       if (!mounted) return;
-      setState(() => _error = householdFailureMessage(l10n, error));
+      setState(() => _error = failureMessage(l10n, error));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

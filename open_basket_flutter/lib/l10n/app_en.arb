@@ -19,7 +19,14 @@
     }
   },
   "codeEntryContinue": "Continue",
-  "codeEntryResendIn": "Resend in",
+  "codeEntryResendIn": "Resend in {time}",
+  "@codeEntryResendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "codeEntryResend": "Send a new code",
   "codeEntryResendNote": "The old code stops working straight away.",
   "codeEntryWrongAddress": "Wrong address?",
@@ -294,8 +301,6 @@
   },
   "checkoutNotAPrice": "That doesn't look like a price.",
   "@checkoutNotAPrice": {},
-  "checkoutDidNotSave": "That didn't save. Try again.",
-  "@checkoutDidNotSave": {},
   "settlementBadge": "SETTLED",
   "@settlementBadge": {},
   "settlementTitle": "Settled up",
@@ -682,6 +687,18 @@
       }
     }
   },
+  "historyDayAndTime": "{day}, {time}",
+  "@historyDayAndTime": {
+    "description": "A weekday or a short date, then a time: \"Sunday, 11:04\", \"3 Sep, 18:40\".",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "historyYesterday": "Yesterday, {time}",
   "@historyYesterday": {
     "placeholders": {
@@ -894,5 +911,39 @@
   "liveBasketUsually": "YOU USUALLY ASK FOR",
   "@liveBasketUsually": {},
   "liveBasketTooMany": "That's a lot at once. Give it a moment.",
-  "@liveBasketTooMany": {}
+  "@liveBasketTooMany": {},
+  "errorNotAMember": "You're not in this household any more.",
+  "@errorNotAMember": {},
+  "errorNotTheShopper": "Only the shopper can do that.",
+  "@errorNotTheShopper": {},
+  "errorBasketNotFound": "That basket is gone.",
+  "@errorBasketNotFound": {},
+  "errorInvalidDuration": "Pick between 1 and 120 minutes.",
+  "@errorInvalidDuration": {},
+  "errorItemNotFound": "That item was just removed.",
+  "@errorItemNotFound": {},
+  "errorNotYourItem": "Only the person who asked for it can change it.",
+  "@errorNotYourItem": {},
+  "errorInvalidItem": "Give the item a name, and a quantity from 1 to 99.",
+  "@errorInvalidItem": {},
+  "errorStoreNotFound": "That store was just removed.",
+  "@errorStoreNotFound": {},
+  "errorInvalidStore": "Store names are 1 to 60 characters.",
+  "@errorInvalidStore": {},
+  "errorInvalidHouseholdName": "Household names are 1 to 60 characters.",
+  "@errorInvalidHouseholdName": {},
+  "errorInvalidCurrency": "That currency isn't one we support yet.",
+  "@errorInvalidCurrency": {},
+  "errorBasketNotFrozen": "Prices go in once the basket is at checkout.",
+  "@errorBasketNotFrozen": {},
+  "errorAlreadySettled": "This basket is already settled.",
+  "@errorAlreadySettled": {},
+  "errorNotFullyPriced": "Mark every item first: got it, with a price, or not available.",
+  "@errorNotFullyPriced": {},
+  "errorExtensionUsed": "You've already added five minutes to this basket.",
+  "@errorExtensionUsed": {},
+  "checkoutEmpty": "Nobody added anything this time.",
+  "@checkoutEmpty": {},
+  "checkoutEmptyNote": "Settle to close the run. If you enter a receipt total, it's split evenly across the household.",
+  "@checkoutEmptyNote": {}
 }

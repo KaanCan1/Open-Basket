@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/theme.dart';
 import 'basket_controller.dart';
 import 'live_basket_controller.dart';
 import 'live_basket_state.dart';
+import '../../core/failure_message.dart';
 
 /// The bar at the bottom of a live basket.
 ///
@@ -65,16 +65,9 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
       // someone tap back into the field between "milk" and "eggs" is the
       // difference between adding three things and adding one.
       _nameFocus.requestFocus();
-    } on OpenBasketException catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
-      setState(
-        () => _error = e.error == BasketError.tooManyItems
-            ? l10n.liveBasketTooMany
-            : l10n.commonSomethingWentWrong,
-      );
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _error = l10n.commonSomethingWentWrong);
+      setState(() => _error = failureMessage(l10n, e));
     } finally {
       if (mounted) setState(() => _sending = false);
     }

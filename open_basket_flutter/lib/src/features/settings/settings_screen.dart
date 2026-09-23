@@ -12,6 +12,7 @@ import '../../core/theme.dart';
 import '../household/household_controller.dart';
 import '../stores/stores_controller.dart';
 import 'currency_screen.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 19. The household's settings, and the way out.
 ///
@@ -62,10 +63,8 @@ class SettingsScreen extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     try {
       await ref.read(householdControllerProvider).rename(name);
-    } catch (_) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.commonSomethingWentWrong)),
-      );
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     }
   }
 
@@ -100,18 +99,8 @@ class SettingsScreen extends ConsumerWidget {
     try {
       await ref.read(householdControllerProvider).leave();
       router.go(Routes.home);
-    } on OpenBasketException catch (e) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            e.error == BasketError.shopperCannotLeave
-                ? l10n.settingsShopperCannotLeave
-                : l10n.commonSomethingWentWrong,
-          ),
-        ),
-      );
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.commonOffline)));
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     }
   }
 

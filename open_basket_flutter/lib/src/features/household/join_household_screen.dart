@@ -6,7 +6,7 @@ import '../../core/theme.dart';
 import '../../../l10n/app_localizations.dart';
 import 'household_code_formatter.dart';
 import 'household_controller.dart';
-import 'household_failure.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 05b.
 ///
@@ -46,7 +46,7 @@ class _JoinHouseholdScreenState extends ConsumerState<JoinHouseholdScreen> {
       context.pop();
     } catch (error) {
       if (!mounted) return;
-      setState(() => _error = householdFailureMessage(l10n, error));
+      setState(() => _error = failureMessage(l10n, error));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
