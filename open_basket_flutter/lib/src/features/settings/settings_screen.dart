@@ -153,9 +153,7 @@ class SettingsScreen extends ConsumerWidget {
             value:
                 '${MoneyFormat.symbol(currency)} $currency · '
                 '${CurrencyScreen.nameOf(l10n, currency)}',
-            note: l10n.settingsCurrencyNote(
-              CurrencyScreen.nameOf(l10n, currency),
-            ),
+            note: l10n.settingsCurrencyNote,
             onTap: () => context.push(Routes.currency),
           ),
           _Row(

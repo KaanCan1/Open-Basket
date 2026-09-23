@@ -966,6 +966,9 @@ class Protocol extends _is.DatabaseSerializationManager {
           )
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
     if (t == List<_iprw808a.PastRun>) {
       return (data as List)
               .map((e) => deserialize<_iprw808a.PastRun>(e))

@@ -798,14 +798,8 @@
   "@settingsName": {},
   "settingsCurrency": "Currency",
   "@settingsCurrency": {},
-  "settingsCurrencyNote": "{name} · every price and settlement",
-  "@settingsCurrencyNote": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
+  "settingsCurrencyNote": "Every price and settlement uses it.",
+  "@settingsCurrencyNote": {},
   "settingsStores": "Stores",
   "@settingsStores": {},
   "settingsMembers": "Members and code",
@@ -896,5 +890,9 @@
   "currencyNameJPY": "Japanese yen",
   "@currencyNameJPY": {},
   "currencyNameCHF": "Swiss franc",
-  "@currencyNameCHF": {}
+  "@currencyNameCHF": {},
+  "liveBasketUsually": "YOU USUALLY ASK FOR",
+  "@liveBasketUsually": {},
+  "liveBasketTooMany": "That's a lot at once. Give it a moment.",
+  "@liveBasketTooMany": {}
 }

@@ -513,6 +513,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['itemId'],
                   ),
         ),
+        'suggestions': _is.MethodConnector(
+          name: 'suggestions',
+          params: {
+            'limit': _is.ParameterDescription(
+              name: 'limit',
+              type: _is.getType<int?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['basket'] as _iq57g1s3.BasketEndpoint).suggestions(
+                    session,
+                    limit: params['limit'],
+                  ),
+        ),
         'markItem': _is.MethodConnector(
           name: 'markItem',
           params: {

@@ -7,6 +7,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/router.dart';
+import '../../core/server_clock.dart';
 import '../../core/theme.dart';
 import '../household/household_controller.dart';
 import '../stores/stores_controller.dart';
@@ -119,7 +120,15 @@ class LiveBasketScreen extends ConsumerWidget {
                       }
                       final item = state.items[index];
                       return _ItemRow(
+                        key: ValueKey(item.id),
                         item: item,
+                        arrivedJustNow:
+                            item.requesterMemberId != me?.id &&
+                            ref
+                                    .read(serverClockProvider)
+                                    .now()
+                                    .difference(item.addedAt) <
+                                const Duration(seconds: 4),
                         requester: _nameFor(members, item.requesterMemberId),
                         shopper: shopperName,
                         // ADR-005: the shopper ticks things off while walking
@@ -232,7 +241,12 @@ class _ItemRow extends StatelessWidget {
     required this.shopper,
     required this.onTap,
     required this.onRemove,
+    this.arrivedJustNow = false,
+    super.key,
   });
+
+  /// Added by someone else in the last few seconds.
+  final bool arrivedJustNow;
 
   final BasketItem item;
   final String requester;
@@ -326,8 +340,24 @@ class _ItemRow extends StatelessWidget {
       ),
     );
 
-    if (onTap == null) return row;
-    return InkWell(onTap: onTap, child: row);
+    final tappable = onTap == null ? row : InkWell(onTap: onTap, child: row);
+    if (!arrivedJustNow) return tappable;
+    // The plan's "small animation when an item lands on another device": a
+    // row someone else added a moment ago slides and fades in, so a glance
+    // catches it. Your own rows just appear — you know you added them.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeOutCubic,
+      builder: (final context, final t, final child) => Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: Offset(0, (1 - t) * 12),
+          child: child,
+        ),
+      ),
+      child: tappable,
+    );
   }
 }
 

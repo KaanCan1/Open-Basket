@@ -736,3 +736,39 @@ bad household name `notAMember`; they are now `invalidCurrency` and `invalidHous
 Screens 19 and 20 (settings, currency) are built on this. The design's notification switches are
 left out until pushes exist — a switch that turns off nothing is a promise the app does not keep.
 Sign out moved from the home screen into settings, reached by a gear on home.
+
+## ADR-037: The local development database runs without the rule 4 index
+
+In development run mode Serverpod 4.0.0 verifies the database against the latest migration's
+`definition.json` on every start, and if they differ it throws `ExitException(1)` — the process
+exits with code 1 and prints nothing after the "does not match target state" warning. Production
+only warns. `definition.json` cannot describe a partial index (ADR-013), so once the hand-written
+`basket_one_open_per_household_idx` exists in the local database, the dev server can never start.
+
+It did not bite until 2026-09-23: the earlier migration had been applied locally before the index
+was added to it by hand, so the local database never had the index. The next migration's
+`CREATE INDEX IF NOT EXISTS` created it, and every start after that died silently. Found with a
+verbose run and by reading `serverpod.dart`; a zone guard showed no uncaught error, which is what
+pointed at a deliberate exit.
+
+The options were: teach `definition.json` about the index (it has no predicate field, and the next
+`create-migration` would then emit a `DROP INDEX` against production — not acceptable for the one
+rule with no other enforcement), run locally in another mode, or drop the index from the local
+development database only. `scripts/dev_db_unblock.sh` does the last. Rule 4 stays enforced in
+production and in `dart test`, whose database is built from `definition.sql` and asserted by
+`basket_lifecycle_test`; locally, `basket.open`'s transaction check still gives the right answer
+outside a true two-phone race. Reported as Serverpod feedback finding 7 (`docs/SUBMISSION.md`).
+
+## ADR-038: Polish from Days 22-23
+
+- **Rate limits on `addItem`:** twelve a minute and forty per run, per member (`tooManyItems`).
+  A list is typed by a person; more is a stuck button or a script, and every phone in the house
+  receives each item over the stream. Per member, so one person's burst never blocks another's.
+- **"You usually ask for" (screen 24):** `basket.suggestions` returns the names this member has
+  asked for at least twice, most often first, counting case- and space-insensitively and returning
+  the latest spelling. The add bar shows them as chips when the field is empty and the keyboard is
+  down, minus anything already on this run; a tap adds it.
+- **Arrival animation:** a row someone else added in the last four seconds slides and fades in;
+  your own rows just appear.
+- **Last-minute haptic:** one firm tap when the countdown actually crosses into its last minute —
+  not when a screen is opened already inside it.
