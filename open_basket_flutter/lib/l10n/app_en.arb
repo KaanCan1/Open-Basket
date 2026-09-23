@@ -534,5 +534,133 @@
     }
   },
   "countdownCancelledNote": "Nothing was priced and nobody owes anybody.",
-  "@countdownCancelledNote": {}
+  "@countdownCancelledNote": {},
+  "storesTitle": "Stores",
+  "@storesTitle": {},
+  "storesBlurb": "Everyone in the house can pick it when they open a basket.",
+  "@storesBlurb": {},
+  "storesEmpty": "No stores yet. Add the ones the house actually goes to.",
+  "@storesEmpty": {},
+  "storesAddTitle": "Add a store",
+  "@storesAddTitle": {},
+  "storesNameLabel": "NAME",
+  "@storesNameLabel": {},
+  "storesNameHint": "Migros Bağdat Cd.",
+  "@storesNameHint": {},
+  "storesLocationLabel": "LOCATION",
+  "@storesLocationLabel": {},
+  "storesUseLocation": "Use my current location",
+  "@storesUseLocation": {},
+  "storesLocationNote": "Pinned once, now. We use it only to estimate how long a run takes.",
+  "@storesLocationNote": {},
+  "storesPinned": "Pinned · {lat}, {lng}",
+  "@storesPinned": {
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      },
+      "lng": {
+        "type": "String"
+      }
+    }
+  },
+  "storesNoLocation": "No location · baskets default to 10 minutes",
+  "@storesNoLocation": {},
+  "storesHasLocation": "Pinned",
+  "@storesHasLocation": {},
+  "storesLocationFailed": "Couldn't read your location. You can save it without one.",
+  "@storesLocationFailed": {},
+  "storesSave": "Save store",
+  "@storesSave": {},
+  "storesSkipNote": "Skip the location and we'll default every basket to 10 minutes.",
+  "@storesSkipNote": {},
+  "storesRemove": "Remove",
+  "@storesRemove": {},
+  "storesRemoveConfirm": "Remove {name}?",
+  "@storesRemoveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storesRemoveNote": "Past runs at {name} keep their history.",
+  "@storesRemoveNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storesInvalid": "Give the store a name.",
+  "@storesInvalid": {},
+  "openSheetStore": "STORE",
+  "@openSheetStore": {},
+  "openSheetHowLong": "HOW LONG",
+  "@openSheetHowLong": {},
+  "openSheetAddStore": "Add a store",
+  "@openSheetAddStore": {},
+  "openSheetEstimating": "Working out how far {store} is…",
+  "@openSheetEstimating": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "openSheetEstimated": "Estimated {minutes} min",
+  "@openSheetEstimated": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "openSheetEstimatedNote": "From your distance to {store}. Pick your own if you know better.",
+  "@openSheetEstimatedNote": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "openSheetNoEstimate": "No estimate for {store}, so pick a time.",
+  "@openSheetNoEstimate": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "openSheetOpenFor": "Open for {minutes} minutes",
+  "@openSheetOpenFor": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStoresLabel": "STORES",
+  "@homeStoresLabel": {},
+  "homeStoresNone": "None yet · add one",
+  "@homeStoresNone": {},
+  "countdownAtStore": "AT {store}",
+  "@countdownAtStore": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBasketOpenAt": "{name} is shopping at {store}. Add what you need.",
+  "@homeBasketOpenAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "store": {
+        "type": "String"
+      }
+    }
+  }
 }

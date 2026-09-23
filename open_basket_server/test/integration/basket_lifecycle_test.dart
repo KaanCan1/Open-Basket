@@ -191,7 +191,7 @@ void main() {
           storeId: theirStore.id,
           durationMinutes: 10,
         ),
-        _fails(BasketError.basketNotFound),
+        _fails(BasketError.storeNotFound),
       );
     });
 

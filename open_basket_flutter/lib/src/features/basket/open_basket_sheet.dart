@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../core/eta.dart';
+import '../../core/location.dart';
+import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../stores/stores_controller.dart';
 import 'basket_controller.dart';
 
 /// Screen 06, as a sheet. How long the run is booked for.
@@ -37,6 +42,63 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
   bool _busy = false;
   String? _error;
 
+  /// Screen 06's store row. Picking a store with a pinned location reads this
+  /// phone's position once and suggests a duration (ADR-002); the position is
+  /// used for that one sum and dropped.
+  Store? _store;
+  bool _estimating = false;
+  int? _estimate;
+
+  Future<void> _pickStore(Store store) async {
+    if (_store?.id == store.id) {
+      setState(() {
+        _store = null;
+        _estimate = null;
+      });
+      return;
+    }
+    setState(() {
+      _store = store;
+      _estimate = null;
+      _estimating = store.lat != null && store.lng != null;
+    });
+    if (!_estimating) return;
+
+    final here = await LocationOnce.read();
+    if (!mounted || _store?.id != store.id) return;
+    final minutes = here == null
+        ? null
+        : Eta.suggestMinutes(
+            fromLat: here.lat,
+            fromLng: here.lng,
+            storeLat: store.lat!,
+            storeLng: store.lng!,
+          );
+    setState(() {
+      _estimating = false;
+      _estimate = minutes;
+      // The suggestion becomes the selection, so "Open for 17 minutes" is one
+      // tap — and every pick stays a tap away if the shopper knows better.
+      if (minutes != null) _select(minutes);
+    });
+  }
+
+  void _select(int minutes) {
+    if (OpenBasketSheet.quickPicks.contains(minutes)) {
+      _custom = false;
+      _minutes = minutes;
+    } else {
+      _custom = true;
+      _customMinutes.text = '$minutes';
+    }
+  }
+
+  int? get _chosenMinutes {
+    if (!_custom) return _minutes;
+    final typed = int.tryParse(_customMinutes.text.trim());
+    return typed == null || typed <= 0 ? null : typed;
+  }
+
   @override
   void dispose() {
     _customMinutes.dispose();
@@ -56,7 +118,7 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
     try {
       final basket = await ref
           .read(basketControllerProvider)
-          .open(durationMinutes: minutes);
+          .open(durationMinutes: minutes, storeId: _store?.id);
       if (!mounted) return;
       Navigator.of(context).pop(basket);
     } on OpenBasketException catch (error) {
@@ -105,7 +167,9 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return Padding(
+    // Scrollable: with the store row, the estimate and the custom field's
+    // keyboard all on screen, a fixed column ran off the bottom of a phone.
+    return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
         24,
         24,
@@ -120,6 +184,36 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
           const SizedBox(height: 8),
           Text(l10n.openSheetBlurb, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 24),
+          Text(l10n.openSheetStore, style: theme.textTheme.labelSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final store in ref.watch(storesProvider).value ?? <Store>[])
+                _Pick(
+                  label: store.name,
+                  selected: _store?.id == store.id,
+                  onTap: () => _pickStore(store),
+                ),
+              _Pick(
+                label: l10n.openSheetAddStore,
+                selected: false,
+                onTap: () => context.push(Routes.stores),
+              ),
+            ],
+          ),
+          if (_store != null) ...[
+            const SizedBox(height: 12),
+            _Estimate(
+              store: _store!,
+              estimating: _estimating,
+              minutes: _estimate,
+            ),
+          ],
+          const SizedBox(height: 20),
+          Text(l10n.openSheetHowLong, style: theme.textTheme.labelSmall),
+          const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -146,6 +240,7 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
               controller: _customMinutes,
               autofocus: true,
               keyboardType: TextInputType.number,
+              onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(hintText: '30'),
             ),
           ],
@@ -162,7 +257,11 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
                     width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(l10n.openSheetStart),
+                : Text(
+                    _chosenMinutes == null
+                        ? l10n.openSheetStart
+                        : l10n.openSheetOpenFor(_chosenMinutes!),
+                  ),
           ),
           const SizedBox(height: 8),
         ],
@@ -209,6 +308,56 @@ class _Pick extends StatelessWidget {
           label,
           style: OpenBasketText.item(selected ? OpenBasketColors.ink : ink),
         ),
+      ),
+    );
+  }
+}
+
+/// "Estimated 12 min — from your distance to Migros." A quiet panel, never an
+/// error: without a pinned location or a position it says so and the picks
+/// below carry on as before.
+class _Estimate extends StatelessWidget {
+  const _Estimate({
+    required this.store,
+    required this.estimating,
+    required this.minutes,
+  });
+
+  final Store store;
+  final bool estimating;
+  final int? minutes;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    final String title;
+    final String? note;
+    if (estimating) {
+      title = l10n.openSheetEstimating(store.name);
+      note = null;
+    } else if (minutes != null) {
+      title = l10n.openSheetEstimated(minutes!);
+      note = l10n.openSheetEstimatedNote(store.name);
+    } else {
+      title = l10n.openSheetNoEstimate(store.name);
+      note = null;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: theme.textTheme.titleMedium),
+          if (note != null) ...[
+            const SizedBox(height: 2),
+            Text(note, style: theme.textTheme.bodySmall),
+          ],
+        ],
       ),
     );
   }

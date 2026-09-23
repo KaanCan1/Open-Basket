@@ -628,4 +628,122 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get countdownCancelledNote =>
       'Nothing was priced and nobody owes anybody.';
+
+  @override
+  String get storesTitle => 'Stores';
+
+  @override
+  String get storesBlurb =>
+      'Everyone in the house can pick it when they open a basket.';
+
+  @override
+  String get storesEmpty =>
+      'No stores yet. Add the ones the house actually goes to.';
+
+  @override
+  String get storesAddTitle => 'Add a store';
+
+  @override
+  String get storesNameLabel => 'NAME';
+
+  @override
+  String get storesNameHint => 'Migros Bağdat Cd.';
+
+  @override
+  String get storesLocationLabel => 'LOCATION';
+
+  @override
+  String get storesUseLocation => 'Use my current location';
+
+  @override
+  String get storesLocationNote =>
+      'Pinned once, now. We use it only to estimate how long a run takes.';
+
+  @override
+  String storesPinned(String lat, String lng) {
+    return 'Pinned · $lat, $lng';
+  }
+
+  @override
+  String get storesNoLocation => 'No location · baskets default to 10 minutes';
+
+  @override
+  String get storesHasLocation => 'Pinned';
+
+  @override
+  String get storesLocationFailed =>
+      'Couldn\'t read your location. You can save it without one.';
+
+  @override
+  String get storesSave => 'Save store';
+
+  @override
+  String get storesSkipNote =>
+      'Skip the location and we\'ll default every basket to 10 minutes.';
+
+  @override
+  String get storesRemove => 'Remove';
+
+  @override
+  String storesRemoveConfirm(String name) {
+    return 'Remove $name?';
+  }
+
+  @override
+  String storesRemoveNote(String name) {
+    return 'Past runs at $name keep their history.';
+  }
+
+  @override
+  String get storesInvalid => 'Give the store a name.';
+
+  @override
+  String get openSheetStore => 'STORE';
+
+  @override
+  String get openSheetHowLong => 'HOW LONG';
+
+  @override
+  String get openSheetAddStore => 'Add a store';
+
+  @override
+  String openSheetEstimating(String store) {
+    return 'Working out how far $store is…';
+  }
+
+  @override
+  String openSheetEstimated(int minutes) {
+    return 'Estimated $minutes min';
+  }
+
+  @override
+  String openSheetEstimatedNote(String store) {
+    return 'From your distance to $store. Pick your own if you know better.';
+  }
+
+  @override
+  String openSheetNoEstimate(String store) {
+    return 'No estimate for $store, so pick a time.';
+  }
+
+  @override
+  String openSheetOpenFor(int minutes) {
+    return 'Open for $minutes minutes';
+  }
+
+  @override
+  String get homeStoresLabel => 'STORES';
+
+  @override
+  String get homeStoresNone => 'None yet · add one';
+
+  @override
+  String countdownAtStore(String store) {
+    return 'AT $store';
+  }
+
+  @override
+  String homeBasketOpenAt(String name, String store) {
+    return '$name is shopping at $store. Add what you need.';
+  }
 }

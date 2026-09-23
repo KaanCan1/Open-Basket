@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../household/household_controller.dart';
+import '../stores/stores_controller.dart';
 import 'add_item_bar.dart';
 import 'basket_controller.dart';
 import 'countdown_banner.dart';
@@ -58,6 +59,10 @@ class LiveBasketScreen extends ConsumerWidget {
     final isFrozen = basket.status == BasketStatus.frozen;
     final isSettled = basket.status == BasketStatus.settled;
     final shopperName = _nameFor(members, basket.shopperMemberId);
+    final storeName = (ref.watch(storesProvider).value ?? const <Store>[])
+        .where((s) => s.id == basket.storeId)
+        .firstOrNull
+        ?.name;
 
     return Scaffold(
       appBar: AppBar(
@@ -75,6 +80,7 @@ class LiveBasketScreen extends ConsumerWidget {
             basket: basket,
             compact: typing,
             shopperName: shopperName,
+            storeName: storeName,
           ),
           // Screen 25: the countdown stays at full strength while offline,
           // because it is the server's clock and not this phone's; the strip

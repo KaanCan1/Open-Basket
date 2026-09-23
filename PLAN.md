@@ -60,8 +60,8 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - ✅ **M1**
 
 ### Day 7: Stores + buffer
-- [ ] **A** `store_endpoint.dart`: add/list household stores (name, lat, lng). This is only the store's fixed location.
-- [ ] **B** `stores_screen.dart`: simple form, no map; "Use my current location for this store" button
+- [x] **A** `store_endpoint.dart`: add/list household stores (name, lat, lng). This is only the store's fixed location. Plus `remove`; a repeated name returns the existing store (ADR-034)
+- [x] **A for B** `stores_screen.dart`: simple form, no map; "Use my current location for this store" button
 - [ ] Weekly review, catch up on slipped tasks
 
 ---
@@ -136,9 +136,9 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **A for B** `settlement_screen.dart`: "Ayşe owes Kaan ₺84.50", shareable text summary (copied to the clipboard; the share sheet is not wired). A member reaches it from the "last run" card on the home screen (ADR-031)
 
 ### Days 19-20: ETA suggestion
-- [ ] **B** In `open_basket_sheet.dart`: pick store → read location once → "Estimated 12 min" suggestion, user can change it
-- [ ] **B/A** Formula (in a shared, tested Dart file): haversine distance × 1.3 road factor / walking or driving speed + shopping buffer (e.g. 5 min), rounded to minutes. **Computed on the client**, so location never reaches the server. Record this decision in `docs/ARCHITECTURE.md`.
-- [ ] **B** If location permission is denied, fall back silently to manual duration
+- [x] **A for B** In `open_basket_sheet.dart`: pick store → read location once → "Estimated 12 min" suggestion, user can change it
+- [x] **A for B** Formula (in a shared, tested Dart file): haversine distance × 1.3 road factor / walking or driving speed + shopping buffer (e.g. 5 min), rounded to minutes. **Computed on the client**, so location never reaches the server. Record this decision in `docs/ARCHITECTURE.md`.
+- [x] **A for B** If location permission is denied, fall back silently to manual duration
 
 ### Day 21: History + review
 - [ ] **A** `getHistory(householdId, limit)` — `history.list` done early for the last-run card (ADR-031); `history.get` still to do
