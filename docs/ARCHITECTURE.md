@@ -842,3 +842,20 @@ script's "Ayşe owes Kaan" impossible to film. A defect, so fixed after the Day 
 - Not asked for at sign-up or join: one more field on the first screen costs more than a
   passable default that can be fixed later.
 
+## ADR-042: Two keyboards that got in the way
+
+Found walking a full run on two simulators for the screenshots (`docs/screenshots`).
+
+- **The open sheet raised the keyboard by itself.** When the suggested time is not one of the
+  quick picks, the sheet fills *Custom* with it — and the custom field had `autofocus`, so tapping
+  a store threw up a number pad over *Open for 21 minutes*. The field now takes focus only when
+  the shopper taps *Custom*.
+- **Nothing put the add-item keyboard away.** On the live basket the keyboard covered half the
+  list and tapping elsewhere did nothing; checkout already dismissed on an outside tap, the add
+  bar did not. Both fields now do, with the fields and the *Add* button in one
+  `TextFieldTapRegion`, so adding item after item or moving to the note keeps the keyboard up.
+
+Also seen, not changed: *Extend once* sits directly above the add field, and a tap that misses
+the field extends the basket — one-way, once per run. Low harm (five more minutes), so it stays;
+worth a look if real use shows it happening.
+

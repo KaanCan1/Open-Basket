@@ -92,6 +92,8 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
     ];
   }
 
+  void _dismissKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -171,52 +173,60 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
               ),
               const SizedBox(height: 8),
             ],
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _name,
-                        focusNode: _nameFocus,
-                        textCapitalization: TextCapitalization.sentences,
-                        decoration: InputDecoration(
-                          hintText: l10n.liveBasketAddHint,
-                          isDense: true,
+            // One tap region for both fields and the Add button: a tap
+            // anywhere else puts the keyboard away (it covered half the list
+            // and nothing dismissed it), while tapping Add or moving to the
+            // note keeps it up.
+            TextFieldTapRegion(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _name,
+                          onTapOutside: (_) => _dismissKeyboard(),
+                          focusNode: _nameFocus,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: InputDecoration(
+                            hintText: l10n.liveBasketAddHint,
+                            isDense: true,
+                          ),
+                          onSubmitted: (_) => _sending ? null : _add(),
                         ),
-                        onSubmitted: (_) => _sending ? null : _add(),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _note,
-                        decoration: InputDecoration(
-                          hintText: l10n.liveBasketNoteHint,
-                          isDense: true,
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _note,
+                          onTapOutside: (_) => _dismissKeyboard(),
+                          decoration: InputDecoration(
+                            hintText: l10n.liveBasketNoteHint,
+                            isDense: true,
+                          ),
+                          style: OpenBasketText.meta(
+                            theme.textTheme.bodySmall!.color!,
+                          ),
+                          onSubmitted: (_) => _sending ? null : _add(),
                         ),
-                        style: OpenBasketText.meta(
-                          theme.textTheme.bodySmall!.color!,
-                        ),
-                        onSubmitted: (_) => _sending ? null : _add(),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                  width: 84,
-                  child: FilledButton(
-                    onPressed: _sending ? null : _add,
-                    child: _sending
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(l10n.liveBasketAdd),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 84,
+                    child: FilledButton(
+                      onPressed: _sending ? null : _add,
+                      child: _sending
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(l10n.liveBasketAdd),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
