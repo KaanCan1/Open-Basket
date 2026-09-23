@@ -42,8 +42,9 @@ captions to match. What matters is that the line on screen follows from the pric
 
 ## Setup before recording
 
-1. **Accounts.** Two real addresses, signed in on production by emailed code. Display names
-   **Kaan** and **Ayşe** with capitals — the settlement line prints them.
+1. **Accounts.** Two real addresses, signed in on production by emailed code. Set the names
+   to **Kaan** and **Ayşe** in *Settings → Your name* — the settlement line prints them, and
+   the default is only a guess from the email.
 2. **Household** "Kaya household", TRY. Store **Migros** saved *with a location*, so the
    estimate appears; stand (or set the simulator location) about a kilometre away.
 3. **History, so the chips appear.** Ayşe must have asked for *Oat milk* in at least two

@@ -67,6 +67,9 @@ enum BasketError implements _is.SerializableModel {
   /// Not a three-letter ISO 4217 code.
   invalidCurrency,
 
+  /// An empty or overlong name for yourself (ADR-041).
+  invalidMemberName,
+
   /// The shopper of a basket that is still open or at the checkout cannot
   /// leave: nobody else could finish or settle it.
   shopperCannotLeave,
@@ -128,6 +131,8 @@ enum BasketError implements _is.SerializableModel {
         return BasketError.invalidHouseholdName;
       case 'invalidCurrency':
         return BasketError.invalidCurrency;
+      case 'invalidMemberName':
+        return BasketError.invalidMemberName;
       case 'shopperCannotLeave':
         return BasketError.shopperCannotLeave;
       case 'tooManyItems':

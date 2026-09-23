@@ -92,6 +92,13 @@ class HouseholdController {
     return household;
   }
 
+  /// Any member: what the house calls you (ADR-041).
+  Future<HouseholdMember> setMyName(String name) async {
+    final member = await _client.household.setMyName(name);
+    _invalidate();
+    return member;
+  }
+
   /// The caller leaves; the household keeps its history (ADR-036).
   Future<void> leave() async {
     await _client.household.leave();

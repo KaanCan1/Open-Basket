@@ -823,3 +823,22 @@ outside a true two-phone race. Reported as Serverpod feedback finding 7 (`docs/S
 - **`docs/REPORT.md`** is drafted with definitions and empty tables. No number goes in until it
   comes out of `report.sql` against production, after real use.
 
+## ADR-041: People name themselves
+
+Found on Day 28 while preparing screenshots: a member's name was the local part of their email,
+with no way to change it. On production that puts "kaancan368368 owes ayse.kaya.1990" on a
+settlement — the one screen whose whole job is to be read at a glance — and it made the demo
+script's "Ayşe owes Kaan" impossible to film. A defect, so fixed after the Day 25 freeze.
+
+- **A better first guess.** `DisplayName.fromEmail`: the first word of the local part, without
+  digits, capitalised — "kaancan368368" becomes "Kaancan", "ayse.kaya" becomes "Ayse". A
+  provider-supplied full name still wins. Existing members keep the name they have until they
+  change it.
+- **`household.setMyName`**, any member, 1 to 40 characters, whitespace collapsed; a new
+  `invalidMemberName` error. Settings gets a "You" section with the one row.
+- **Names are looked up, never copied.** Settlement lines and items store member ids, so a new
+  name shows everywhere at once, past runs included. That is the intent: "who owes whom" should
+  name the person as the house knows them now.
+- Not asked for at sign-up or join: one more field on the first screen costs more than a
+  passable default that can be fixed later.
+

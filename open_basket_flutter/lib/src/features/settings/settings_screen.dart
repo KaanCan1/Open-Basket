@@ -22,23 +22,25 @@ import '../../core/failure_message.dart';
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
-  Future<void> _rename(
-    BuildContext context,
-    WidgetRef ref,
-    Household household,
-  ) async {
+  /// One text field in an alert; null when cancelled or left unchanged.
+  static Future<String?> _askForName(
+    BuildContext context, {
+    required String title,
+    required String current,
+    required int maxLength,
+  }) async {
     final l10n = AppLocalizations.of(context);
-    final controller = TextEditingController(text: household.name);
+    final controller = TextEditingController(text: current);
     final name = await showCupertinoDialog<String>(
       context: context,
       builder: (final context) => CupertinoAlertDialog(
-        title: Text(l10n.settingsRenameTitle),
+        title: Text(title),
         content: Padding(
           padding: const EdgeInsets.only(top: 12),
           child: CupertinoTextField(
             controller: controller,
             autofocus: true,
-            maxLength: 60,
+            maxLength: maxLength,
             textCapitalization: TextCapitalization.words,
           ),
         ),
@@ -56,13 +58,49 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
     controller.dispose();
-    if (name == null || name.trim().isEmpty || name.trim() == household.name) {
-      return;
+    if (name == null || name.trim().isEmpty || name.trim() == current) {
+      return null;
     }
-    if (!context.mounted) return;
+    return name;
+  }
+
+  Future<void> _rename(
+    BuildContext context,
+    WidgetRef ref,
+    Household household,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final name = await _askForName(
+      context,
+      title: l10n.settingsRenameTitle,
+      current: household.name,
+      maxLength: 60,
+    );
+    if (name == null || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     try {
       await ref.read(householdControllerProvider).rename(name);
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
+    }
+  }
+
+  Future<void> _nameMyself(
+    BuildContext context,
+    WidgetRef ref,
+    HouseholdMember me,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final name = await _askForName(
+      context,
+      title: l10n.settingsYourNameTitle,
+      current: me.displayName,
+      maxLength: 40,
+    );
+    if (name == null || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(householdControllerProvider).setMyName(name);
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     }
@@ -130,6 +168,17 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           Text(l10n.settingsTitle, style: theme.textTheme.displayLarge),
           const SizedBox(height: 24),
+          if (me != null) ...[
+            Text(l10n.settingsYou, style: theme.textTheme.labelSmall),
+            const SizedBox(height: 4),
+            _Row(
+              label: l10n.settingsYourName,
+              value: me.displayName,
+              note: l10n.settingsYourNameNote,
+              onTap: () => _nameMyself(context, ref, me),
+            ),
+            const SizedBox(height: 24),
+          ],
           Text(l10n.settingsHousehold, style: theme.textTheme.labelSmall),
           const SizedBox(height: 4),
           _Row(

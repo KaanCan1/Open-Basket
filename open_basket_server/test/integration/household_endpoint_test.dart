@@ -148,6 +148,45 @@ void main() {
       );
     });
 
+    test('anyone can name themselves, and the house sees it', () async {
+      final owner = asUser(kaan);
+      final household = await endpoints.household.create(
+        owner,
+        'Kaya household',
+      );
+      await endpoints.household.joinWithCode(asUser(ayse), household.code);
+
+      final renamed = await endpoints.household.setMyName(
+        asUser(ayse),
+        '  Ayşe   Kaya ',
+      );
+      expect(renamed.displayName, 'Ayşe Kaya');
+
+      final members = await endpoints.household.listMembers(owner);
+      expect(members.map((m) => m.displayName), contains('Ayşe Kaya'));
+    });
+
+    test('a name must be 1 to 40 characters', () async {
+      final owner = asUser(kaan);
+      await endpoints.household.create(owner, 'Kaya household');
+
+      await expectLater(
+        endpoints.household.setMyName(owner, '   '),
+        _fails(BasketError.invalidMemberName),
+      );
+      await expectLater(
+        endpoints.household.setMyName(owner, 'k' * 41),
+        _fails(BasketError.invalidMemberName),
+      );
+    });
+
+    test('someone in no household has no name to set', () async {
+      await expectLater(
+        endpoints.household.setMyName(asUser(deniz), 'Deniz'),
+        _fails(BasketError.notAMember),
+      );
+    });
+
     test('a non-member cannot read another household', () async {
       // The plan's explicit requirement for this day. Being outside every
       // household and being inside a different one both have to fail.

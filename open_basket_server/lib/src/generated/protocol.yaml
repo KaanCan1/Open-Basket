@@ -38,6 +38,7 @@ household:
   - listMembers:
   - rename:
   - setCurrency:
+  - setMyName:
   - currencyMinorUnitDigits:
   - setNotificationPreferences:
   - leave:
