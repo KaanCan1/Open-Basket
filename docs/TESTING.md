@@ -19,14 +19,25 @@ backs the phones. Nothing to install.
    account. A six-digit code arrives by email within a few seconds. Enter it.
 2. **Start a household.** Give it any name. You become its owner, and a six-character
    join code appears on the home screen.
-3. **Open a basket.** Press *Open a basket*, pick a duration, press *Open the basket*.
-   The countdown is rendered from the server's clock, not the browser's.
+3. **Open a basket.** Press *Open a basket*. Optionally add a store first (*Add a store*); a
+   store saved with a location gets a suggested duration, worked out on the device. Pick a
+   duration and press *Open for N minutes*. The countdown is rendered from the server's
+   clock, not the browser's.
 4. **Add items.** Type a name and an optional note, press *Add*. The row appears once the
    server has accepted it and pushed it back down the stream — it is not drawn
    optimistically.
 5. **Extend once.** *Extend once* adds five minutes to the deadline and then disables
    itself. One extension per basket, by design.
-6. **Check out.** *At checkout* freezes the list. No more items; the countdown stops.
+6. **Check out.** *At checkout* freezes the list: no more items, the countdown stops. As the
+   shopper you can already tick items off while the basket is open, by tapping them.
+7. **Price it.** *Enter the prices*: type what each item cost, or tap it and choose *Not
+   available*. Enter the receipt total if it differs — tax, a bag, a discount.
+8. **Settle.** *Work out who owes what*. The server computes the lines: each member owes
+   their own items plus an even share of any gap between the items and the receipt, and
+   the lines always add up to exactly what was paid. A settled run cannot be changed.
+9. **Look back.** *History* on the home screen lists every settled or cancelled run; tap one
+   for the full breakdown. *Settings* (the gear) has the household name, currency, stores,
+   sign out and leave.
 
 ## Seeing the live part, which is the point of the app
 
@@ -68,14 +79,12 @@ default is a local one.
 
 Said plainly so no one hunts for a screen that does not exist:
 
-- **Marking items and prices.** A run ends at *At checkout*. Ticking items off, entering
-  the receipt total and the settlement screen are not implemented, so nobody is told who
-  owes whom yet. The arithmetic behind it is written and property-tested
-  (`Money.splitEvenly`), and the rule it implements is in `docs/ARCHITECTURE.md` ADR-007.
-- **Push notifications.** "Everyone is told" is currently only true for whoever has the
-  app open. The per-member preferences are on the data model; the sending is not built.
-- **Stores and the walking-time estimate.** A basket opens without a store.
+- **Push notifications.** Opening a basket does not notify the household, and there is no
+  "two minutes left" reminder; people see a basket when they open the app. The per-member
+  preferences are on the data model; the sending is not built.
 - **Quantity in the add-item bar.** The endpoint takes it; the bar does not offer it yet.
+- **One open basket per household at a time.** Deliberate (rule 4), not a missing feature: a
+  second *Open a basket* takes you into the one already running.
 
 ## If you want to look at the server
 

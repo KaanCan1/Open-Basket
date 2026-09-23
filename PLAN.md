@@ -179,7 +179,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **B** Record and edit a 2-3 minute video (English narration or captions)
 
 ### Day 28: Documentation
-- [ ] **A** `README.md`: problem, solution, where and why we used Serverpod (streaming, future calls, auth, server-side settlement), setup, architecture diagram
+- [x] **A** `README.md`: problem, solution, where and why we used Serverpod (streaming, future calls, auth, server-side settlement), setup, architecture diagram
 - [ ] **B** Screenshots, APK link
 
 ### Day 29: Submission
