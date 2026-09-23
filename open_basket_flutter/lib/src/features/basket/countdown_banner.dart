@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_basket_client/open_basket_client.dart';
@@ -70,8 +71,32 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
       return;
     }
     _tick ??= Timer.periodic(const Duration(seconds: 1), (final _) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      _buzzAtTheLastMinute();
+      setState(() {});
     });
+  }
+
+  bool _buzzed = false;
+
+  /// One firm tap as the basket crosses into its last minute (the plan's
+  /// "haptic in the last minute"): the phone in a pocket says what the screen
+  /// cannot. Once per basket, and not when opening a screen already inside
+  /// the last minute — only an actual crossing buzzes.
+  Duration? _lastLeft;
+
+  void _buzzAtTheLastMinute() {
+    final left = widget.basket.closesAt.difference(
+      ref.read(serverClockProvider).now(),
+    );
+    final previous = _lastLeft;
+    _lastLeft = left;
+    if (_buzzed || previous == null) return;
+    const minute = Duration(minutes: 1);
+    if (previous > minute && left <= minute && !left.isNegative) {
+      _buzzed = true;
+      HapticFeedback.heavyImpact();
+    }
   }
 
   @override

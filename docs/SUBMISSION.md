@@ -126,7 +126,7 @@ Source: https://github.com/KaanCan1/Open-Basket
 - [ ] GitHub repository description filled in (currently empty).
 - [ ] Project description above updated to match what actually shipped.
 - [ ] **Most Valuable Feedback submission** ($500 cash + $500 credits, one per entrant),
-      through the feedback form on BuilderBase. Five findings so far, all hit in this
+      through the feedback form on BuilderBase. Seven findings so far, all hit in this
       build and all reproducible:
       1. `serverpod_test` 4.0.0 starts the embedded postmaster twice per test group and
          the second attempt cannot attach, because `embedded_postgres_resolver.dart`
@@ -150,5 +150,13 @@ Source: https://github.com/KaanCan1/Open-Basket
          `TimeoutException` from its own `.timeout()` escapes, so awaiting it before
          `runApp` — the obvious way to use it — turns a slow server into a permanently
          white app (ADR-026).
+      7. In **development** run mode the same schema check is fatal and silent:
+         `_applyMigrations` throws `ExitException(1)` when the database does not match,
+         with no message after the warning. So a project that follows finding 4's
+         workaround — a hand-written partial index, which `definition.json` cannot
+         describe — cannot start its dev server at all once that index exists locally.
+         Production only warns. It took a verbose run and reading `serverpod.dart` to
+         find; a one-line "refusing to start because…" would have saved an afternoon
+         (ADR-037).
 - [ ] A public post about the project, tagging Serverpod, during the event period
       (Best Hackathon Post, $500 in credits).

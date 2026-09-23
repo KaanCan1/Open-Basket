@@ -865,9 +865,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCurrency => 'Currency';
 
   @override
-  String settingsCurrencyNote(String name) {
-    return '$name · every price and settlement';
-  }
+  String get settingsCurrencyNote => 'Every price and settlement uses it.';
 
   @override
   String get settingsStores => 'Stores';
@@ -966,4 +964,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyNameCHF => 'Swiss franc';
+
+  @override
+  String get liveBasketUsually => 'YOU USUALLY ASK FOR';
+
+  @override
+  String get liveBasketTooMany => 'That\'s a lot at once. Give it a moment.';
 }

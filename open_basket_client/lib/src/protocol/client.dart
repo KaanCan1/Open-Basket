@@ -382,6 +382,19 @@ class EndpointBasket extends _isc.EndpointRef {
     {'itemId': itemId},
   );
 
+  /// Names this member has asked for more than once, most often first — the
+  /// design's "You usually ask for" chips (screen 24). Case and surrounding
+  /// space are ignored when counting; the spelling returned is the most
+  /// recent one. Only the caller's own requests, only their household.
+  ///
+  /// Nullable `limit` for the generated-client reason noted on `addItem`.
+  _ida.Future<List<String>> suggestions({int? limit}) =>
+      caller.callServerEndpoint<List<String>>(
+        'basket',
+        'suggestions',
+        {'limit': limit},
+      );
+
   /// Ticks an item off. Shopper only, allowed in **both** `open` and `frozen`
   /// (ADR-005) — the shopper marks things as they walk the aisles. `priceMinor`
   /// is only accepted once the basket is `frozen`, and only on a `picked`

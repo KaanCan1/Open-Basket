@@ -213,6 +213,11 @@ flutter test
 > migration's `definition.sql` *and* `migration.sql`. Rule 4 has no other enforcement and the
 > generator cannot express it (ADR-013). `basket_lifecycle_test` fails with instructions if you
 > forget.
+>
+> **If the local dev server exits silently right after "Database does not match target state"**,
+> that index is why: development mode treats the mismatch as fatal. Run
+> `./scripts/dev_db_unblock.sh`, which drops it from the local development database only
+> (ADR-037). Production and tests keep it.
 
 ## Basket state machine
 

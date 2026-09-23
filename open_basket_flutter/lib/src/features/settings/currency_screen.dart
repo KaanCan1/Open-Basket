@@ -152,11 +152,18 @@ class _CurrencyRow extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Some symbols are the code itself ("CHF"): scaled down to fit
+            // the column rather than wrapping onto a second line.
             SizedBox(
-              width: 36,
-              child: Text(
-                MoneyFormat.symbol(code),
-                style: OpenBasketText.money(ink).copyWith(fontSize: 20),
+              width: 40,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  MoneyFormat.symbol(code),
+                  maxLines: 1,
+                  style: OpenBasketText.money(ink).copyWith(fontSize: 20),
+                ),
               ),
             ),
             const SizedBox(width: 8),

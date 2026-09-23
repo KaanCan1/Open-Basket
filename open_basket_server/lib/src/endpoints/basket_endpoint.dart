@@ -230,6 +230,7 @@ class BasketEndpoint extends Endpoint {
     final basket = await _requireVisible(session, basketId);
     final member = await Authz.requireMemberOf(session, basket.householdId);
     _requireOpenBasket(basket);
+    await _requireRoomFor(session, basketId, member.id!);
 
     final item = await BasketItem.db.insertRow(
       session,
@@ -306,6 +307,31 @@ class BasketEndpoint extends Endpoint {
       BasketEventType.itemRemoved,
       item: item,
     );
+  }
+
+  /// Names this member has asked for more than once, most often first — the
+  /// design's "You usually ask for" chips (screen 24). Case and surrounding
+  /// space are ignored when counting; the spelling returned is the most
+  /// recent one. Only the caller's own requests, only their household.
+  ///
+  /// Nullable `limit` for the generated-client reason noted on `addItem`.
+  Future<List<String>> suggestions(Session session, {int? limit}) async {
+    final member = await Authz.requireMember(session);
+    final rows = await session.db.unsafeQuery(
+      'SELECT (array_agg("name" ORDER BY "addedAt" DESC))[1] AS "name", '
+      'COUNT(*) AS "times" '
+      'FROM "basket_item" '
+      'WHERE "requesterMemberId" = @member '
+      'GROUP BY lower(trim("name")) '
+      'HAVING COUNT(*) >= 2 '
+      'ORDER BY COUNT(*) DESC, MAX("addedAt") DESC '
+      'LIMIT @limit',
+      parameters: QueryParameters.named({
+        'member': member.id,
+        'limit': (limit ?? 5).clamp(1, 12),
+      }),
+    );
+    return [for (final row in rows) row.toColumnMap()['name'] as String];
   }
 
   /// Ticks an item off. Shopper only, allowed in **both** `open` and `frozen`
@@ -533,6 +559,37 @@ class BasketEndpoint extends Endpoint {
     error: BasketError.basketAlreadySettled,
     message: 'This basket has been settled, so it can no longer change.',
   );
+
+  /// Rate limiting, the plan's "item spam" line. A shopping list is typed by
+  /// a person: forty things from one member on one run, or more than twelve
+  /// in a minute, is a stuck button or a script, and every phone in the house
+  /// is receiving each of them over the stream.
+  static const maxItemsPerMember = 40;
+  static const maxItemsPerMinute = 12;
+
+  Future<void> _requireRoomFor(
+    Session session,
+    int basketId,
+    int memberId,
+  ) async {
+    final mine = await BasketItem.db.count(
+      session,
+      where: (t) =>
+          t.basketId.equals(basketId) & t.requesterMemberId.equals(memberId),
+    );
+    final lastMinute = await BasketItem.db.count(
+      session,
+      where: (t) =>
+          t.requesterMemberId.equals(memberId) &
+          (t.addedAt > ServerClock.now().subtract(const Duration(minutes: 1))),
+    );
+    if (mine >= maxItemsPerMember || lastMinute >= maxItemsPerMinute) {
+      throw OpenBasketException(
+        error: BasketError.tooManyItems,
+        message: 'That is a lot of items at once. Give it a moment.',
+      );
+    }
+  }
 
   void _requireOpenBasket(Basket basket) {
     if (basket.status != BasketStatus.open) {

@@ -1411,8 +1411,8 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCurrencyNote.
   ///
   /// In en, this message translates to:
-  /// **'{name} · every price and settlement'**
-  String settingsCurrencyNote(String name);
+  /// **'Every price and settlement uses it.'**
+  String get settingsCurrencyNote;
 
   /// No description provided for @settingsStores.
   ///
@@ -1569,6 +1569,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swiss franc'**
   String get currencyNameCHF;
+
+  /// No description provided for @liveBasketUsually.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU USUALLY ASK FOR'**
+  String get liveBasketUsually;
+
+  /// No description provided for @liveBasketTooMany.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s a lot at once. Give it a moment.'**
+  String get liveBasketTooMany;
 }
 
 class _AppLocalizationsDelegate

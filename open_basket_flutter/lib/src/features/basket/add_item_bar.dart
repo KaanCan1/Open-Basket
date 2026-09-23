@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/theme.dart';
+import 'basket_controller.dart';
 import 'live_basket_controller.dart';
 import 'live_basket_state.dart';
 
@@ -41,9 +43,9 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
     super.dispose();
   }
 
-  Future<void> _add() async {
+  Future<void> _add([String? suggested]) async {
     final l10n = AppLocalizations.of(context);
-    final name = _name.text.trim();
+    final name = (suggested ?? _name.text).trim();
     if (name.isEmpty) return;
 
     setState(() {
@@ -51,23 +53,50 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
       _error = null;
     });
     try {
-      final note = _note.text.trim();
+      final note = suggested == null ? _note.text.trim() : '';
       await ref
           .read(liveBasketProvider(widget.basketId).notifier)
           .add(name, note: note.isEmpty ? null : note);
       if (!mounted) return;
+      if (suggested != null) return;
       _name.clear();
       _note.clear();
       // Keep the keyboard up: a shopping list is typed in bursts, and making
       // someone tap back into the field between "milk" and "eggs" is the
       // difference between adding three things and adding one.
       _nameFocus.requestFocus();
+    } on OpenBasketException catch (e) {
+      if (!mounted) return;
+      setState(
+        () => _error = e.error == BasketError.tooManyItems
+            ? l10n.liveBasketTooMany
+            : l10n.commonSomethingWentWrong,
+      );
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = l10n.commonSomethingWentWrong);
     } finally {
       if (mounted) setState(() => _sending = false);
     }
+  }
+
+  /// The caller's usual items that are not on this run yet, so a chip never
+  /// offers something already there. Hidden while typing: the field is the
+  /// thing being used then.
+  List<String> _suggestions() {
+    if (_name.text.isNotEmpty || MediaQuery.viewInsetsOf(context).bottom > 0) {
+      return const [];
+    }
+    final usual = ref.watch(suggestionsProvider).value ?? const <String>[];
+    final state = ref.watch(liveBasketProvider(widget.basketId));
+    final present = {
+      for (final i in state.items) i.name.trim().toLowerCase(),
+      for (final q in state.queued) q.name.trim().toLowerCase(),
+    };
+    return [
+      for (final name in usual)
+        if (!present.contains(name.trim().toLowerCase())) name,
+    ];
   }
 
   @override
@@ -96,6 +125,39 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (_suggestions().isNotEmpty) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.liveBasketUsually,
+                  style: theme.textTheme.labelSmall,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SizedBox(
+                height: 36,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    for (final name in _suggestions())
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ActionChip(
+                          label: Text(name),
+                          onPressed: _sending ? null : () => _add(name),
+                          backgroundColor:
+                              theme.colorScheme.surfaceContainerHighest,
+                          side: BorderSide(color: theme.dividerColor),
+                          labelStyle: OpenBasketText.body(
+                            theme.textTheme.bodyLarge!.color!,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
             if (offline && _error == null) ...[
               Align(
                 alignment: Alignment.centerLeft,

@@ -224,6 +224,9 @@ class Protocol extends _isc.SerializationManager {
           )
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
     if (t == List<_igqoy608.PastRun>) {
       return (data as List)
               .map((e) => deserialize<_igqoy608.PastRun>(e))

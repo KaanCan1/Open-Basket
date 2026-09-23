@@ -19,6 +19,7 @@ basket:
   - addItem:
   - updateItem:
   - removeItem:
+  - suggestions:
   - markItem:
   - setReceiptTotal:
 basketStream:

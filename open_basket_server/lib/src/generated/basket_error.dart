@@ -70,6 +70,10 @@ enum BasketError implements _is.SerializableModel {
   /// The shopper of a basket that is still open or at the checkout cannot
   /// leave: nobody else could finish or settle it.
   shopperCannotLeave,
+
+  /// A member has hit the per-basket item cap, or is adding faster than any
+  /// person types. Protects the stream every phone in the house is on.
+  tooManyItems,
   basketNotOpen,
   basketNotFrozen,
   basketAlreadySettled,
@@ -126,6 +130,8 @@ enum BasketError implements _is.SerializableModel {
         return BasketError.invalidCurrency;
       case 'shopperCannotLeave':
         return BasketError.shopperCannotLeave;
+      case 'tooManyItems':
+        return BasketError.tooManyItems;
       case 'basketNotOpen':
         return BasketError.basketNotOpen;
       case 'basketNotFrozen':

@@ -111,3 +111,11 @@ final settlementProvider = FutureProvider.autoDispose
 final basketControllerProvider = Provider<BasketController>(
   BasketController.new,
 );
+
+/// What the caller asks for again and again, most often first (screen 24's
+/// "You usually ask for"). Refetched when a basket screen opens.
+final suggestionsProvider = FutureProvider.autoDispose<List<String>>((
+  final ref,
+) async {
+  return ref.watch(clientProvider).basket.suggestions();
+});
