@@ -180,11 +180,11 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 
 ### Day 28: Documentation
 - [x] **A** `README.md`: problem, solution, where and why we used Serverpod (streaming, future calls, auth, server-side settlement), setup, architecture diagram
-- [ ] **A for B** Screenshots, APK link — screenshots done; the APK link waits for a GitHub release
+- [ ] **A for B** Screenshots, APK link — screenshots done; a release APK from `main` is built and verified against production on an Android 10 emulator (2026-09-23), and waits for Kaan's go-ahead to publish as a GitHub release
 
 ### Day 29: Submission
 - [ ] Check every field of the hackathon submission form (repo link, video, description, team)
-- [ ] Repo is public; `passwords.yaml` and keys are really not in the repo
+- [ ] Repo is public; `passwords.yaml` and keys are really not in the repo — history scanned 2026-09-23: none ever committed; the only password in the tree is the throwaway test-database one in CI and `docker-compose.yaml`. Scan again on the day
 - [ ] Submit, then open one more basket and celebrate
 
 ---
