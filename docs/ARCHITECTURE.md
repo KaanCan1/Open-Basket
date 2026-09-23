@@ -609,3 +609,32 @@ this is shopping order rather than strict finish order — the order the house t
 
 This is the pull half. The Day 11-12 "settlement is ready" push is the other half, for a member
 who does not open the app.
+
+## ADR-032: Offline on the live basket
+
+- **Coming back to the app always resubscribes.** iOS suspends a backgrounded app and its socket
+  dies with it, often without an error reaching the stream, so a phone taken out of a pocket could
+  show a list that looked live and was minutes old. `AppLifecycleListener.onResume` drops the
+  subscription and opens a new one straight away, skipping any pending backoff; the snapshot that
+  opens every subscription does the resync (ADR-016).
+- **Reconnecting is shown, not hidden in the app bar** (screen 25): an ink strip under the
+  countdown — "The countdown is right — the server keeps the clock, not this phone" — with the
+  time of the last event. The countdown keeps full strength because it is the server's time.
+- **Items added offline are queued** (ADR-011, screens 25–26). The add bar queues instead of failing
+  when the stream is down, or when a send fails for any reason other than the server refusing it.
+  A queued item is a greyed row that says "Queued on this phone", never a normal row, so nobody
+  mistakes it for being on everyone's list. On the next snapshot the queue is sent in order; a
+  strip says "Back online · N items sent" for eight seconds. If the basket closed meanwhile the
+  server refuses them, and the strip names what could not be sent instead of retrying forever.
+- **Limits, on purpose:** the queue lives in memory. It survives leaving the screen (the controller
+  keeps itself alive while anything is queued) and backgrounding, but not the app being killed.
+  A queued item gets the server's time when it lands, not the time it was typed — the design's
+  "it kept the time you added it" would need the client to send a timestamp the server then
+  trusts, which rule 1 argues against.
+- **The live screen compacts while the keyboard is up.** Full countdown card, reconnect strip,
+  shopper buttons and add bar overflowed the screen by 55 px and left the list no height; now the
+  countdown drops to one line, the strip loses its explanation and the shopper buttons step aside
+  until the keyboard goes.
+
+Tested by stopping the local server under a live simulator: strip appears, "Butter" is queued,
+the server comes back, Butter lands as an ordinary row.

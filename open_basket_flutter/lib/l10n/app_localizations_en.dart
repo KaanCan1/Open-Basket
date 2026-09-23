@@ -537,4 +537,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeLastRunClear => 'You don\'t owe anything on this one.';
+
+  @override
+  String get liveBasketReconnectingNote =>
+      'The countdown is right — the server keeps the clock, not this phone.';
+
+  @override
+  String liveBasketLastSynced(String time) {
+    return 'last synced $time';
+  }
+
+  @override
+  String get liveBasketQueuedRow =>
+      'Queued on this phone · sends when you\'re back';
+
+  @override
+  String liveBasketQueuedCount(int count) {
+    return '$count queued';
+  }
+
+  @override
+  String get liveBasketOfflineHint =>
+      'Offline — anything you add is kept here and sent the moment you\'re back.';
+
+  @override
+  String liveBasketBackOnline(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Back online · $count items sent',
+      one: 'Back online · 1 item sent',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String liveBasketBackOnlineNote(String names) {
+    return 'Now on everyone\'s list: $names.';
+  }
+
+  @override
+  String liveBasketDropped(String names) {
+    return 'The basket closed before these could be sent: $names.';
+  }
 }

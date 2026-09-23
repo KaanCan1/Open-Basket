@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/theme.dart';
-import 'basket_controller.dart';
+import 'live_basket_controller.dart';
+import 'live_basket_state.dart';
 
 /// The bar at the bottom of a live basket.
 ///
@@ -12,6 +13,10 @@ import 'basket_controller.dart';
 /// shows on your phone and nowhere else is worse than one that takes half a
 /// second, because the whole promise of the product is that everyone is
 /// looking at the same list.
+///
+/// The one exception is being offline (ADR-011): then the item is queued on
+/// this phone, shown as a dashed row that says so, and sent on reconnect —
+/// never passed off as being on everyone's list.
 class AddItemBar extends ConsumerStatefulWidget {
   const AddItemBar({required this.basketId, super.key});
 
@@ -46,9 +51,10 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
       _error = null;
     });
     try {
+      final note = _note.text.trim();
       await ref
-          .read(basketControllerProvider)
-          .addItem(widget.basketId, name, note: _note.text);
+          .read(liveBasketProvider(widget.basketId).notifier)
+          .add(name, note: note.isEmpty ? null : note);
       if (!mounted) return;
       _name.clear();
       _note.clear();
@@ -68,6 +74,11 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final offline =
+        ref.watch(
+          liveBasketProvider(widget.basketId).select((s) => s.connection),
+        ) ==
+        LiveConnection.reconnecting;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -85,6 +96,16 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (offline && _error == null) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.liveBasketOfflineHint,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
             if (_error != null) ...[
               Align(
                 alignment: Alignment.centerLeft,

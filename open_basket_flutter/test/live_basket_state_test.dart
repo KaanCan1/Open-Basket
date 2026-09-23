@@ -63,4 +63,46 @@ void main() {
       expect(state.items, hasLength(1));
     });
   });
+
+  group('the offline queue (ADR-011)', () {
+    QueuedItem q(String name) =>
+        QueuedItem(name: name, queuedAt: DateTime(2030));
+
+    test('keeps what was added, oldest first', () {
+      final state = live.enqueue(q('Butter')).enqueue(q('Bread'));
+      expect(state.queued.map((i) => i.name), ['Butter', 'Bread']);
+    });
+
+    test('sending takes the oldest off the front', () {
+      final state = live.enqueue(q('Butter')).enqueue(q('Bread')).dequeue();
+      expect(state.queued.map((i) => i.name), ['Bread']);
+      expect(live.dequeue().queued, isEmpty);
+    });
+
+    test('a reconnect snapshot does not throw the queue away', () {
+      // The controller applies a snapshot with copyWith. A fresh state here
+      // was the obvious code, and would have silently deleted everything the
+      // person typed while offline.
+      final offline = live
+          .copyWith(connection: LiveConnection.reconnecting)
+          .enqueue(q('Butter'));
+      final back = offline.copyWith(
+        connection: LiveConnection.live,
+        items: [_item(1)],
+      );
+      expect(back.queued.map((i) => i.name), ['Butter']);
+    });
+
+    test('the report is replaced, and clearing takes it down', () {
+      final withReport = live.copyWith(
+        report: const QueueReport(sent: ['Butter']),
+      );
+      expect(
+        withReport.copyWith(connection: LiveConnection.live).report,
+        isNotNull,
+      );
+      expect(withReport.copyWith(clearReport: true).report, isNull);
+      expect(const QueueReport().isEmpty, isTrue);
+    });
+  });
 }

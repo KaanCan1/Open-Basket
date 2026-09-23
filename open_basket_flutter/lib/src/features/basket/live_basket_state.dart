@@ -18,11 +18,47 @@ enum LiveConnection {
   over,
 }
 
+/// Something added while this phone could not reach the server (ADR-011).
+/// Held here, shown as a dashed row, and sent in order once the stream is
+/// back.
+class QueuedItem {
+  const QueuedItem({
+    required this.name,
+    required this.queuedAt,
+    this.note,
+    this.quantity,
+  });
+
+  final String name;
+  final String? note;
+  final int? quantity;
+
+  /// Local time, for display only.
+  final DateTime queuedAt;
+}
+
+/// What happened to the queue the last time it was sent, for the "back
+/// online" strip. Cleared a few seconds later.
+class QueueReport {
+  const QueueReport({this.sent = const [], this.dropped = const []});
+
+  /// Names that reached the server.
+  final List<String> sent;
+
+  /// Names that could not be sent because the basket closed meanwhile.
+  final List<String> dropped;
+
+  bool get isEmpty => sent.isEmpty && dropped.isEmpty;
+}
+
 class LiveBasketState {
   const LiveBasketState({
     required this.connection,
     this.basket,
     this.items = const [],
+    this.queued = const [],
+    this.report,
+    this.lastSyncedAt,
   });
 
   const LiveBasketState.connecting()
@@ -34,19 +70,45 @@ class LiveBasketState {
   /// In the order the server sent them, oldest first.
   final List<BasketItem> items;
 
+  /// Added on this phone while offline, not yet on the server, oldest first.
+  final List<QueuedItem> queued;
+
+  /// The outcome of the last time the queue was sent, while it is on screen.
+  final QueueReport? report;
+
+  /// Local time of the last event from the server — the "last synced" line
+  /// while reconnecting.
+  final DateTime? lastSyncedAt;
+
   bool get isOpen => basket?.status == BasketStatus.open;
 
+  /// [report] is replaced rather than merged: pass [clearReport] to take the
+  /// strip down.
   LiveBasketState copyWith({
     LiveConnection? connection,
     Basket? basket,
     List<BasketItem>? items,
+    List<QueuedItem>? queued,
+    QueueReport? report,
+    bool clearReport = false,
+    DateTime? lastSyncedAt,
   }) {
     return LiveBasketState(
       connection: connection ?? this.connection,
       basket: basket ?? this.basket,
       items: items ?? this.items,
+      queued: queued ?? this.queued,
+      report: clearReport ? null : report ?? this.report,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
     );
   }
+
+  LiveBasketState enqueue(QueuedItem item) =>
+      copyWith(queued: [...queued, item]);
+
+  /// Drops the oldest queued item, the one that was just sent.
+  LiveBasketState dequeue() =>
+      copyWith(queued: queued.isEmpty ? queued : queued.sublist(1));
 
   /// Applies an item event by id rather than by appending.
   ///

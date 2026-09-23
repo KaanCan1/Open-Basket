@@ -933,6 +933,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You don\'t owe anything on this one.'**
   String get homeLastRunClear;
+
+  /// No description provided for @liveBasketReconnectingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The countdown is right — the server keeps the clock, not this phone.'**
+  String get liveBasketReconnectingNote;
+
+  /// No description provided for @liveBasketLastSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'last synced {time}'**
+  String liveBasketLastSynced(String time);
+
+  /// No description provided for @liveBasketQueuedRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Queued on this phone · sends when you\'re back'**
+  String get liveBasketQueuedRow;
+
+  /// No description provided for @liveBasketQueuedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} queued'**
+  String liveBasketQueuedCount(int count);
+
+  /// No description provided for @liveBasketOfflineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline — anything you add is kept here and sent the moment you\'re back.'**
+  String get liveBasketOfflineHint;
+
+  /// No description provided for @liveBasketBackOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Back online · 1 item sent} other{Back online · {count} items sent}}'**
+  String liveBasketBackOnline(int count);
+
+  /// No description provided for @liveBasketBackOnlineNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Now on everyone\'s list: {names}.'**
+  String liveBasketBackOnlineNote(String names);
+
+  /// No description provided for @liveBasketDropped.
+  ///
+  /// In en, this message translates to:
+  /// **'The basket closed before these could be sent: {names}.'**
+  String liveBasketDropped(String names);
 }
 
 class _AppLocalizationsDelegate

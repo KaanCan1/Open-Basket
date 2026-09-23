@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show KeepAliveLink;
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
@@ -24,7 +26,14 @@ class LiveBasketController extends Notifier<LiveBasketState> {
 
   StreamSubscription<BasketEvent>? _subscription;
   Timer? _retry;
+  Timer? _clearReport;
   int _attempt = 0;
+  bool _flushing = false;
+  AppLifecycleListener? _lifecycle;
+
+  /// Held while anything is queued, so leaving the screen does not throw the
+  /// queue away with the controller (the provider is autoDispose).
+  KeepAliveLink? _queueKeepAlive;
 
   /// Backoff for reconnects. The first retry is quick because the common
   /// cause is a phone waking up, which resolves immediately; the ceiling
@@ -41,6 +50,12 @@ class LiveBasketController extends Notifier<LiveBasketState> {
   @override
   LiveBasketState build() {
     ref.onDispose(_stop);
+    // iOS suspends the app in the background and the socket dies with it,
+    // often without an error reaching the stream — so a phone taken out of a
+    // pocket showed a list that looked live and was minutes old. Coming back
+    // to the foreground always resubscribes, and the snapshot that opens
+    // every subscription brings the list up to date.
+    _lifecycle = AppLifecycleListener(onResume: resync);
     _connect();
     return const LiveBasketState.connecting();
   }
@@ -48,8 +63,108 @@ class LiveBasketController extends Notifier<LiveBasketState> {
   void _stop() {
     _retry?.cancel();
     _retry = null;
+    _clearReport?.cancel();
+    _clearReport = null;
     _subscription?.cancel();
     _subscription = null;
+    _lifecycle?.dispose();
+    _lifecycle = null;
+  }
+
+  /// Drops whatever connection there is and subscribes again straight away,
+  /// skipping any backoff that was pending.
+  void resync() {
+    if (state.connection == LiveConnection.over) return;
+    _retry?.cancel();
+    _retry = null;
+    _attempt = 0;
+    _connect();
+  }
+
+  /// Adds an item, or queues it on this phone when the server cannot be
+  /// reached (ADR-011). Returns true when it was queued rather than sent.
+  ///
+  /// A refusal from the server — the basket closed, the name is empty — is
+  /// not a connection problem and is rethrown for the add bar to show.
+  Future<bool> add(String name, {String? note, int? quantity}) async {
+    final queued = QueuedItem(
+      name: name,
+      note: note,
+      quantity: quantity,
+      queuedAt: DateTime.now(),
+    );
+    if (state.connection != LiveConnection.live) {
+      _enqueue(queued);
+      return true;
+    }
+    try {
+      await ref
+          .read(basketControllerProvider)
+          .addItem(basketId, name, note: note, quantity: quantity);
+      return false;
+    } on OpenBasketException {
+      rethrow;
+    } catch (_) {
+      // The stream will notice the same outage and start reconnecting; the
+      // item waits for it rather than being lost with the request.
+      _enqueue(queued);
+      _scheduleRetry();
+      return true;
+    }
+  }
+
+  void _enqueue(QueuedItem item) {
+    _queueKeepAlive ??= ref.keepAlive();
+    state = state.enqueue(item).copyWith(clearReport: true);
+  }
+
+  /// Sends the queue in order, one at a time, once the stream is live again.
+  Future<void> _flush() async {
+    if (_flushing || state.queued.isEmpty) return;
+    _flushing = true;
+    final sent = <String>[];
+    final dropped = <String>[];
+    try {
+      while (state.queued.isNotEmpty &&
+          state.connection == LiveConnection.live) {
+        final next = state.queued.first;
+        try {
+          await ref
+              .read(basketControllerProvider)
+              .addItem(
+                basketId,
+                next.name,
+                note: next.note,
+                quantity: next.quantity,
+              );
+          sent.add(next.name);
+          state = state.dequeue();
+        } on OpenBasketException {
+          // The basket closed, or was cancelled, while this phone was away.
+          // Nothing queued can be added any more; say so rather than keep
+          // retrying something the server will never take.
+          dropped.addAll(state.queued.map((q) => q.name));
+          state = state.copyWith(queued: const []);
+        } catch (_) {
+          // Offline again. Keep the rest for the next reconnect.
+          break;
+        }
+      }
+    } finally {
+      _flushing = false;
+    }
+    if (state.queued.isEmpty) {
+      _queueKeepAlive?.close();
+      _queueKeepAlive = null;
+    }
+    final report = QueueReport(sent: sent, dropped: dropped);
+    if (!report.isEmpty) {
+      state = state.copyWith(report: report);
+      _clearReport?.cancel();
+      _clearReport = Timer(const Duration(seconds: 8), () {
+        state = state.copyWith(clearReport: true);
+      });
+    }
   }
 
   void _connect() {
@@ -94,7 +209,9 @@ class LiveBasketController extends Notifier<LiveBasketState> {
     _attempt = 0;
 
     state = switch (event.type) {
-      BasketEventType.snapshot => LiveBasketState(
+      // copyWith rather than a fresh state: a reconnect's snapshot must not
+      // throw away what is queued on this phone.
+      BasketEventType.snapshot => state.copyWith(
         connection: LiveConnection.live,
         basket: event.basket,
         items: event.items ?? const [],
@@ -119,7 +236,9 @@ class LiveBasketController extends Notifier<LiveBasketState> {
       state = state.copyWith(connection: LiveConnection.over);
     }
 
+    state = state.copyWith(lastSyncedAt: DateTime.now());
     _refreshMembersIfSomeoneIsNew();
+    if (event.type == BasketEventType.snapshot) unawaited(_flush());
 
     // The home screen reads the basket through its own provider, fetched
     // once. Without this it kept saying "a basket is open" after the stream
