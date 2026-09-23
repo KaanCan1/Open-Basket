@@ -39,6 +39,7 @@ dependencies:
     path: ../open_basket_client
   serverpod_auth_idp_flutter: 4.0.0
   serverpod_flutter: 4.0.0
+  geolocator: ^14.0.3
 
 dev_dependencies:
   integration_test:

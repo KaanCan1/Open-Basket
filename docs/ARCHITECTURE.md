@@ -657,3 +657,28 @@ the server comes back, Butter lands as an ordinary row.
 Both walked on two simulators against a local server: a basket that auto-closed overnight showed
 the screen 23 header, and opening a basket on one phone while the other had one open landed in
 that run with the strip.
+
+## ADR-034: Stores and the duration suggestion
+
+- **A store's location is pinned once, by whoever adds it**, with "Use my current location" — the
+  design's screen 07. It is the store's fixed position, not a person's, and it is the only
+  coordinate the server ever holds. A store without one is fine: its baskets just get no
+  suggestion.
+- **Any member adds or removes a store.** It is the household's shared list. Adding a name the
+  household already has (ignoring case and surrounding space) returns the existing store rather
+  than a second chip with the same name. Removing one keeps its baskets (`onDelete=SetNull`).
+- **The suggestion is computed on the phone (ADR-002, rule 7).** Picking a pinned store in the open
+  sheet reads the shopper's position once, computes, and drops it; the server receives the store id
+  and the minutes. `core/eta.dart` is the formula, unit-tested: great-circle distance × 1.3 road
+  factor; walking at 5 km/h up to 1.5 km by road, otherwise 25 km/h city driving; plus 5 minutes in
+  the aisles; rounded up and clamped to 5–120. It is the way *to* the checkout, because that is
+  when the basket closes. The suggestion becomes the selection, so the common case is one tap.
+- **Every location failure is quiet.** Services off, permission refused, no fix in ten seconds:
+  the sheet says "No estimate for Şok, so pick a time" and the quick picks carry on.
+- **Accuracy is `medium`.** A store is a building and a run is minutes; best accuracy costs time and
+  battery for nothing.
+- **`storeNotFound`** replaces `basketNotFound` for a store id that is unknown or another
+  household's, in both `store.remove` and `basket.open`.
+
+Until the settings screen exists, the stores list is reached from a "Stores" row on the home screen
+and from "Add a store" in the open sheet. The live basket and the home card name the store.

@@ -1041,6 +1041,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing was priced and nobody owes anybody.'**
   String get countdownCancelledNote;
+
+  /// No description provided for @storesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stores'**
+  String get storesTitle;
+
+  /// No description provided for @storesBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone in the house can pick it when they open a basket.'**
+  String get storesBlurb;
+
+  /// No description provided for @storesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No stores yet. Add the ones the house actually goes to.'**
+  String get storesEmpty;
+
+  /// No description provided for @storesAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a store'**
+  String get storesAddTitle;
+
+  /// No description provided for @storesNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NAME'**
+  String get storesNameLabel;
+
+  /// No description provided for @storesNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Migros Bağdat Cd.'**
+  String get storesNameHint;
+
+  /// No description provided for @storesLocationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'LOCATION'**
+  String get storesLocationLabel;
+
+  /// No description provided for @storesUseLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my current location'**
+  String get storesUseLocation;
+
+  /// No description provided for @storesLocationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned once, now. We use it only to estimate how long a run takes.'**
+  String get storesLocationNote;
+
+  /// No description provided for @storesPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned · {lat}, {lng}'**
+  String storesPinned(String lat, String lng);
+
+  /// No description provided for @storesNoLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'No location · baskets default to 10 minutes'**
+  String get storesNoLocation;
+
+  /// No description provided for @storesHasLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get storesHasLocation;
+
+  /// No description provided for @storesLocationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read your location. You can save it without one.'**
+  String get storesLocationFailed;
+
+  /// No description provided for @storesSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save store'**
+  String get storesSave;
+
+  /// No description provided for @storesSkipNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip the location and we\'ll default every basket to 10 minutes.'**
+  String get storesSkipNote;
+
+  /// No description provided for @storesRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get storesRemove;
+
+  /// No description provided for @storesRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}?'**
+  String storesRemoveConfirm(String name);
+
+  /// No description provided for @storesRemoveNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Past runs at {name} keep their history.'**
+  String storesRemoveNote(String name);
+
+  /// No description provided for @storesInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the store a name.'**
+  String get storesInvalid;
+
+  /// No description provided for @openSheetStore.
+  ///
+  /// In en, this message translates to:
+  /// **'STORE'**
+  String get openSheetStore;
+
+  /// No description provided for @openSheetHowLong.
+  ///
+  /// In en, this message translates to:
+  /// **'HOW LONG'**
+  String get openSheetHowLong;
+
+  /// No description provided for @openSheetAddStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a store'**
+  String get openSheetAddStore;
+
+  /// No description provided for @openSheetEstimating.
+  ///
+  /// In en, this message translates to:
+  /// **'Working out how far {store} is…'**
+  String openSheetEstimating(String store);
+
+  /// No description provided for @openSheetEstimated.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated {minutes} min'**
+  String openSheetEstimated(int minutes);
+
+  /// No description provided for @openSheetEstimatedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'From your distance to {store}. Pick your own if you know better.'**
+  String openSheetEstimatedNote(String store);
+
+  /// No description provided for @openSheetNoEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'No estimate for {store}, so pick a time.'**
+  String openSheetNoEstimate(String store);
+
+  /// No description provided for @openSheetOpenFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Open for {minutes} minutes'**
+  String openSheetOpenFor(int minutes);
+
+  /// No description provided for @homeStoresLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'STORES'**
+  String get homeStoresLabel;
+
+  /// No description provided for @homeStoresNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None yet · add one'**
+  String get homeStoresNone;
+
+  /// No description provided for @countdownAtStore.
+  ///
+  /// In en, this message translates to:
+  /// **'AT {store}'**
+  String countdownAtStore(String store);
+
+  /// No description provided for @homeBasketOpenAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is shopping at {store}. Add what you need.'**
+  String homeBasketOpenAt(String name, String store);
 }
 
 class _AppLocalizationsDelegate

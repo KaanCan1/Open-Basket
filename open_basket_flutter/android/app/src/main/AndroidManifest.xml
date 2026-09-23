@@ -5,6 +5,9 @@
          Found by reading the manifests before handing the APK over, not by
          running it. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Read once, on the phone, to pin a store or estimate a run (ADR-002). -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:label="Open Basket"
         android:name="${applicationName}"

@@ -52,6 +52,14 @@ enum BasketError implements _is.SerializableModel {
   /// A negative price, a price on an item that was not picked, or a total
   /// beyond what one shopping run can cost.
   invalidPrice,
+
+  /// The store id is unknown, or belongs to another household. One error for
+  /// both, for the same reason as basketNotFound.
+  storeNotFound,
+
+  /// An empty or overlong store name, or coordinates that are not a place on
+  /// Earth, or only one of the two.
+  invalidStore,
   basketNotOpen,
   basketNotFrozen,
   basketAlreadySettled,
@@ -98,6 +106,10 @@ enum BasketError implements _is.SerializableModel {
         return BasketError.invalidItem;
       case 'invalidPrice':
         return BasketError.invalidPrice;
+      case 'storeNotFound':
+        return BasketError.storeNotFound;
+      case 'invalidStore':
+        return BasketError.invalidStore;
       case 'basketNotOpen':
         return BasketError.basketNotOpen;
       case 'basketNotFrozen':

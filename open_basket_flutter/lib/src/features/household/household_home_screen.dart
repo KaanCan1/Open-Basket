@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import '../../core/theme.dart';
 import '../basket/basket_controller.dart';
 import '../basket/open_basket_sheet.dart';
 import '../../../l10n/app_localizations.dart';
+import '../stores/stores_controller.dart';
 import 'create_or_join_screen.dart';
 import 'household_controller.dart';
 
@@ -111,6 +113,8 @@ class _Home extends ConsumerWidget {
               const SizedBox(height: 28),
               const _BasketSection(),
               const SizedBox(height: 32),
+              const _StoresRow(),
+              const SizedBox(height: 24),
               _CodeCard(code: household.code),
               const SizedBox(height: 32),
               Text(l10n.homeMembersTitle, style: theme.textTheme.labelSmall),
@@ -317,6 +321,10 @@ class _BasketSection extends ConsumerWidget {
         .map((final m) => m.displayName)
         .firstOrNull;
     final open = basket.status == BasketStatus.open;
+    final store = (ref.watch(storesProvider).value ?? const <Store>[])
+        .where((s) => s.id == basket.storeId)
+        .firstOrNull
+        ?.name;
 
     final card = Container(
       padding: const EdgeInsets.all(20),
@@ -331,7 +339,9 @@ class _BasketSection extends ConsumerWidget {
           const SizedBox(height: 4),
           Text(
             open
-                ? l10n.homeBasketOpenNote(shopper ?? '')
+                ? (store == null
+                      ? l10n.homeBasketOpenNote(shopper ?? '')
+                      : l10n.homeBasketOpenAt(shopper ?? '', store))
                 : l10n.homeBasketFrozenNote(shopper ?? ''),
             style: theme.textTheme.bodySmall,
           ),
@@ -416,6 +426,59 @@ class _LastRunCard extends ConsumerWidget {
             child: Text(l10n.liveBasketSeeSettlement),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Where the stores live until there is a settings screen (screen 19 has a
+/// "Stores" row; this is that row, on the home screen for now).
+class _StoresRow extends ConsumerWidget {
+  const _StoresRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final stores = ref.watch(storesProvider).value ?? const <Store>[];
+
+    return InkWell(
+      onTap: () => context.push(Routes.stores),
+      child: Container(
+        constraints: const BoxConstraints(minHeight: kMinTapTarget),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: theme.dividerColor),
+            bottom: BorderSide(color: theme.dividerColor),
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.homeStoresLabel, style: theme.textTheme.labelSmall),
+                  const SizedBox(height: 4),
+                  Text(
+                    stores.isEmpty
+                        ? l10n.homeStoresNone
+                        : stores.map((s) => s.name).join(', '),
+                    style: theme.textTheme.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              CupertinoIcons.chevron_right,
+              size: 18,
+              color: theme.textTheme.bodySmall!.color,
+            ),
+          ],
+        ),
       ),
     );
   }

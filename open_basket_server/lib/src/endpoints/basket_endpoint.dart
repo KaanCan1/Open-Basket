@@ -48,7 +48,7 @@ class BasketEndpoint extends Endpoint {
         // differently depending on whose household it belongs to tells a
         // caller which ids exist elsewhere.
         throw OpenBasketException(
-          error: BasketError.basketNotFound,
+          error: BasketError.storeNotFound,
           message: 'That store is not in your household.',
         );
       }

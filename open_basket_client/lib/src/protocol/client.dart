@@ -770,6 +770,10 @@ class EndpointStats extends _isc.EndpointRef {
 
 /// Shops the household uses. Only a store's own fixed location is ever stored;
 /// nobody's live position reaches the server (ADR-002).
+///
+/// Any member may add or remove a store: it is a shared list, like the one on
+/// the fridge, and the design offers "Add a store" to everyone who opens a
+/// basket.
 /// {@category Endpoint}
 class EndpointStore extends _isc.EndpointRef {
   EndpointStore(_isc.EndpointCaller caller) : super(caller);
@@ -779,6 +783,10 @@ class EndpointStore extends _isc.EndpointRef {
 
   /// `lat`/`lng` are null when the member skipped the location step, in which
   /// case the client stops suggesting a duration and defaults to 10 minutes.
+  ///
+  /// Adding a name the household already has (ignoring case and surrounding
+  /// space) returns the existing store rather than a second "Migros": two
+  /// chips with the same name and different ids is a choice nobody can make.
   _ida.Future<_icg68kho.Store> add(
     String name, {
     double? lat,
@@ -793,6 +801,7 @@ class EndpointStore extends _isc.EndpointRef {
     },
   );
 
+  /// The household's stores, alphabetically — the order the chips appear in.
   _ida.Future<List<_icg68kho.Store>> list() =>
       caller.callServerEndpoint<List<_icg68kho.Store>>(
         'store',

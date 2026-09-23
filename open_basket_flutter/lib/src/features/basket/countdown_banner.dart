@@ -21,8 +21,12 @@ class CountdownBanner extends ConsumerStatefulWidget {
     required this.basket,
     this.compact = false,
     this.shopperName = '',
+    this.storeName,
     super.key,
   });
+
+  /// "At Migros", when the run has a store.
+  final String? storeName;
 
   final Basket basket;
 
@@ -149,7 +153,10 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.liveBasketClosesByItself,
+            widget.storeName == null
+                ? l10n.liveBasketClosesByItself
+                : '${l10n.countdownAtStore(widget.storeName!.toUpperCase())}'
+                      ' · ${l10n.liveBasketClosesByItself}',
             style: theme.textTheme.labelSmall!.copyWith(
               color: urgent ? OpenBasketColors.ink : null,
             ),
