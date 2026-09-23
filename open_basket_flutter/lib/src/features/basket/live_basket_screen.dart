@@ -66,17 +66,27 @@ class LiveBasketScreen extends ConsumerWidget {
         .firstOrNull
         ?.name;
 
+    final picked = state.items
+        .where((i) => i.status == ItemStatus.picked)
+        .length;
+    final mine = state.items.where((i) => i.requesterMemberId == me?.id).length;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           // "No items yet" promises items that can no longer come once the
           // basket has closed.
+          // Screens 08-09: how far along it is — for the shopper what is
+          // already in the trolley, for everyone else how much is theirs.
           !isOpen && state.items.isEmpty
               ? l10n.liveBasketNoItems
-              : state.queued.isEmpty
-              ? l10n.liveBasketItems(state.items.length)
-              : '${l10n.liveBasketItems(state.items.length)} · '
-                    '${l10n.liveBasketQueuedCount(state.queued.length)}',
+              : [
+                  l10n.liveBasketItems(state.items.length),
+                  if (isShopper && picked > 0) l10n.liveBasketGot(picked),
+                  if (!isShopper && mine > 0) l10n.liveBasketYours(mine),
+                  if (state.queued.isNotEmpty)
+                    l10n.liveBasketQueuedCount(state.queued.length),
+                ].join(' · '),
           style: Theme.of(context).textTheme.labelSmall,
         ),
       ),

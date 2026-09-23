@@ -178,10 +178,16 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
           ),
           const SizedBox(height: 8),
           Text(
-            widget.storeName == null
-                ? l10n.liveBasketClosesByItself
-                : '${l10n.countdownAtStore(widget.storeName!.toUpperCase())}'
-                      ' · ${l10n.liveBasketClosesByItself}',
+            // When it closes, as a time on this phone's clock, and whether
+            // that is already the extended time (screen 12) — so nobody has
+            // to work out 18:42 from "7:13 left".
+            [
+              if (widget.storeName != null)
+                l10n.countdownAtStore(widget.storeName!.toUpperCase()),
+              widget.basket.extendCount > 0
+                  ? l10n.countdownExtendedTo(_clock(widget.basket.closesAt))
+                  : l10n.countdownClosesAt(_clock(widget.basket.closesAt)),
+            ].join(' · '),
             style: theme.textTheme.labelSmall!.copyWith(
               color: urgent ? OpenBasketColors.ink : null,
             ),
@@ -190,6 +196,8 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
       ),
     );
   }
+
+  static String _clock(DateTime at) => DateFormat.Hm().format(at.toLocal());
 
   /// `mm:ss`, and `h:mm:ss` only if someone books an hour.
   static String _format(Duration left) {

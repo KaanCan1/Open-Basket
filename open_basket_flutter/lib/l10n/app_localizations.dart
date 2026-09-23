@@ -526,12 +526,6 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{No items yet} =1{1 item} other{{count} items}}'**
   String liveBasketItems(int count);
 
-  /// No description provided for @liveBasketClosesByItself.
-  ///
-  /// In en, this message translates to:
-  /// **'CLOSES BY ITSELF'**
-  String get liveBasketClosesByItself;
-
   /// No description provided for @liveBasketAddHint.
   ///
   /// In en, this message translates to:
@@ -571,7 +565,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketExtendUsed.
   ///
   /// In en, this message translates to:
-  /// **'Already extended'**
+  /// **'Extend used'**
   String get liveBasketExtendUsed;
 
   /// No description provided for @liveBasketCheckout.
@@ -2055,6 +2049,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quantity {count}'**
   String liveBasketQuantityLabel(int count);
+
+  /// No description provided for @countdownClosesAt.
+  ///
+  /// In en, this message translates to:
+  /// **'CLOSES {time}'**
+  String countdownClosesAt(String time);
+
+  /// No description provided for @countdownExtendedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'EXTENDED TO {time}'**
+  String countdownExtendedTo(String time);
+
+  /// No description provided for @liveBasketGot.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} got'**
+  String liveBasketGot(int count);
+
+  /// No description provided for @liveBasketYours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 is yours} other{{count} are yours}}'**
+  String liveBasketYours(int count);
+
+  /// No description provided for @homeInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get homeInvite;
+
+  /// No description provided for @householdChoiceSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}. Not you?'**
+  String householdChoiceSignedInAs(String email);
+
+  /// No description provided for @householdChoiceNotYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Not you?'**
+  String get householdChoiceNotYou;
 }
 
 class _AppLocalizationsDelegate

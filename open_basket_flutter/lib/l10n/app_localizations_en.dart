@@ -265,9 +265,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get liveBasketClosesByItself => 'CLOSES BY ITSELF';
-
-  @override
   String get liveBasketAddHint => 'Add an item';
 
   @override
@@ -287,7 +284,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveBasketExtend => 'Extend once';
 
   @override
-  String get liveBasketExtendUsed => 'Already extended';
+  String get liveBasketExtendUsed => 'Extend used';
 
   @override
   String get liveBasketCheckout => 'At checkout';
@@ -1286,4 +1283,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String liveBasketQuantityLabel(int count) {
     return 'Quantity $count';
   }
+
+  @override
+  String countdownClosesAt(String time) {
+    return 'CLOSES $time';
+  }
+
+  @override
+  String countdownExtendedTo(String time) {
+    return 'EXTENDED TO $time';
+  }
+
+  @override
+  String liveBasketGot(int count) {
+    return '$count got';
+  }
+
+  @override
+  String liveBasketYours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count are yours',
+      one: '1 is yours',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeInvite => 'Invite';
+
+  @override
+  String householdChoiceSignedInAs(String email) {
+    return 'Signed in as $email. Not you?';
+  }
+
+  @override
+  String get householdChoiceNotYou => 'Not you?';
 }
