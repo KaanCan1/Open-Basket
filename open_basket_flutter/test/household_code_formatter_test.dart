@@ -33,4 +33,21 @@ void main() {
       expect(HouseholdCodeFormatter.alphabet, hasLength(33));
     });
   });
+
+  group('a pasted message', () {
+    test('finds the code in the share text', () {
+      expect(
+        HouseholdCodeFormatter.fromMessage(
+          'Join Kaya household on Open Basket. The code is KZ74QM. '
+          'Get the app at https://open-basket.serverpod.space',
+        ),
+        'KZ74QM',
+      );
+    });
+
+    test('a bare code, with the letters the alphabet folds', () {
+      expect(HouseholdCodeFormatter.fromMessage('KZ74OM'), 'KZ740M');
+      expect(HouseholdCodeFormatter.fromMessage('  kz74qm '), 'KZ74QM');
+    });
+  });
 }

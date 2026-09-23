@@ -14,53 +14,59 @@ void main() {
     });
   });
 
-  group('the three messages, word for word (plan, Days 11-12)', () {
+  group('the three messages, as screen 21 has them', () {
     test('a basket opened, with and without a store', () {
       final withStore = NotificationCopy.basketOpened(
-        household: 'Kaya household',
         shopper: 'Kaan',
         store: 'Migros',
         minutes: 10,
         basketId: 7,
       );
-      expect(withStore.title, 'Kaya household');
-      expect(
-        withStore.body,
-        'Kaan is heading to Migros. Add what you need in the next 10 min.',
-      );
+      expect(withStore.title, 'Kaan is heading to Migros');
+      expect(withStore.body, 'Add what you need in the next 10 min.');
       expect(withStore.data, {'type': 'basket_opened', 'basketId': '7'});
 
-      final noStore = NotificationCopy.basketOpened(
-        household: 'Kaya household',
-        shopper: 'Kaan',
-        store: null,
-        minutes: 8,
-        basketId: 7,
-      );
       expect(
-        noStore.body,
-        'Kaan is going shopping. Add what you need in the next 8 min.',
+        NotificationCopy.basketOpened(
+          shopper: 'Kaan',
+          store: null,
+          minutes: 8,
+          basketId: 7,
+        ).title,
+        'Kaan is going shopping',
       );
     });
 
     test('two minutes left', () {
-      expect(
-        NotificationCopy.closingSoon(household: 'H', basketId: 1).body,
-        '2 minutes left on the basket.',
-      );
+      final m = NotificationCopy.closingSoon(shopper: 'Kaan', basketId: 1);
+      expect(m.title, '2 minutes left on the basket');
+      expect(m.body, "Last chance to add something to Kaan's run.");
     });
 
-    test('what you owe, in the basket\'s currency', () {
-      expect(
-        NotificationCopy.settlementReady(
-          household: 'H',
-          shopper: 'Kaan',
-          amountMinor: 8450,
-          currencyCode: 'TRY',
-          basketId: 1,
-        ).body,
-        "You owe Kaan ₺84.50 for today's run.",
+    test('what you owe, and how it was reached', () {
+      final m = NotificationCopy.settlementReady(
+        shopper: 'Kaan',
+        amountMinor: 8500,
+        itemsMinor: 8450,
+        receiptGapMinor: 50,
+        currencyCode: 'TRY',
+        basketId: 1,
       );
+      expect(m.title, 'You owe Kaan ₺85.00');
+      expect(m.body, '₺84.50 of items plus ₺0.50 of the receipt gap.');
+    });
+
+    test('no gap, or a receipt that came under the items', () {
+      String body(int gap) => NotificationCopy.settlementReady(
+        shopper: 'Kaan',
+        amountMinor: 8450 + gap,
+        itemsMinor: 8450,
+        receiptGapMinor: gap,
+        currencyCode: 'TRY',
+        basketId: 1,
+      ).body;
+      expect(body(0), '₺84.50 of items.');
+      expect(body(-50), '₺84.50 of items less ₺0.50 the receipt came under.');
     });
   });
 }

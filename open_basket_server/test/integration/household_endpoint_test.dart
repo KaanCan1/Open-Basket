@@ -113,10 +113,11 @@ void main() {
       final rotated = await endpoints.household.rotateCode(owner);
       expect(rotated.code, isNot(household.code));
 
-      // The message sent last week no longer works...
+      // The message sent last week no longer works, and says why (screen
+      // 28, ADR-045)...
       await expectLater(
         endpoints.household.joinWithCode(asUser(deniz), household.code),
-        _fails(BasketError.unknownHouseholdCode),
+        _fails(BasketError.householdCodeRotated),
       );
       // ...and the new one does.
       await endpoints.household.joinWithCode(asUser(deniz), rotated.code);
@@ -185,6 +186,73 @@ void main() {
         endpoints.household.setMyName(asUser(deniz), 'Deniz'),
         _fails(BasketError.notAMember),
       );
+    });
+
+    group('joining with a wrong code (ADR-045)', () {
+      int? triesLeftOf(Object e) =>
+          e is OpenBasketException ? e.triesLeft : null;
+
+      test('says how many tries are left, then makes you wait', () async {
+        final stranger = asUser(deniz);
+        for (final left in [2, 1, 0]) {
+          await expectLater(
+            endpoints.household.joinWithCode(stranger, 'ZZZZZZ'),
+            throwsA(
+              predicate(
+                (e) =>
+                    _errorOf(e) == BasketError.unknownHouseholdCode &&
+                    triesLeftOf(e!) == left,
+              ),
+            ),
+          );
+        }
+        // Even the right code waits now: that is what makes guessing slow.
+        final household = await endpoints.household.create(
+          asUser(kaan),
+          'Kaya household',
+        );
+        await expectLater(
+          endpoints.household.joinWithCode(stranger, household.code),
+          _fails(BasketError.tooManyJoinAttempts),
+        );
+      });
+
+      test('a code that was rotated away says so', () async {
+        final owner = asUser(kaan);
+        final household = await endpoints.household.create(
+          owner,
+          'Kaya household',
+        );
+        final old = household.code;
+        final rotated = await endpoints.household.rotateCode(owner);
+        expect(rotated.code, isNot(old));
+
+        await expectLater(
+          endpoints.household.joinWithCode(asUser(ayse), old),
+          _fails(BasketError.householdCodeRotated),
+        );
+        // The new one works, and a success clears the count.
+        await endpoints.household.joinWithCode(asUser(ayse), rotated.code);
+        expect(
+          await JoinAttempt.db.count(sessionBuilder.build()),
+          0,
+        );
+      });
+
+      test('a retired code is kept, so it is never issued again', () async {
+        final owner = asUser(kaan);
+        final household = await endpoints.household.create(
+          owner,
+          'Kaya household',
+        );
+        await endpoints.household.rotateCode(owner);
+
+        final retired = await RetiredHouseholdCode.db.find(
+          sessionBuilder.build(),
+        );
+        expect(retired.single.code, household.code);
+        expect(retired.single.householdId, household.id);
+      });
     });
 
     test('a non-member cannot read another household', () async {

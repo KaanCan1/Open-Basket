@@ -912,3 +912,46 @@ Both found on the simulator on Day 28.
 - Push claims in `SUBMISSION.md`, `README.md` and `TESTING.md` now say what is true: the server
   sends (ADR-043), the app does not register yet, so nothing reaches a phone.
 
+## ADR-045: Joining with a wrong code, and a stale session on a shared phone
+
+Screens 27 and 28, and a privacy bug found while testing them.
+
+- **Three wrong codes per fifteen minutes, per account.** A six-character code is all that stands
+  between a stranger and a household; guessing should be slow. Each failed join writes a
+  `join_attempt` row; the fourth within the window is `tooManyJoinAttempts`, even with the right
+  code. A successful join clears the account's rows. `OpenBasketException` gained `triesLeft` so
+  the join screen can say "2 tries left" (screen 27).
+- **A rotated code says it was rotated (screen 28).** Rotating writes the old code to
+  `retired_household_code`, and a join with it is `householdCodeRotated`: "Nothing wrong with
+  what you typed — ask for the new six characters". This reverses the earlier choice (the old
+  comment on `joinWithCode`) not to confirm that a code once existed. It is safe now because a
+  retired code opens nothing and is never issued again — `_unusedCode` skips retired codes — and
+  guessing is capped. The wording that helps a real invitee was worth more than hiding a fact
+  that gives a guesser nothing.
+- **The O-versus-0 hint in the design is not needed.** The code alphabet has no O, and the field
+  already folds O to 0, I and L to 1 as you type, so "codes never contain the letter O" can never
+  be the reason a code failed.
+- **Paste what you were sent.** The share text carries the code inside a sentence; pasting the
+  whole message picks the six-character code out of it.
+- **Bug: signing out did not forget the previous account.** Riverpod caches per provider, not per
+  account, so on a phone signed out and signed in as someone else, the home screen showed the
+  previous person's household, history and join code until the app restarted. A new
+  `sessionUserProvider` follows the auth listenable, and every provider that fetches someone's
+  data watches it, so a change of account throws them all away. Verified on the simulator by
+  signing out of a household member and in as a new account without restarting.
+
+## ADR-046: What is left of the design set, and one screen detail not built
+
+After screens 17-20 and 27-28 (ADR-045), every screen in the design set exists except the
+parts of 21 that need the app half of push. Recorded so the gap is a decision, not an oversight:
+
+- **Screen 21, the lock screen.** The server now words all three notifications as the design
+  does — the title says what happened, the body why ("₺84.50 of items plus ₺0.50 of the receipt
+  gap."). The "Add an item" and "Nothing for me" buttons on the basket-opened push are
+  notification actions, which live in the app's push setup; they come with Firebase.
+- **Screen 07's "Typical run from home: 12 min" is not built.** It needs to know where home is,
+  and rule 7 keeps a location on the phone, read once, only when a basket opens. At the moment a
+  store is saved its pinned location is where the person is standing — usually the store itself —
+  so any estimate there would be about nothing. The estimate the design is after is shown where
+  it matters, on the open sheet (screen 06), from wherever the shopper is at that moment.
+

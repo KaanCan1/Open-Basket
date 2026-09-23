@@ -158,8 +158,11 @@ class _CodeCard extends StatelessWidget {
     final theme = Theme.of(context);
     final muted = theme.textTheme.bodySmall!.color!;
 
+    // Tap for the members screen (17), where the code can be shared or
+    // rotated; long-press still copies it, for the person who only wants that.
     return GestureDetector(
-      onTap: () async {
+      onTap: () => context.push(Routes.members),
+      onLongPress: () async {
         await Clipboard.setData(ClipboardData(text: code));
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

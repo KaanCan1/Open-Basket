@@ -578,10 +578,12 @@ class EndpointHousehold extends _isc.EndpointRef {
 
   /// Joins by code.
   ///
-  /// Throws `unknownHouseholdCode` for a typo and for a code that has been
-  /// rotated away. The client words those two differently, but the server must
-  /// not confirm that a code once existed — that is the difference between a
-  /// hint and an oracle.
+  /// A wrong code is `unknownHouseholdCode`, with how many tries are left; a
+  /// code the household has since rotated away is `householdCodeRotated`
+  /// (screen 28). Saying that a code once existed is safe because it opens
+  /// nothing — a retired code is never issued again — and because an account
+  /// gets three wrong codes per fifteen minutes, after which it is
+  /// `tooManyJoinAttempts` until the window passes (ADR-045).
   _ida.Future<_iig1c7mf.Household> joinWithCode(String code) =>
       caller.callServerEndpoint<_iig1c7mf.Household>(
         'household',

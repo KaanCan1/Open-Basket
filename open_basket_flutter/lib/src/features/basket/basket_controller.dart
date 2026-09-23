@@ -9,6 +9,7 @@ import '../history/history_controller.dart';
 /// This is what a cold start reads to discover that a basket is open, or that
 /// one closed while the app was away.
 final activeBasketProvider = FutureProvider<Basket?>((final ref) async {
+  if (ref.watch(sessionUserProvider) == null) return null;
   return ref.watch(clientProvider).basket.getActive();
 });
 
@@ -90,6 +91,7 @@ final lastSettledRunProvider =
     FutureProvider<({Basket basket, List<SettlementLine> lines})?>((
       final ref,
     ) async {
+      if (ref.watch(sessionUserProvider) == null) return null;
       final client = ref.watch(clientProvider);
       final runs = await client.history.list(limit: 1);
       if (runs.isEmpty || runs.single.basket.status != BasketStatus.settled) {

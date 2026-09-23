@@ -40,6 +40,8 @@ dependencies:
   serverpod_auth_idp_flutter: 4.0.0
   serverpod_flutter: 4.0.0
   geolocator: ^14.0.3
+  share_plus: ^13.3.0
+  package_info_plus: ^10.2.1
 
 dev_dependencies:
   integration_test:

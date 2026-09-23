@@ -1,0 +1,14 @@
+### A household code that was rotated away (ADR-045). Kept so a join with it
+### can say "that code has been replaced" instead of "no such code", and so it
+### is never handed to another household: a code in an old group chat must
+### not start opening a stranger's house.
+class: RetiredHouseholdCode
+table: retired_household_code
+fields:
+  householdId: int, relation(parent=household, onDelete=Cascade)
+  code: String
+  retiredAt: DateTime
+indexes:
+  retired_household_code_idx:
+    fields: code
+    unique: true

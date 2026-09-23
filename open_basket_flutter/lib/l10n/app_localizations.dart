@@ -1749,6 +1749,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settle'**
   String get checkoutConfirmYes;
+
+  /// No description provided for @membersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HOUSEHOLD'**
+  String get membersLabel;
+
+  /// No description provided for @membersCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HOUSEHOLD CODE'**
+  String get membersCodeLabel;
+
+  /// No description provided for @membersPermanent.
+  ///
+  /// In en, this message translates to:
+  /// **'PERMANENT'**
+  String get membersPermanent;
+
+  /// No description provided for @membersShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get membersShare;
+
+  /// No description provided for @membersRotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate'**
+  String get membersRotate;
+
+  /// No description provided for @membersCodeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone with this code can join.'**
+  String get membersCodeNote;
+
+  /// No description provided for @membersRotateOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the owner can change the code.'**
+  String get membersRotateOwnerOnly;
+
+  /// No description provided for @membersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 MEMBER} other{{count} MEMBERS}}'**
+  String membersCount(int count);
+
+  /// No description provided for @membersYou.
+  ///
+  /// In en, this message translates to:
+  /// **'· you'**
+  String get membersYou;
+
+  /// No description provided for @membersJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{when, select, thisWeek{Joined this week} lastWeek{Joined last week} other{Joined {month}}}'**
+  String membersJoined(String when, String month);
+
+  /// No description provided for @membersOwnerJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{when, select, thisWeek{Owner · joined this week} lastWeek{Owner · joined last week} other{Owner · joined {month}}}'**
+  String membersOwnerJoined(String when, String month);
+
+  /// No description provided for @membersShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {household} on Open Basket'**
+  String membersShareSubject(String household);
+
+  /// No description provided for @membersShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {household} on Open Basket. The code is {code}. Get the app at https://open-basket.serverpod.space'**
+  String membersShareText(String household, String code);
+
+  /// No description provided for @rotateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate the household code?'**
+  String get rotateTitle;
+
+  /// No description provided for @rotateBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone already in stays in. Only new joins are affected.'**
+  String get rotateBlurb;
+
+  /// No description provided for @rotateOld.
+  ///
+  /// In en, this message translates to:
+  /// **'OLD'**
+  String get rotateOld;
+
+  /// No description provided for @rotateOldNote.
+  ///
+  /// In en, this message translates to:
+  /// **'stops working now'**
+  String get rotateOldNote;
+
+  /// No description provided for @rotateNew.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get rotateNew;
+
+  /// No description provided for @rotateNewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'picked when you rotate'**
+  String get rotateNewNote;
+
+  /// No description provided for @rotateWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone holding the old code can no longer join, including any message you already sent.'**
+  String get rotateWarning;
+
+  /// No description provided for @rotateKeepPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} keep their place. Nothing in history changes.'**
+  String rotateKeepPlace(String names);
+
+  /// No description provided for @rotateKeepPlaceOne.
+  ///
+  /// In en, this message translates to:
+  /// **'You keep your place. Nothing in history changes.'**
+  String get rotateKeepPlaceOne;
+
+  /// No description provided for @namesAnd.
+  ///
+  /// In en, this message translates to:
+  /// **'{first} and {last}'**
+  String namesAnd(String first, String last);
+
+  /// No description provided for @rotateOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner only. There\'s no expiry: rotate as often as you like.'**
+  String get rotateOwnerOnly;
+
+  /// No description provided for @rotateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate and share the new code'**
+  String get rotateAction;
+
+  /// No description provided for @rotateKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep {code}'**
+  String rotateKeep(String code);
+
+  /// No description provided for @rotateNewDone.
+  ///
+  /// In en, this message translates to:
+  /// **'yours from now on'**
+  String get rotateNewDone;
+
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTIFICATIONS'**
+  String get settingsNotifications;
+
+  /// No description provided for @settingsNotifyOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'A basket opens'**
+  String get settingsNotifyOpened;
+
+  /// No description provided for @settingsNotifyClosingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Two minutes left'**
+  String get settingsNotifyClosingSoon;
+
+  /// No description provided for @settingsNotifySettled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement is ready'**
+  String get settingsNotifySettled;
+
+  /// No description provided for @settingsNotificationsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept on the server for when this phone can receive notifications; it can\'t yet.'**
+  String get settingsNotificationsNote;
+
+  /// No description provided for @settingsFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Basket {version}'**
+  String settingsFooter(String version);
+
+  /// No description provided for @settingsFooterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Basket {version} · {email}'**
+  String settingsFooterEmail(String version, String email);
+
+  /// No description provided for @errorHouseholdCodeRotated.
+  ///
+  /// In en, this message translates to:
+  /// **'That code has been replaced'**
+  String get errorHouseholdCodeRotated;
+
+  /// No description provided for @errorTooManyJoinAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many tries. Wait a few minutes and try again.'**
+  String get errorTooManyJoinAttempts;
+
+  /// No description provided for @joinTriesLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No tries left for now: wait a few minutes.} =1{One try left.} other{{count} tries left.}}'**
+  String joinTriesLeft(int count);
+
+  /// No description provided for @joinUnknownNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Check it against the message you were sent.'**
+  String get joinUnknownNote;
+
+  /// No description provided for @joinTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get joinTryAgain;
+
+  /// No description provided for @joinPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste what you were sent'**
+  String get joinPaste;
+
+  /// No description provided for @joinRotatedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing wrong with what you typed: the household changed its code after the message you were sent.'**
+  String get joinRotatedNote;
+
+  /// No description provided for @joinAskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for the new six characters'**
+  String get joinAskTitle;
+
+  /// No description provided for @joinAskNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Whoever invited you can see the current code on their members screen. Codes don\'t expire on their own; this one was changed on purpose.'**
+  String get joinAskNote;
+
+  /// No description provided for @joinAskAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send them a request'**
+  String get joinAskAction;
+
+  /// No description provided for @joinAskShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Could you send me the new code for our household on Open Basket?'**
+  String get joinAskShareText;
+
+  /// No description provided for @joinEnterDifferent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a different code'**
+  String get joinEnterDifferent;
+
+  /// No description provided for @joinNeverIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody has removed you from anything: you were never in yet.'**
+  String get joinNeverIn;
+
+  /// No description provided for @joinNoCode.
+  ///
+  /// In en, this message translates to:
+  /// **'No code yet?'**
+  String get joinNoCode;
+
+  /// No description provided for @joinStartOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your own household'**
+  String get joinStartOwn;
 }
 
 class _AppLocalizationsDelegate

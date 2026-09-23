@@ -31,6 +31,12 @@ enum BasketError implements _is.SerializableModel {
   /// The six-character household code is wrong, or was rotated away.
   unknownHouseholdCode,
 
+  /// The code belonged to a household that has since rotated it (ADR-045).
+  householdCodeRotated,
+
+  /// Three wrong codes in fifteen minutes; wait before trying again.
+  tooManyJoinAttempts,
+
   /// The basket id is unknown, or belongs to a household that is not the
   /// caller's. Deliberately the same error for both: an id that answers
   /// "not found" for one household and "not yours" for another is an oracle.
@@ -114,6 +120,10 @@ enum BasketError implements _is.SerializableModel {
         return BasketError.alreadyInAHousehold;
       case 'unknownHouseholdCode':
         return BasketError.unknownHouseholdCode;
+      case 'householdCodeRotated':
+        return BasketError.householdCodeRotated;
+      case 'tooManyJoinAttempts':
+        return BasketError.tooManyJoinAttempts;
       case 'basketNotFound':
         return BasketError.basketNotFound;
       case 'invalidDuration':

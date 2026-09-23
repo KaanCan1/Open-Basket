@@ -29,6 +29,20 @@ class HouseholdCodeFormatter extends TextInputFormatter {
     return buffer.toString();
   }
 
+  /// The code out of a pasted message: "Join Kaya household on Open Basket.
+  /// The code is KZ74QM. Get the app at …". The first run of six characters
+  /// that could be a code, upper-cased and folded; failing that, whatever
+  /// [normalize] makes of the whole text.
+  static String fromMessage(String message) {
+    for (final word in message.split(RegExp(r'[^A-Za-z0-9]+'))) {
+      if (word.length == length && word.toUpperCase() == word) {
+        final code = normalize(word);
+        if (code.length == length) return code;
+      }
+    }
+    return normalize(message);
+  }
+
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,

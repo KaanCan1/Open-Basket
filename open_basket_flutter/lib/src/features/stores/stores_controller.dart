@@ -5,6 +5,7 @@ import '../../core/client_provider.dart';
 
 /// The household's stores, alphabetically.
 final storesProvider = FutureProvider<List<Store>>((final ref) async {
+  if (ref.watch(sessionUserProvider) == null) return const [];
   return ref.watch(clientProvider).store.list();
 });
 

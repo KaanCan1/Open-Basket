@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/client_provider.dart';
@@ -19,6 +20,10 @@ import '../../core/failure_message.dart';
 /// The design's notification switches are left out until pushes exist
 /// (Days 11-12): a switch that turns off nothing is a promise the app does
 /// not keep.
+final _versionProvider = FutureProvider<String>(
+  (final ref) async => (await PackageInfo.fromPlatform()).version,
+);
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -151,6 +156,8 @@ class SettingsScreen extends ConsumerWidget {
     final members = ref.watch(activeMembersProvider).value ?? const [];
     final stores = ref.watch(storesProvider).value ?? const <Store>[];
     final isOwner = me?.role == MemberRole.owner;
+    final version = ref.watch(_versionProvider).value;
+    final email = ref.watch(myEmailProvider).value;
 
     if (household == null) {
       return Scaffold(
@@ -204,10 +211,51 @@ class SettingsScreen extends ConsumerWidget {
           _Row(
             label: l10n.settingsMembers,
             value: l10n.settingsMembersValue(members.length, household.code),
+            onTap: () => context.push(Routes.members),
           ),
           if (!isOwner) ...[
             const SizedBox(height: 8),
             Text(l10n.settingsOwnerOnly, style: theme.textTheme.bodySmall),
+          ],
+          if (me != null) ...[
+            const SizedBox(height: 32),
+            Text(l10n.settingsNotifications, style: theme.textTheme.labelSmall),
+            const SizedBox(height: 4),
+            _Switch(
+              label: l10n.settingsNotifyOpened,
+              value: me.notifyBasketOpened,
+              onChanged: (v) => _setNotifications(
+                context,
+                ref,
+                me,
+                basketOpened: v,
+              ),
+            ),
+            _Switch(
+              label: l10n.settingsNotifyClosingSoon,
+              value: me.notifyClosingSoon,
+              onChanged: (v) => _setNotifications(
+                context,
+                ref,
+                me,
+                closingSoon: v,
+              ),
+            ),
+            _Switch(
+              label: l10n.settingsNotifySettled,
+              value: me.notifySettlementReady,
+              onChanged: (v) => _setNotifications(
+                context,
+                ref,
+                me,
+                settlementReady: v,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.settingsNotificationsNote,
+              style: theme.textTheme.bodySmall,
+            ),
           ],
           const SizedBox(height: 32),
           OutlinedButton(
@@ -229,6 +277,75 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 24),
+          Center(
+            child: Text(
+              switch ((version, email)) {
+                (final v?, final e?) => l10n.settingsFooterEmail(v, e),
+                (final v?, null) => l10n.settingsFooter(v),
+                _ => '',
+              },
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _setNotifications(
+    BuildContext context,
+    WidgetRef ref,
+    HouseholdMember me, {
+    bool? basketOpened,
+    bool? closingSoon,
+    bool? settlementReady,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref
+          .read(householdControllerProvider)
+          .setNotifications(
+            basketOpened: basketOpened ?? me.notifyBasketOpened,
+            closingSoon: closingSoon ?? me.notifyClosingSoon,
+            settlementReady: settlementReady ?? me.notifySettlementReady,
+          );
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
+    }
+  }
+}
+
+/// One notification type and its switch (screen 19).
+class _Switch extends StatelessWidget {
+  const _Switch({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      constraints: const BoxConstraints(minHeight: kMinTapTarget),
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: theme.dividerColor)),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
+          CupertinoSwitch(
+            value: value,
+            activeTrackColor: theme.textTheme.bodyLarge!.color,
+            onChanged: onChanged,
           ),
         ],
       ),

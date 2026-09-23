@@ -62,32 +62,72 @@ class HouseholdEndpoint extends Endpoint {
     return Household.db.findById(session, member.householdId);
   }
 
+  /// How many wrong codes an account may try, and over what window, before
+  /// it has to wait (ADR-045).
+  static const maxJoinAttempts = 3;
+  static const joinAttemptWindow = Duration(minutes: 15);
+
   /// Joins by code.
   ///
-  /// Throws `unknownHouseholdCode` for a typo and for a code that has been
-  /// rotated away. The client words those two differently, but the server must
-  /// not confirm that a code once existed — that is the difference between a
-  /// hint and an oracle.
+  /// A wrong code is `unknownHouseholdCode`, with how many tries are left; a
+  /// code the household has since rotated away is `householdCodeRotated`
+  /// (screen 28). Saying that a code once existed is safe because it opens
+  /// nothing — a retired code is never issued again — and because an account
+  /// gets three wrong codes per fifteen minutes, after which it is
+  /// `tooManyJoinAttempts` until the window passes (ADR-045).
   Future<Household> joinWithCode(Session session, String code) async {
     await _requireNoHousehold(session);
-
-    if (!HouseholdCode.isWellFormed(code)) {
-      throw OpenBasketException(
-        error: BasketError.unknownHouseholdCode,
-        message: 'No household with that code.',
-      );
-    }
-
-    final household = await Household.db.findFirstRow(
+    final userId = Authz.userId(session);
+    final since = ServerClock.now().subtract(joinAttemptWindow);
+    final failed = await JoinAttempt.db.count(
       session,
-      where: (final t) => t.code.equals(HouseholdCode.normalize(code)),
+      where: (t) => t.userId.equals(userId) & (t.attemptedAt > since),
     );
-    if (household == null) {
+    if (failed >= maxJoinAttempts) {
       throw OpenBasketException(
-        error: BasketError.unknownHouseholdCode,
-        message: 'No household with that code.',
+        error: BasketError.tooManyJoinAttempts,
+        message: 'Too many tries. Wait a few minutes and try again.',
+        triesLeft: 0,
       );
     }
+
+    final normalized = HouseholdCode.normalize(code);
+    final household = HouseholdCode.isWellFormed(code)
+        ? await Household.db.findFirstRow(
+            session,
+            where: (final t) => t.code.equals(normalized),
+          )
+        : null;
+    if (household == null) {
+      await JoinAttempt.db.insertRow(
+        session,
+        JoinAttempt(userId: userId, attemptedAt: ServerClock.now()),
+      );
+      final triesLeft = maxJoinAttempts - failed - 1;
+      final retired = HouseholdCode.isWellFormed(code)
+          ? await RetiredHouseholdCode.db.findFirstRow(
+              session,
+              where: (t) => t.code.equals(normalized),
+            )
+          : null;
+      throw retired != null
+          ? OpenBasketException(
+              error: BasketError.householdCodeRotated,
+              message: 'That code has been replaced.',
+              triesLeft: triesLeft,
+            )
+          : OpenBasketException(
+              error: BasketError.unknownHouseholdCode,
+              message: 'No household with that code.',
+              triesLeft: triesLeft,
+            );
+    }
+
+    // In: the slate is clean for whatever this account does next.
+    await JoinAttempt.db.deleteWhere(
+      session,
+      where: (t) => t.userId.equals(userId),
+    );
 
     // Someone coming back gets their old row back rather than a second one:
     // the unique index is per household and user, and their history is
@@ -132,10 +172,26 @@ class HouseholdEndpoint extends Endpoint {
       owner.householdId,
     ))!;
 
-    return Household.db.updateRow(
-      session,
-      household.copyWith(code: await _unusedCode(session)),
-    );
+    return session.db.transaction((transaction) async {
+      // The old code is kept, never reissued, and answers "replaced" to
+      // anyone who still tries it (ADR-045).
+      await RetiredHouseholdCode.db.insertRow(
+        session,
+        RetiredHouseholdCode(
+          householdId: household.id!,
+          code: household.code,
+          retiredAt: ServerClock.now(),
+        ),
+        transaction: transaction,
+      );
+      return Household.db.updateRow(
+        session,
+        household.copyWith(
+          code: await _unusedCode(session, transaction: transaction),
+        ),
+        transaction: transaction,
+      );
+    });
   }
 
   /// Everyone in the household, longest-standing first. With
@@ -337,7 +393,12 @@ class HouseholdEndpoint extends Endpoint {
         where: (final t) => t.code.equals(code),
         transaction: transaction,
       );
-      if (taken == null) return code;
+      final retired = await RetiredHouseholdCode.db.findFirstRow(
+        session,
+        where: (final t) => t.code.equals(code),
+        transaction: transaction,
+      );
+      if (taken == null && retired == null) return code;
     }
     throw StateError('Could not find an unused household code in 5 tries');
   }

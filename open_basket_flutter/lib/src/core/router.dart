@@ -10,6 +10,8 @@ import '../features/history/history_screen.dart';
 import '../features/history/past_run_screen.dart';
 import '../features/household/household_home_screen.dart';
 import '../features/household/join_household_screen.dart';
+import '../features/household/members_screen.dart';
+import '../features/household/rotate_code_screen.dart';
 import '../features/settings/currency_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/settlement/settlement_screen.dart';
@@ -27,6 +29,8 @@ abstract final class Routes {
   static const history = '/history';
   static const settings = '/settings';
   static const currency = '/settings/currency';
+  static const members = '/members';
+  static const rotateCode = '/members/rotate';
 }
 
 final routerProvider = Provider<GoRouter>((final ref) {
@@ -67,6 +71,17 @@ final routerProvider = Provider<GoRouter>((final ref) {
               GoRoute(
                 path: 'currency',
                 builder: (final context, final state) => const CurrencyScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'members',
+            builder: (final context, final state) => const MembersScreen(),
+            routes: [
+              GoRoute(
+                path: 'rotate',
+                builder: (final context, final state) =>
+                    const RotateCodeScreen(),
               ),
             ],
           ),
