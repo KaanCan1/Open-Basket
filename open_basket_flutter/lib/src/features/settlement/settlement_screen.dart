@@ -146,7 +146,8 @@ class SettlementScreen extends ConsumerWidget {
             Text(
               l10n.settlementGapAcross(
                 MoneyFormat.format(gap, currency),
-                members.length,
+                ref.watch(activeMembersProvider).value?.length ??
+                    members.length,
               ),
               style: theme.textTheme.bodySmall,
             ),

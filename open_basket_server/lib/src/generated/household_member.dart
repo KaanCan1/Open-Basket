@@ -26,6 +26,7 @@ abstract class HouseholdMember
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    this.leftAt,
   }) : role = role ?? _insyygng.MemberRole.member,
        notifyBasketOpened = notifyBasketOpened ?? true,
        notifyClosingSoon = notifyClosingSoon ?? true,
@@ -42,6 +43,7 @@ abstract class HouseholdMember
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    DateTime? leftAt,
   }) = _HouseholdMemberImpl;
 
   factory HouseholdMember.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -73,6 +75,9 @@ abstract class HouseholdMember
       joinedAt: jsonSerialization['joinedAt'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['joinedAt']),
+      leftAt: jsonSerialization['leftAt'] == null
+          ? null
+          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['leftAt']),
     );
   }
 
@@ -102,6 +107,12 @@ abstract class HouseholdMember
 
   DateTime joinedAt;
 
+  /// Set when the member leaves; the row stays. Deleting it cascaded into
+  /// their items, their settlement lines and any basket they had shopped —
+  /// the history rule 6 says is immutable and the report is built from
+  /// (ADR-036). Null for everyone still in.
+  DateTime? leftAt;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -118,6 +129,7 @@ abstract class HouseholdMember
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    DateTime? leftAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -132,6 +144,7 @@ abstract class HouseholdMember
       'notifyClosingSoon': notifyClosingSoon,
       'notifySettlementReady': notifySettlementReady,
       'joinedAt': joinedAt.toJson(),
+      if (leftAt != null) 'leftAt': leftAt?.toJson(),
     };
   }
 
@@ -148,6 +161,7 @@ abstract class HouseholdMember
       'notifyClosingSoon': notifyClosingSoon,
       'notifySettlementReady': notifySettlementReady,
       'joinedAt': joinedAt.toJson(),
+      if (leftAt != null) 'leftAt': leftAt?.toJson(),
     };
   }
 
@@ -192,6 +206,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    DateTime? leftAt,
   }) : super._(
          id: id,
          householdId: householdId,
@@ -202,6 +217,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
          notifyClosingSoon: notifyClosingSoon,
          notifySettlementReady: notifySettlementReady,
          joinedAt: joinedAt,
+         leftAt: leftAt,
        );
 
   /// Returns a shallow copy of this [HouseholdMember]
@@ -218,6 +234,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    Object? leftAt = _Undefined,
   }) {
     return HouseholdMember(
       id: id is int? ? id : this.id,
@@ -230,6 +247,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
       notifySettlementReady:
           notifySettlementReady ?? this.notifySettlementReady,
       joinedAt: joinedAt ?? this.joinedAt,
+      leftAt: leftAt is DateTime? ? leftAt : this.leftAt,
     );
   }
 }
@@ -281,6 +299,12 @@ class HouseholdMemberUpdateTable extends _is.UpdateTable<HouseholdMemberTable> {
         table.joinedAt,
         value,
       );
+
+  _is.ColumnValue<DateTime, DateTime> leftAt(DateTime? value) =>
+      _is.ColumnValue(
+        table.leftAt,
+        value,
+      );
 }
 
 class HouseholdMemberTable extends _is.Table<int?> {
@@ -325,6 +349,10 @@ class HouseholdMemberTable extends _is.Table<int?> {
       this,
       hasDefault: true,
     );
+    leftAt = _is.ColumnDateTime(
+      'leftAt',
+      this,
+    );
   }
 
   late final HouseholdMemberUpdateTable updateTable;
@@ -348,6 +376,12 @@ class HouseholdMemberTable extends _is.Table<int?> {
 
   late final _is.ColumnDateTime joinedAt;
 
+  /// Set when the member leaves; the row stays. Deleting it cascaded into
+  /// their items, their settlement lines and any basket they had shopped —
+  /// the history rule 6 says is immutable and the report is built from
+  /// (ADR-036). Null for everyone still in.
+  late final _is.ColumnDateTime leftAt;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -359,6 +393,7 @@ class HouseholdMemberTable extends _is.Table<int?> {
     notifyClosingSoon,
     notifySettlementReady,
     joinedAt,
+    leftAt,
   ];
 }
 

@@ -26,6 +26,7 @@ abstract class HouseholdMember
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    this.leftAt,
   }) : role = role ?? _insyygng.MemberRole.member,
        notifyBasketOpened = notifyBasketOpened ?? true,
        notifyClosingSoon = notifyClosingSoon ?? true,
@@ -42,6 +43,7 @@ abstract class HouseholdMember
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    DateTime? leftAt,
   }) = _HouseholdMemberImpl;
 
   factory HouseholdMember.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -73,6 +75,9 @@ abstract class HouseholdMember
       joinedAt: jsonSerialization['joinedAt'] == null
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['joinedAt']),
+      leftAt: jsonSerialization['leftAt'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['leftAt']),
     );
   }
 
@@ -100,6 +105,12 @@ abstract class HouseholdMember
 
   DateTime joinedAt;
 
+  /// Set when the member leaves; the row stays. Deleting it cascaded into
+  /// their items, their settlement lines and any basket they had shopped —
+  /// the history rule 6 says is immutable and the report is built from
+  /// (ADR-036). Null for everyone still in.
+  DateTime? leftAt;
+
   /// Returns a shallow copy of this [HouseholdMember]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -113,6 +124,7 @@ abstract class HouseholdMember
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    DateTime? leftAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -127,6 +139,7 @@ abstract class HouseholdMember
       'notifyClosingSoon': notifyClosingSoon,
       'notifySettlementReady': notifySettlementReady,
       'joinedAt': joinedAt.toJson(),
+      if (leftAt != null) 'leftAt': leftAt?.toJson(),
     };
   }
 
@@ -143,6 +156,7 @@ abstract class HouseholdMember
       'notifyClosingSoon': notifyClosingSoon,
       'notifySettlementReady': notifySettlementReady,
       'joinedAt': joinedAt.toJson(),
+      if (leftAt != null) 'leftAt': leftAt?.toJson(),
     };
   }
 
@@ -165,6 +179,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    DateTime? leftAt,
   }) : super._(
          id: id,
          householdId: householdId,
@@ -175,6 +190,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
          notifyClosingSoon: notifyClosingSoon,
          notifySettlementReady: notifySettlementReady,
          joinedAt: joinedAt,
+         leftAt: leftAt,
        );
 
   /// Returns a shallow copy of this [HouseholdMember]
@@ -191,6 +207,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
     bool? notifyClosingSoon,
     bool? notifySettlementReady,
     DateTime? joinedAt,
+    Object? leftAt = _Undefined,
   }) {
     return HouseholdMember(
       id: id is int? ? id : this.id,
@@ -203,6 +220,7 @@ class _HouseholdMemberImpl extends HouseholdMember {
       notifySettlementReady:
           notifySettlementReady ?? this.notifySettlementReady,
       joinedAt: joinedAt ?? this.joinedAt,
+      leftAt: leftAt is DateTime? ? leftAt : this.leftAt,
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart';
 import '../generated/protocol.dart';
 import '../services/analytics_service.dart';
 import '../services/authz.dart';
+import '../services/basket_service.dart';
+import '../util/clock.dart';
 import '../util/household_code.dart';
 import '../util/money.dart';
 
@@ -86,15 +88,29 @@ class HouseholdEndpoint extends Endpoint {
       );
     }
 
-    final member = await HouseholdMember.db.insertRow(
+    // Someone coming back gets their old row back rather than a second one:
+    // the unique index is per household and user, and their history is
+    // already attached to that row (ADR-036).
+    final previous = await HouseholdMember.db.findFirstRow(
       session,
-      HouseholdMember(
-        householdId: household.id!,
-        userId: Authz.userId(session),
-        displayName: await _displayNameFor(session),
-        role: MemberRole.member,
-      ),
+      where: (final t) =>
+          t.householdId.equals(household.id!) &
+          t.userId.equals(Authz.userId(session)),
     );
+    final member = previous != null
+        ? await HouseholdMember.db.updateRow(
+            session,
+            previous.copyWith(leftAt: null, role: MemberRole.member),
+          )
+        : await HouseholdMember.db.insertRow(
+            session,
+            HouseholdMember(
+              householdId: household.id!,
+              userId: Authz.userId(session),
+              displayName: await _displayNameFor(session),
+              role: MemberRole.member,
+            ),
+          );
     await AnalyticsService.track(
       session,
       AnalyticsType.memberJoined,
@@ -121,11 +137,22 @@ class HouseholdEndpoint extends Endpoint {
     );
   }
 
-  Future<List<HouseholdMember>> listMembers(Session session) async {
+  /// Everyone in the household, longest-standing first. With
+  /// `includeFormer` also the people who have left (their `leftAt` is set),
+  /// so history can still name who asked for what and who paid whom.
+  ///
+  /// Nullable rather than defaulted, for the same generated-client reason as
+  /// `addItem`'s quantity.
+  Future<List<HouseholdMember>> listMembers(
+    Session session, {
+    bool? includeFormer,
+  }) async {
     final member = await Authz.requireMember(session);
     return HouseholdMember.db.find(
       session,
-      where: (final t) => t.householdId.equals(member.householdId),
+      where: (final t) => includeFormer == true
+          ? t.householdId.equals(member.householdId)
+          : t.householdId.equals(member.householdId) & t.leftAt.equals(null),
       orderBy: (final t) => t.joinedAt,
     );
   }
@@ -149,10 +176,10 @@ class HouseholdEndpoint extends Endpoint {
   /// so changing this only affects what happens next (ADR-008).
   Future<Household> setCurrency(Session session, String currencyCode) async {
     final owner = await Authz.requireOwner(session);
-    final code = currencyCode.toUpperCase();
+    final code = currencyCode.trim().toUpperCase();
     if (!RegExp(r'^[A-Z]{3}$').hasMatch(code)) {
       throw OpenBasketException(
-        error: BasketError.notTheOwner,
+        error: BasketError.invalidCurrency,
         message: 'That is not a currency code.',
       );
     }
@@ -199,19 +226,34 @@ class HouseholdEndpoint extends Endpoint {
     );
   }
 
-  /// Leaves the household. The caller loses access to its history.
+  /// Leaves the household. The caller loses access to its history; the
+  /// household keeps it (ADR-036).
+  ///
+  /// The row is marked, not deleted. Deleting it cascaded into the member's
+  /// items, their settlement lines and every basket they had shopped — the
+  /// immutable history of rule 6, and the data the report is built from.
+  ///
+  /// The shopper of a basket that is still open or at the checkout cannot
+  /// leave: nobody else may extend, price or settle it (rule 3).
   ///
   /// An owner who leaves hands ownership to the longest-standing member left,
   /// so a household can never end up with nobody able to rotate the code or
-  /// change the currency. The last member out leaves the household empty
-  /// rather than deleted: its baskets are what the report is built from.
+  /// change the currency.
   Future<void> leave(Session session) async {
     final member = await Authz.requireMember(session);
 
+    final running = await BasketService.activeFor(session, member.householdId);
+    if (running != null && running.shopperMemberId == member.id) {
+      throw OpenBasketException(
+        error: BasketError.shopperCannotLeave,
+        message: 'Finish or cancel your basket before you leave.',
+      );
+    }
+
     await session.db.transaction((final transaction) async {
-      await HouseholdMember.db.deleteRow(
+      await HouseholdMember.db.updateRow(
         session,
-        member,
+        member.copyWith(leftAt: ServerClock.now(), role: MemberRole.member),
         transaction: transaction,
       );
 
@@ -219,7 +261,8 @@ class HouseholdEndpoint extends Endpoint {
 
       final remaining = await HouseholdMember.db.find(
         session,
-        where: (final t) => t.householdId.equals(member.householdId),
+        where: (final t) =>
+            t.householdId.equals(member.householdId) & t.leftAt.equals(null),
         orderBy: (final t) => t.joinedAt,
         limit: 1,
         transaction: transaction,
@@ -241,7 +284,7 @@ class HouseholdEndpoint extends Endpoint {
     final trimmed = name.trim();
     if (trimmed.isEmpty || trimmed.length > 60) {
       throw OpenBasketException(
-        error: BasketError.notAMember,
+        error: BasketError.invalidHouseholdName,
         message: 'Give the household a name.',
       );
     }

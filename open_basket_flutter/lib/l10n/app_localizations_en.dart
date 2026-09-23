@@ -201,9 +201,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open one when you are heading out, and the house has until it closes to add things.';
 
   @override
-  String get homeSignOut => 'Sign out';
-
-  @override
   String get homeMembersTitle => 'IN THIS HOUSEHOLD';
 
   @override
@@ -854,4 +851,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeHistoryNone => 'Nothing finished yet';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsHousehold => 'HOUSEHOLD';
+
+  @override
+  String get settingsName => 'Name';
+
+  @override
+  String get settingsCurrency => 'Currency';
+
+  @override
+  String settingsCurrencyNote(String name) {
+    return '$name · every price and settlement';
+  }
+
+  @override
+  String get settingsStores => 'Stores';
+
+  @override
+  String get settingsMembers => 'Members and code';
+
+  @override
+  String settingsMembersValue(int count, String code) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+    );
+    return '$_temp0 · $code';
+  }
+
+  @override
+  String get settingsOwnerOnly => 'Only the owner can change this.';
+
+  @override
+  String get settingsRenameTitle => 'Rename the household';
+
+  @override
+  String get settingsRenameSave => 'Save';
+
+  @override
+  String get settingsSignOut => 'Sign out';
+
+  @override
+  String settingsLeave(String name) {
+    return 'Leave $name';
+  }
+
+  @override
+  String get settingsLeaveNote => 'You\'ll lose access to its history.';
+
+  @override
+  String settingsLeaveConfirm(String name) {
+    return 'Leave $name?';
+  }
+
+  @override
+  String get settingsLeaveConfirmNote =>
+      'The household keeps every run you were part of. You can come back with its code.';
+
+  @override
+  String get settingsLeaveYes => 'Leave';
+
+  @override
+  String get settingsShopperCannotLeave =>
+      'Finish or cancel your basket before you leave.';
+
+  @override
+  String get currencyTitle => 'Currency';
+
+  @override
+  String get currencyBlurb =>
+      'One for the whole household. Every price, settlement and shared summary uses it.';
+
+  @override
+  String get currencyInUse => 'In use';
+
+  @override
+  String currencySample(String code, String sample) {
+    return '$code · $sample';
+  }
+
+  @override
+  String currencyNoCents(String code, String sample) {
+    return '$code · $sample · no cents';
+  }
+
+  @override
+  String get currencyNote =>
+      'Changing this doesn\'t convert anything. Past runs keep the currency they were settled in.';
+
+  @override
+  String get currencySave => 'Save currency';
+
+  @override
+  String get currencyNameTRY => 'Turkish lira';
+
+  @override
+  String get currencyNameEUR => 'Euro';
+
+  @override
+  String get currencyNameGBP => 'Pound sterling';
+
+  @override
+  String get currencyNameUSD => 'US dollar';
+
+  @override
+  String get currencyNameJPY => 'Japanese yen';
+
+  @override
+  String get currencyNameCHF => 'Swiss franc';
 }

@@ -240,6 +240,98 @@ void main() {
       },
     );
 
+    test('leaving keeps the history: items, lines and baskets stay', () async {
+      // ADR-036. Leaving used to delete the member row, and the cascade took
+      // their items, their settlement lines and every basket they had
+      // shopped with it.
+      final owner = asUser(kaan);
+      final household = await endpoints.household.create(owner, 'Kaya');
+      final member = asUser(ayse);
+      await endpoints.household.joinWithCode(member, household.code);
+      final basket = await endpoints.basket.open(member, durationMinutes: 10);
+      final milk = await endpoints.basket.addItem(owner, basket.id!, 'Milk');
+      await endpoints.basket.freeze(member, basket.id!);
+      await endpoints.basket.markItem(
+        member,
+        milk.id!,
+        ItemStatus.picked,
+        priceMinor: 4250,
+      );
+      await endpoints.settlement.settle(member, basket.id!);
+
+      await endpoints.household.leave(member);
+
+      final session = sessionBuilder.build();
+      expect(await Basket.db.findById(session, basket.id!), isNotNull);
+      expect(await BasketItem.db.findById(session, milk.id!), isNotNull);
+      expect(await endpoints.settlement.get(owner, basket.id!), hasLength(1));
+      expect(await endpoints.household.getMine(member), isNull);
+    });
+
+    test('whoever is shopping cannot leave mid-run', () async {
+      final owner = asUser(kaan);
+      await endpoints.household.create(owner, 'Kaya');
+      final basket = await endpoints.basket.open(owner, durationMinutes: 10);
+
+      await expectLater(
+        endpoints.household.leave(owner),
+        _fails(BasketError.shopperCannotLeave),
+      );
+
+      // At the checkout is still mid-run: nobody else could settle it.
+      await endpoints.basket.freeze(owner, basket.id!);
+      await expectLater(
+        endpoints.household.leave(owner),
+        _fails(BasketError.shopperCannotLeave),
+      );
+    });
+
+    test('former members are listed only when asked for', () async {
+      final owner = asUser(kaan);
+      final household = await endpoints.household.create(owner, 'Kaya');
+      await endpoints.household.joinWithCode(asUser(ayse), household.code);
+      await endpoints.household.leave(asUser(ayse));
+
+      expect(await endpoints.household.listMembers(owner), hasLength(1));
+      final everyone = await endpoints.household.listMembers(
+        owner,
+        includeFormer: true,
+      );
+      expect(everyone, hasLength(2));
+      expect(everyone.where((m) => m.leftAt != null), hasLength(1));
+    });
+
+    test('coming back gets the old membership back', () async {
+      final owner = asUser(kaan);
+      final household = await endpoints.household.create(owner, 'Kaya');
+      final member = asUser(ayse);
+      await endpoints.household.joinWithCode(member, household.code);
+      final before = (await endpoints.household.listMembers(owner)).last;
+      await endpoints.household.leave(member);
+
+      await endpoints.household.joinWithCode(member, household.code);
+
+      final after = (await endpoints.household.listMembers(owner)).last;
+      expect(after.id, before.id);
+      expect(after.leftAt, isNull);
+    });
+
+    test('a bad name or currency says so, not "not the owner"', () async {
+      final owner = asUser(kaan);
+      await endpoints.household.create(owner, 'Kaya');
+
+      await expectLater(
+        endpoints.household.rename(owner, '  '),
+        _fails(BasketError.invalidHouseholdName),
+      );
+      await expectLater(
+        endpoints.household.setCurrency(owner, 'lira'),
+        _fails(BasketError.invalidCurrency),
+      );
+      final changed = await endpoints.household.setCurrency(owner, ' eur ');
+      expect(changed.currencyCode, 'EUR');
+    });
+
     test('leaving frees you to join somewhere else', () async {
       final session = asUser(kaan);
       await endpoints.household.create(session, 'First');

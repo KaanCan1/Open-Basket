@@ -134,7 +134,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           _TotalsPanel(
             basket: basket,
             itemSum: itemSum,
-            memberCount: members.length,
+            // The split is across the household as it is now (ADR-036).
+            memberCount: ref.watch(activeMembersProvider).value?.length ?? 0,
             unfinished: unfinished,
             settling: _settling,
             onSettle: _settle,
