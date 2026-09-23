@@ -165,7 +165,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - ✅ **M5: no new features after Day 25**
 
 ### Day 26: Report data
-- [ ] **A** `stats_endpoint.dart` and `scripts/report.sql`:
+- [x] **A** `stats_endpoint.dart` and `scripts/report.sql` (ADR-040; the endpoint answers for the caller's household only):
   - Total baskets opened, per household
   - Total items, average items per basket
   - Outcome breakdown (auto-closed / manually frozen / cancelled / settled)

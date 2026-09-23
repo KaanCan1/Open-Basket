@@ -801,3 +801,25 @@ outside a true two-phone race. Reported as Serverpod feedback finding 7 (`docs/S
   email (our own checks) and `WebSocketConnectionClosed` logged at ERROR on ordinary disconnects
   (Serverpod feedback finding 9). No error from our code.
 
+## ADR-040: The report reads the tables, and only the operator sees every household
+
+- **Source.** The Day 26 figures come from `basket`, `basket_item` and `household_member`, which
+  already record how each run ended (`closedAutomatically`, `frozenAt`, `extendCount`) and who
+  asked for what and when. `analytics_event` stays the audit trail (rule 8) and a cross-check,
+  not the source: counting events would double-count a retried write and miss one that failed,
+  which `AnalyticsService.track` is allowed to do.
+- **One query, two readers.** `StatsService.headlineSql` takes an optional household. The
+  `stats.report` endpoint always passes the caller's; `scripts/report.sql` carries the same text
+  with the filter set to NULL. `stats_test` fails if the two differ, and runs every query in the
+  script, so the report cannot quietly drift from what the app computes.
+- **Scope.** The endpoint never answers for all households. Any signed-in account — a judge's
+  included — could otherwise count the houses using the app and see how they shop. Every
+  household at once is an operator's question, answered with `psql` and a temporary database
+  user that is deleted afterwards.
+- **Definitions** that make a figure honest rather than flattering: shares and the join rate
+  leave out a run that is still open (its answer is not in yet) and one-person houses (nobody
+  else could have joined); chosen duration excludes the five-minute extension; "members" means
+  the members in the house when the run opened, which soft leave (ADR-036) makes possible.
+- **`docs/REPORT.md`** is drafted with definitions and empty tables. No number goes in until it
+  comes out of `report.sql` against production, after real use.
+
