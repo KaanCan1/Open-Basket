@@ -316,9 +316,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveBasketClosedTitle => 'This basket closed';
 
   @override
-  String get liveBasketClosedNote => 'It closed while you were away.';
-
-  @override
   String get liveBasketBack => 'Back';
 
   @override
@@ -746,4 +743,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String homeBasketOpenAt(String name, String store) {
     return '$name is shopping at $store. Add what you need.';
   }
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String historySummary(int count, String total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count runs',
+      one: '1 run',
+    );
+    return '$_temp0 · $total through the house';
+  }
+
+  @override
+  String get historyEmpty =>
+      'No finished runs yet. They show up here once a basket is settled or cancelled.';
+
+  @override
+  String historyToday(String time) {
+    return 'Today, $time';
+  }
+
+  @override
+  String historyYesterday(String time) {
+    return 'Yesterday, $time';
+  }
+
+  @override
+  String historyWhen(String when, String name) {
+    return '$when · $name shopped';
+  }
+
+  @override
+  String historyRan(int minutes) {
+    return 'ran $minutes min';
+  }
+
+  @override
+  String get historyNoStore => 'A run';
+
+  @override
+  String get historySettled => 'Settled';
+
+  @override
+  String get historyCancelled => 'Cancelled';
+
+  @override
+  String get historyStatItems => 'items';
+
+  @override
+  String get historyStatUnavailable => 'unavailable';
+
+  @override
+  String get historyStatReceipt => 'receipt';
+
+  @override
+  String get historyHowSettled => 'HOW IT SETTLED';
+
+  @override
+  String historyLine(String from, String to) {
+    return '$from → $to';
+  }
+
+  @override
+  String historyGapNote(String each, String gap) {
+    return 'Includes $each each of the $gap receipt gap.';
+  }
+
+  @override
+  String get historyNobody => 'Nobody owes anybody';
+
+  @override
+  String historyCancelledNote(String name) {
+    return '$name cancelled before the till, so nothing was priced and no settlement was made.';
+  }
+
+  @override
+  String get historyWhatWasInIt => 'WHAT WAS IN IT';
+
+  @override
+  String historyAskedDropped(String name) {
+    return '$name asked · dropped';
+  }
+
+  @override
+  String get historyHowItRan => 'HOW IT RAN';
+
+  @override
+  String get historyOpened => 'Opened';
+
+  @override
+  String historyOpenedFor(String time, int minutes) {
+    return '$time · for $minutes min';
+  }
+
+  @override
+  String get historyClosed => 'Closed';
+
+  @override
+  String get historyPriced => 'Priced';
+
+  @override
+  String get historyNothing => 'nothing';
+
+  @override
+  String get homeHistoryLabel => 'HISTORY';
+
+  @override
+  String get homeHistoryNone => 'Nothing finished yet';
 }

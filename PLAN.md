@@ -141,8 +141,8 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **A for B** If location permission is denied, fall back silently to manual duration
 
 ### Day 21: History + review
-- [ ] **A** `getHistory(householdId, limit)` — `history.list` done early for the last-run card (ADR-031); `history.get` still to do
-- [ ] **B** `history_screen.dart`: past baskets, totals, who asked for what, plus the detail view for one past run (screens 29-30)
+- [x] **A** `getHistory(householdId, limit)` — `history.list` (now one `PastRun` summary per row) and `history.get` (ADR-031, ADR-035)
+- [x] **A for B** `history_screen.dart`: past baskets, totals, who asked for what, plus the detail view for one past run (screens 29-30)
 - [ ] **Both** Review usage notes; the last big change decision is made here
 - ✅ **M4**
 

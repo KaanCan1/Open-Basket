@@ -69,8 +69,8 @@ void main() {
       // Any member reads it, not only whoever shopped.
       final runs = await endpoints.history.list(asUser(ayse));
 
-      expect(runs.map((b) => b.id), [third.id, second.id, first.id]);
-      expect(runs.map((b) => b.status), [
+      expect(runs.map((r) => r.basket.id), [third.id, second.id, first.id]);
+      expect(runs.map((r) => r.basket.status), [
         BasketStatus.settled,
         BasketStatus.cancelled,
         BasketStatus.settled,
@@ -117,6 +117,114 @@ void main() {
       // Zero or less still answers something rather than nothing.
       expect(await endpoints.history.list(shopper, limit: 0), hasLength(1));
       expect(HistoryEndpoint.maxLimit, lessThanOrEqualTo(50));
+    });
+
+    test('each row carries its total and who asked for what', () async {
+      final shopper = asUser(kaan);
+      final household = await endpoints.household.create(shopper, 'Kaya');
+      await endpoints.household.joinWithCode(asUser(ayse), household.code);
+      final basket = await endpoints.basket.open(shopper, durationMinutes: 10);
+      final milk = await endpoints.basket.addItem(
+        asUser(ayse),
+        basket.id!,
+        'Milk',
+      );
+      final eggs = await endpoints.basket.addItem(
+        asUser(ayse),
+        basket.id!,
+        'Eggs',
+      );
+      final bread = await endpoints.basket.addItem(
+        shopper,
+        basket.id!,
+        'Bread',
+      );
+      await endpoints.basket.freeze(shopper, basket.id!);
+      await endpoints.basket.markItem(
+        shopper,
+        milk.id!,
+        ItemStatus.picked,
+        priceMinor: 4250,
+      );
+      await endpoints.basket.markItem(
+        shopper,
+        eggs.id!,
+        ItemStatus.unavailable,
+      );
+      await endpoints.basket.markItem(
+        shopper,
+        bread.id!,
+        ItemStatus.picked,
+        priceMinor: 1500,
+      );
+      await endpoints.settlement.settle(shopper, basket.id!);
+
+      final run = (await endpoints.history.list(shopper)).single;
+
+      // No receipt total entered: the priced items are what it cost.
+      expect(run.totalMinor, 5750);
+      expect(run.itemCount, 3);
+      expect(run.unavailableCount, 1);
+      expect(run.itemsByMember.values.toList()..sort(), [1, 2]);
+    });
+
+    test(
+      'a receipt total wins over the item sum, and cancelled costs nothing',
+      () {
+        final settled = Basket(
+          householdId: 1,
+          shopperMemberId: 1,
+          status: BasketStatus.settled,
+          openedAt: DateTime.utc(2030),
+          closesAt: DateTime.utc(2030),
+          receiptTotalMinor: 6000,
+        );
+        final item = BasketItem(
+          basketId: 1,
+          requesterMemberId: 2,
+          name: 'Milk',
+          quantity: 1,
+          status: ItemStatus.picked,
+          priceMinor: 4250,
+          addedAt: DateTime.utc(2030),
+        );
+
+        expect(HistoryEndpoint.summarise(settled, [item]).totalMinor, 6000);
+        expect(
+          HistoryEndpoint.summarise(
+            settled.copyWith(status: BasketStatus.cancelled),
+            [item],
+          ).totalMinor,
+          0,
+        );
+      },
+    );
+
+    test('one run comes back in full, to any member', () async {
+      final shopper = asUser(kaan);
+      final household = await endpoints.household.create(shopper, 'Kaya');
+      await endpoints.household.joinWithCode(asUser(ayse), household.code);
+      final basket = await endpoints.basket.open(shopper, durationMinutes: 10);
+      await endpoints.basket.addItem(asUser(ayse), basket.id!, 'Milk');
+      await endpoints.basket.cancel(shopper, basket.id!);
+
+      final run = await endpoints.history.get(asUser(ayse), basket.id!);
+
+      expect(run.basket!.status, BasketStatus.cancelled);
+      expect(run.items!.map((i) => i.name), ['Milk']);
+    });
+
+    test('an outsider cannot read one run', () async {
+      final shopper = asUser(kaan);
+      await endpoints.household.create(shopper, 'Kaya');
+      final basket = await endpoints.basket.open(shopper, durationMinutes: 10);
+      final outsider = asUser(mert);
+      await endpoints.household.create(outsider, 'Other house');
+
+      await expectLater(
+        endpoints.history.get(outsider, basket.id!),
+        _fails(BasketError.basketNotFound),
+      );
     });
 
     test('someone with no household is refused', () async {

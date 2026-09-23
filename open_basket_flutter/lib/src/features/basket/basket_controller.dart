@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
+import '../history/history_controller.dart';
 
 /// The household's basket that is still going, or null.
 ///
@@ -37,6 +38,7 @@ class BasketController {
   Future<Basket> cancel(int basketId) async {
     final basket = await _client.basket.cancel(basketId);
     _ref.invalidate(activeBasketProvider);
+    _ref.invalidate(historyProvider);
     return basket;
   }
 
@@ -72,6 +74,7 @@ class BasketController {
     final lines = await _client.settlement.settle(basketId);
     _ref.invalidate(activeBasketProvider);
     _ref.invalidate(lastSettledRunProvider);
+    _ref.invalidate(historyProvider);
     _ref.invalidate(settlementProvider(basketId));
     return lines;
   }
@@ -89,10 +92,10 @@ final lastSettledRunProvider =
     ) async {
       final client = ref.watch(clientProvider);
       final runs = await client.history.list(limit: 1);
-      if (runs.isEmpty || runs.single.status != BasketStatus.settled) {
+      if (runs.isEmpty || runs.single.basket.status != BasketStatus.settled) {
         return null;
       }
-      final basket = runs.single;
+      final basket = runs.single.basket;
       return (
         basket: basket,
         lines: await client.settlement.get(basket.id!),

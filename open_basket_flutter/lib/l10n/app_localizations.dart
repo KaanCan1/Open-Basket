@@ -628,12 +628,6 @@ abstract class AppLocalizations {
   /// **'This basket closed'**
   String get liveBasketClosedTitle;
 
-  /// No description provided for @liveBasketClosedNote.
-  ///
-  /// In en, this message translates to:
-  /// **'It closed while you were away.'**
-  String get liveBasketClosedNote;
-
   /// No description provided for @liveBasketBack.
   ///
   /// In en, this message translates to:
@@ -1227,6 +1221,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} is shopping at {store}. Add what you need.'**
   String homeBasketOpenAt(String name, String store);
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTitle;
+
+  /// No description provided for @historySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 run} other{{count} runs}} · {total} through the house'**
+  String historySummary(int count, String total);
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No finished runs yet. They show up here once a basket is settled or cancelled.'**
+  String get historyEmpty;
+
+  /// No description provided for @historyToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today, {time}'**
+  String historyToday(String time);
+
+  /// No description provided for @historyYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday, {time}'**
+  String historyYesterday(String time);
+
+  /// No description provided for @historyWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'{when} · {name} shopped'**
+  String historyWhen(String when, String name);
+
+  /// No description provided for @historyRan.
+  ///
+  /// In en, this message translates to:
+  /// **'ran {minutes} min'**
+  String historyRan(int minutes);
+
+  /// No description provided for @historyNoStore.
+  ///
+  /// In en, this message translates to:
+  /// **'A run'**
+  String get historyNoStore;
+
+  /// No description provided for @historySettled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled'**
+  String get historySettled;
+
+  /// No description provided for @historyCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get historyCancelled;
+
+  /// No description provided for @historyStatItems.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get historyStatItems;
+
+  /// No description provided for @historyStatUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'unavailable'**
+  String get historyStatUnavailable;
+
+  /// No description provided for @historyStatReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'receipt'**
+  String get historyStatReceipt;
+
+  /// No description provided for @historyHowSettled.
+  ///
+  /// In en, this message translates to:
+  /// **'HOW IT SETTLED'**
+  String get historyHowSettled;
+
+  /// No description provided for @historyLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} → {to}'**
+  String historyLine(String from, String to);
+
+  /// No description provided for @historyGapNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Includes {each} each of the {gap} receipt gap.'**
+  String historyGapNote(String each, String gap);
+
+  /// No description provided for @historyNobody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody owes anybody'**
+  String get historyNobody;
+
+  /// No description provided for @historyCancelledNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} cancelled before the till, so nothing was priced and no settlement was made.'**
+  String historyCancelledNote(String name);
+
+  /// No description provided for @historyWhatWasInIt.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT WAS IN IT'**
+  String get historyWhatWasInIt;
+
+  /// No description provided for @historyAskedDropped.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asked · dropped'**
+  String historyAskedDropped(String name);
+
+  /// No description provided for @historyHowItRan.
+  ///
+  /// In en, this message translates to:
+  /// **'HOW IT RAN'**
+  String get historyHowItRan;
+
+  /// No description provided for @historyOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened'**
+  String get historyOpened;
+
+  /// No description provided for @historyOpenedFor.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} · for {minutes} min'**
+  String historyOpenedFor(String time, int minutes);
+
+  /// No description provided for @historyClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get historyClosed;
+
+  /// No description provided for @historyPriced.
+  ///
+  /// In en, this message translates to:
+  /// **'Priced'**
+  String get historyPriced;
+
+  /// No description provided for @historyNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'nothing'**
+  String get historyNothing;
+
+  /// No description provided for @homeHistoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HISTORY'**
+  String get homeHistoryLabel;
+
+  /// No description provided for @homeHistoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing finished yet'**
+  String get homeHistoryNone;
 }
 
 class _AppLocalizationsDelegate

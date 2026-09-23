@@ -682,3 +682,28 @@ that run with the strip.
 
 Until the settings screen exists, the stores list is reached from a "Stores" row on the home screen
 and from "Add a store" in the open sheet. The live basket and the home card name the store.
+
+## ADR-035: History is one call per screen
+
+- **`history.list` returns `PastRun` summaries, not bare baskets.** A row on screen 16 shows the
+  total and how many items each member asked for; returning baskets would have meant one more call
+  per row. `PastRun` is a non-table model — the basket, `totalMinor` (the receipt if entered, else
+  the priced items, zero for a cancelled run), item and unavailable counts, and member → item
+  count. The items for every row come from one `inSet` query. The header's "N runs · ₺X through
+  the house" is over the rows returned (up to 50), which covers the usage period many times over.
+- **`history.get` returns a `BasketEvent` snapshot**, the same shape the live stream opens with, so
+  one past run is one call and no socket: a finished run does not change.
+- **Screens 29 and 30** group items by requester with prices, list "Ayşe → Kaan ₺85.00" and the
+  per-head share of the receipt gap for a settled run, and what was dropped for a cancelled one.
+  There is no cancel timestamp on `Basket`, so a cancelled run says when it opened and for how long
+  it was booked, not how long it actually ran.
+
+Found while walking it, and fixed here:
+- History did not refresh when a run settled or was cancelled — it kept the list it had. The
+  lifecycle events and the controller's cancel/settle now invalidate it.
+- Cancelling with a few seconds left raced the auto-close: the basket closed, the shopper buttons
+  left the screen, and the cancel then touched `ref` after unmount and threw, with nothing shown.
+  Shopper actions now read everything before the first await and report a refusal. The confirm is
+  a Cupertino alert, like the other iOS sheets.
+- The closed-basket footer said "It closed while you were away" to the shopper who had just
+  cancelled it. The header already says how it ended (ADR-033); the footer is now just Back.

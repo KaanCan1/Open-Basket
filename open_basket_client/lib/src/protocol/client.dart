@@ -22,6 +22,7 @@ import 'package:open_basket_client/src/protocol/household.dart' as _iig1c7mf;
 import 'package:open_basket_client/src/protocol/household_member.dart'
     as _i5id5rp2;
 import 'package:open_basket_client/src/protocol/item_status.dart' as _i3z6uioy;
+import 'package:open_basket_client/src/protocol/past_run.dart' as _igqoy608;
 import 'package:open_basket_client/src/protocol/settlement_line.dart'
     as _i27lt87a;
 import 'package:open_basket_client/src/protocol/store.dart' as _icg68kho;
@@ -508,8 +509,8 @@ class EndpointHistory extends _isc.EndpointRef {
   /// `limit` is clamped to 1..[maxLimit]. It is nullable for the same reason
   /// as `addItem`'s quantity: a defaulted named parameter becomes a required
   /// one on the generated client.
-  _ida.Future<List<_ifmsley9.Basket>> list({int? limit}) =>
-      caller.callServerEndpoint<List<_ifmsley9.Basket>>(
+  _ida.Future<List<_igqoy608.PastRun>> list({int? limit}) =>
+      caller.callServerEndpoint<List<_igqoy608.PastRun>>(
         'history',
         'list',
         {'limit': limit},
@@ -518,6 +519,9 @@ class EndpointHistory extends _isc.EndpointRef {
   /// One past run in full: its items with who asked and what they cost, and
   /// its settlement lines if it has any. A cancelled run has neither prices
   /// nor lines. Read-only.
+  ///
+  /// Any member may read any of the household's runs; an unknown id and
+  /// another household's answer the same `basketNotFound`, as everywhere.
   _ida.Future<_ivynb499.BasketEvent> get(int basketId) =>
       caller.callServerEndpoint<_ivynb499.BasketEvent>(
         'history',
