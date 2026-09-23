@@ -26,7 +26,7 @@ by itself.**
 
 The shopper opens a basket, picks a store and a duration — "checkout in 10 minutes".
 Everyone in the household is notified and adds what they need, with a note if it matters
-("the glass bottle one"). Items appear on every phone as they are typed. Two minutes
+("the glass bottle one"). Items appear on every phone the moment they are added. Two minutes
 before the end everyone is told, and the shopper can buy one more five-minute extension.
 Then the list is final. At the till the shopper marks what they found and enters the
 receipt total, and the server works out who owes whom.
@@ -51,7 +51,7 @@ Serverpod is doing the work here, not hosting a form.
   and never needs a second call. Every mutation posts to the channel through
   `session.messages`. Every event carries the server's clock, so the countdown keeps
   correcting for device clock drift.
-- **The database schema is the model layer.** Fourteen `.spy.yaml` models generate the
+- **The database schema is the model layer.** Seventeen `.spy.yaml` models generate the
   ORM, the migrations and a fully typed Dart client. Endpoint signatures landed on the
   main branch on day two with `UnimplementedError` bodies, so the Flutter side could be
   built against a compiling, typed client before a single endpoint existed.

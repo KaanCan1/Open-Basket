@@ -3,31 +3,89 @@
   <img alt="Open Basket" src="docs/brand/open-basket-black-on-white-banner.png" width="640">
 </picture>
 
-A live, time-boxed shared shopping basket for families and housemates.
+**One person shops. Everyone adds.**
 
-The shopper opens a basket and sets a duration ("checkout in 8 minutes"). Everyone in the
-household gets a push notification and adds what they need; items appear instantly on every
-device. When the time runs out the basket closes **on the server**, even if the app was killed.
-At checkout the shopper enters prices and the server works out who owes whom.
+A live, time-boxed shared shopping basket for families and housemates, built with Serverpod
+and Flutter.
 
-The only thing shared is the remaining time. Live location never reaches the server.
+## The problem
 
-Built with Serverpod (streaming, future calls, server-side settlement) and Flutter.
+Someone is already at the supermarket when the messages start: one in the family group, one in
+a private chat, a phone call at the till. Something gets forgotten, and afterwards nobody
+remembers who owes whom for what.
 
-Status: in development. See `PLAN.md` for the build plan and `CLAUDE.md` for project rules.
+## What Open Basket does
 
-**Live:** the app is deployed on Serverpod Cloud.
+1. **The shopper opens a basket** for a store and a few minutes — "checkout in 12 minutes". The
+   phone suggests the time from how far away the store is; its location never leaves it.
+2. **Everyone in the house adds what they need**, with a note if it matters. Each item appears
+   on every phone the moment it is added.
+3. **The basket closes itself when the time runs out — on the server**, whether or not any phone
+   is awake. The shopper can extend once, by five minutes, and only the shopper.
+4. **At the till** the shopper ticks off what they found, enters prices and the receipt total,
+   and **the server works out who owes whom**, down to the last kuruş.
+5. Every finished run stays in the household's history.
+
+The only thing shared is the remaining time. Live location is never sent to the server.
+
+**Not built:** push notifications. Opening a basket does not yet notify the house; people see it
+when they open the app (`docs/TESTING.md` lists what is missing).
+
+## Where Serverpod does the work
+
+| Serverpod feature | What it does here | Why it had to be the server |
+|---|---|---|
+| **Future calls** | `CloseBasketFutureCall` is scheduled for the deadline when a basket opens, and freezes it then. Idempotent: a call left over from before an extension fires and does nothing. A sweep at startup closes anything a restart lost. | A phone timer dies with the phone. "The basket closes on time" is only true if something that does not sleep closes it. |
+| **Streaming** | `basketStream.watch(basketId)` is a WebSocket whose first event is a full snapshot, then every change as it happens, each carrying the server's clock. Endpoints post to a `basket:<id>` channel through `session.messages`. | Items have to land on every phone at once, and a phone that dropped its connection has to resync from the stream itself. |
+| **Database and generated client** | 17 `.spy.yaml` models generate the tables, migrations and a typed Dart client. Rule 4 — one open basket per household — is a partial unique index written into the migrations by hand. | Two people tapping *Open a basket* together must not both succeed; only the database can promise that. |
+| **Auth** | Serverpod's auth module under a passwordless flow: a six-digit code by email, 10-minute expiry, 3 attempts. On Serverpod Cloud the code is really emailed. | A judge, or a grandparent, can sign in with nothing but an inbox. |
+| **Server-side settlement** | Integer minor units per currency; each member owes their own items plus an even share of the receipt gap, remainder to the shopper, so the lines add up to exactly what was paid. A settled run is immutable. | Two phones must never disagree about money. |
+
+Every endpoint checks household membership and role, and every state change writes an
+analytics row from the server — the usage report is built from those tables (`scripts/report.sql`).
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Phones["Flutter app (iOS, Android, web)"]
+    K["Shopper"]
+    A["Everyone else"]
+  end
+  subgraph Server["Serverpod on Serverpod Cloud"]
+    E["Endpoints<br/>basket, household, store,<br/>settlement, history, stats"]
+    S["basketStream.watch<br/>WebSocket"]
+    F["CloseBasketFutureCall"]
+    M["session.messages<br/>basket:&lt;id&gt;"]
+  end
+  DB[("PostgreSQL")]
+  K -- "open, extend, mark, price, settle" --> E
+  A -- "add items" --> E
+  E --> DB
+  E -- "schedule at closesAt" --> F
+  F -- "freeze when due" --> DB
+  E --> M
+  F --> M
+  M --> S
+  S -- "snapshot, then every change" --> K
+  S -- "snapshot, then every change" --> A
+```
+
+`docs/ARCHITECTURE.md` records every decision behind this as a numbered ADR, including the
+ones that turned out wrong.
+
+## Try it
 
 | | |
 |---|---|
+| Web (no install) | https://open-basket.serverpod.space/ |
 | API | https://open-basket.api.serverpod.space/ |
-| Web | https://open-basket.serverpod.space/ |
 
-The web address serves the Flutter app itself, so it can be tried in a browser with
-nothing installed. Point a phone build at the same server with
+Sign in with any address you can read mail at. `docs/TESTING.md` is the walkthrough, written
+for someone seeing the app for the first time. Point a phone build at the same server with
 `flutter run --dart-define=SERVER_URL=https://open-basket.api.serverpod.space/`.
 
-`docs/TESTING.md` is the walkthrough, written for someone seeing it for the first time.
+`PLAN.md` is the build plan and status board; `CLAUDE.md` holds the product rules.
 
 ---
 
@@ -84,6 +142,11 @@ dart bin/main.dart --apply-migrations
 That starts PostgreSQL, applies the migrations and listens on `localhost:8080`. No Docker
 is involved.
 
+> If it exits silently right after "Database does not match target state", run
+> `./scripts/dev_db_unblock.sh` from the repository root. Development mode treats the
+> hand-written rule 4 index as a fatal mismatch; the script drops it from the local
+> development database only (ADR-037).
+
 ### Run the app
 
 ```bash
@@ -106,7 +169,7 @@ Integration tests need a PostgreSQL **15 or newer** separate from the developmen
 port 9090. Either bring up the container CI uses:
 
 ```bash
-docker compose up -d postgres_test
+cd open_basket_server && docker compose up -d postgres_test
 ```
 
 or, on a machine without Docker, use the script that creates a local cluster on the same
@@ -162,6 +225,7 @@ serverpod create-migration       # only when the schema changed
 open_basket_server/    Serverpod backend: models, endpoints, future calls, migrations
 open_basket_client/    Generated Dart client. Never edited by hand.
 open_basket_flutter/   The Flutter app
-docs/                  ARCHITECTURE.md (decisions), CONTEXT.md (status), SUBMISSION.md
-scripts/               local_test_db.sh
+docs/                  ARCHITECTURE.md (decisions), CONTEXT.md (status), TESTING.md,
+                       DEMO_SCRIPT.md, REPORT.md, SUBMISSION.md
+scripts/               local_test_db.sh, dev_db_unblock.sh, report.sql
 ```
