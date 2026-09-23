@@ -39,9 +39,11 @@ import 'greetings/greeting.dart' as _izw8z7ou;
 import 'household.dart' as _ijonbu5t;
 import 'household_member.dart' as _iv10erpj;
 import 'item_status.dart' as _ibbyonnn;
+import 'join_attempt.dart' as _ira1fzaj;
 import 'member_role.dart' as _insyygng;
 import 'open_basket_exception.dart' as _ityrezdb;
 import 'past_run.dart' as _ilcj9n2a;
+import 'retired_household_code.dart' as _ijie3fvs;
 import 'settlement_line.dart' as _i7gf6igf;
 import 'sign_in_code.dart' as _iy6eg0ya;
 import 'store.dart' as _ixrn3cz3;
@@ -57,9 +59,11 @@ export 'greetings/greeting.dart';
 export 'household.dart';
 export 'household_member.dart';
 export 'item_status.dart';
+export 'join_attempt.dart';
 export 'member_role.dart';
 export 'open_basket_exception.dart';
 export 'past_run.dart';
+export 'retired_household_code.dart';
 export 'settlement_line.dart';
 export 'sign_in_code.dart';
 export 'store.dart';
@@ -571,6 +575,115 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
+      name: 'join_attempt',
+      dartName: 'JoinAttempt',
+      schema: 'public',
+      module: 'open_basket',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'userId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'attemptedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'join_attempt_user_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'userId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'attemptedAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'retired_household_code',
+      dartName: 'RetiredHouseholdCode',
+      schema: 'public',
+      module: 'open_basket',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'householdId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'code',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'retiredAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'retired_household_code_fk_0',
+          columns: ['householdId'],
+          referenceTable: 'household',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'retired_household_code_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'code',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
       name: 'settlement_line',
       dartName: 'SettlementLine',
       schema: 'public',
@@ -863,6 +976,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ibbyonnn.ItemStatus) {
       return _ibbyonnn.ItemStatus.fromJson(data) as T;
     }
+    if (t == _ira1fzaj.JoinAttempt) {
+      return _ira1fzaj.JoinAttempt.fromJson(data) as T;
+    }
     if (t == _insyygng.MemberRole) {
       return _insyygng.MemberRole.fromJson(data) as T;
     }
@@ -871,6 +987,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _ilcj9n2a.PastRun) {
       return _ilcj9n2a.PastRun.fromJson(data) as T;
+    }
+    if (t == _ijie3fvs.RetiredHouseholdCode) {
+      return _ijie3fvs.RetiredHouseholdCode.fromJson(data) as T;
     }
     if (t == _i7gf6igf.SettlementLine) {
       return _i7gf6igf.SettlementLine.fromJson(data) as T;
@@ -932,6 +1051,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_ibbyonnn.ItemStatus?>()) {
       return (data != null ? _ibbyonnn.ItemStatus.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_ira1fzaj.JoinAttempt?>()) {
+      return (data != null ? _ira1fzaj.JoinAttempt.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_insyygng.MemberRole?>()) {
       return (data != null ? _insyygng.MemberRole.fromJson(data) : null) as T;
     }
@@ -943,6 +1065,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_ilcj9n2a.PastRun?>()) {
       return (data != null ? _ilcj9n2a.PastRun.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ijie3fvs.RetiredHouseholdCode?>()) {
+      return (data != null
+              ? _ijie3fvs.RetiredHouseholdCode.fromJson(data)
+              : null)
+          as T;
     }
     if (t == _is.getType<_i7gf6igf.SettlementLine?>()) {
       return (data != null ? _i7gf6igf.SettlementLine.fromJson(data) : null)
@@ -1032,9 +1160,11 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ijonbu5t.Household => 'Household',
       _iv10erpj.HouseholdMember => 'HouseholdMember',
       _ibbyonnn.ItemStatus => 'ItemStatus',
+      _ira1fzaj.JoinAttempt => 'JoinAttempt',
       _insyygng.MemberRole => 'MemberRole',
       _ityrezdb.OpenBasketException => 'OpenBasketException',
       _ilcj9n2a.PastRun => 'PastRun',
+      _ijie3fvs.RetiredHouseholdCode => 'RetiredHouseholdCode',
       _i7gf6igf.SettlementLine => 'SettlementLine',
       _iy6eg0ya.SignInCode => 'SignInCode',
       _ixrn3cz3.Store => 'Store',
@@ -1080,12 +1210,16 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'HouseholdMember';
       case _ibbyonnn.ItemStatus():
         return 'ItemStatus';
+      case _ira1fzaj.JoinAttempt():
+        return 'JoinAttempt';
       case _insyygng.MemberRole():
         return 'MemberRole';
       case _ityrezdb.OpenBasketException():
         return 'OpenBasketException';
       case _ilcj9n2a.PastRun():
         return 'PastRun';
+      case _ijie3fvs.RetiredHouseholdCode():
+        return 'RetiredHouseholdCode';
       case _i7gf6igf.SettlementLine():
         return 'SettlementLine';
       case _iy6eg0ya.SignInCode():
@@ -1164,6 +1298,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'ItemStatus') {
       return deserialize<_ibbyonnn.ItemStatus>(data['data']);
     }
+    if (dataClassName == 'JoinAttempt') {
+      return deserialize<_ira1fzaj.JoinAttempt>(data['data']);
+    }
     if (dataClassName == 'MemberRole') {
       return deserialize<_insyygng.MemberRole>(data['data']);
     }
@@ -1172,6 +1309,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'PastRun') {
       return deserialize<_ilcj9n2a.PastRun>(data['data']);
+    }
+    if (dataClassName == 'RetiredHouseholdCode') {
+      return deserialize<_ijie3fvs.RetiredHouseholdCode>(data['data']);
     }
     if (dataClassName == 'SettlementLine') {
       return deserialize<_i7gf6igf.SettlementLine>(data['data']);
@@ -1235,6 +1375,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _ijonbu5t.Household.t;
       case _iv10erpj.HouseholdMember:
         return _iv10erpj.HouseholdMember.t;
+      case _ira1fzaj.JoinAttempt:
+        return _ira1fzaj.JoinAttempt.t;
+      case _ijie3fvs.RetiredHouseholdCode:
+        return _ijie3fvs.RetiredHouseholdCode.t;
       case _i7gf6igf.SettlementLine:
         return _i7gf6igf.SettlementLine.t;
       case _iy6eg0ya.SignInCode:

@@ -1219,4 +1219,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsFooterEmail(String version, String email) {
     return 'Open Basket $version · $email';
   }
+
+  @override
+  String get errorHouseholdCodeRotated => 'That code has been replaced';
+
+  @override
+  String get errorTooManyJoinAttempts =>
+      'Too many tries. Wait a few minutes and try again.';
+
+  @override
+  String joinTriesLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tries left.',
+      one: 'One try left.',
+      zero: 'No tries left for now: wait a few minutes.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get joinUnknownNote => 'Check it against the message you were sent.';
+
+  @override
+  String get joinTryAgain => 'Try again';
+
+  @override
+  String get joinPaste => 'Paste what you were sent';
+
+  @override
+  String get joinRotatedNote =>
+      'Nothing wrong with what you typed: the household changed its code after the message you were sent.';
+
+  @override
+  String get joinAskTitle => 'Ask for the new six characters';
+
+  @override
+  String get joinAskNote =>
+      'Whoever invited you can see the current code on their members screen. Codes don\'t expire on their own; this one was changed on purpose.';
+
+  @override
+  String get joinAskAction => 'Send them a request';
+
+  @override
+  String get joinAskShareText =>
+      'Could you send me the new code for our household on Open Basket?';
+
+  @override
+  String get joinEnterDifferent => 'Enter a different code';
+
+  @override
+  String get joinNeverIn =>
+      'Nobody has removed you from anything: you were never in yet.';
+
+  @override
+  String get joinNoCode => 'No code yet?';
+
+  @override
+  String get joinStartOwn => 'Start your own household';
 }

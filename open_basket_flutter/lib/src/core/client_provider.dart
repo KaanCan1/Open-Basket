@@ -84,3 +84,29 @@ final authListenableProvider = Provider<Listenable>(
 /// Accurate from the first build because `createClient` awaits
 /// `auth.initialize()`, which is what restores a stored session.
 bool isSignedIn(Client client) => client.auth.isAuthenticated;
+
+/// Who is signed in, as a value providers can depend on.
+///
+/// Every provider that fetches someone's data watches this, so the moment
+/// the account changes they are thrown away and fetched again. Without it a
+/// phone signed out and signed in as someone else kept showing the first
+/// person's household, history and code — Riverpod caches by provider, not
+/// by account (ADR-045).
+final sessionUserProvider = NotifierProvider<SessionUser, UuidValue?>(
+  SessionUser.new,
+);
+
+class SessionUser extends Notifier<UuidValue?> {
+  @override
+  UuidValue? build() {
+    final listenable = ref.watch(authListenableProvider);
+    void update() {
+      final now = currentUserId(ref.read(clientProvider));
+      if (now != state) state = now;
+    }
+
+    listenable.addListener(update);
+    ref.onDispose(() => listenable.removeListener(update));
+    return currentUserId(ref.read(clientProvider));
+  }
+}

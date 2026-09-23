@@ -1,0 +1,11 @@
+### One failed attempt to join with a code (ADR-045). A six-character code is
+### the only thing between a stranger and a household, so wrong guesses are
+### counted per account and capped.
+class: JoinAttempt
+table: join_attempt
+fields:
+  userId: UuidValue
+  attemptedAt: DateTime
+indexes:
+  join_attempt_user_idx:
+    fields: userId, attemptedAt

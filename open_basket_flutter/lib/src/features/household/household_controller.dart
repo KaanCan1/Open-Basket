@@ -9,6 +9,7 @@ import '../../core/client_provider.dart';
 /// is reached by the home screen resolving to null, which keeps the redirect
 /// synchronous and avoids a flash of the wrong screen while a future settles.
 final myHouseholdProvider = FutureProvider<Household?>((final ref) async {
+  if (ref.watch(sessionUserProvider) == null) return null;
   return ref.watch(clientProvider).household.getMine();
 });
 
@@ -45,7 +46,7 @@ final myMembershipProvider = FutureProvider<HouseholdMember?>((
   final ref,
 ) async {
   final members = await ref.watch(activeMembersProvider.future);
-  final userId = currentUserId(ref.watch(clientProvider));
+  final userId = ref.watch(sessionUserProvider);
   if (userId == null) return null;
   for (final member in members) {
     if (member.userId == userId) return member;
@@ -137,6 +138,7 @@ final householdControllerProvider = Provider<HouseholdController>(
 /// The signed-in account's email, for the footer of the settings screen.
 /// Null when it cannot be read; the footer then shows the version alone.
 final myEmailProvider = FutureProvider<String?>((final ref) async {
+  if (ref.watch(sessionUserProvider) == null) return null;
   try {
     final profile = await ref
         .watch(clientProvider)

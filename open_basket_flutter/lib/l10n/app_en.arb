@@ -1116,5 +1116,41 @@
         "type": "String"
       }
     }
-  }
+  },
+  "errorHouseholdCodeRotated": "That code has been replaced",
+  "@errorHouseholdCodeRotated": {},
+  "errorTooManyJoinAttempts": "Too many tries. Wait a few minutes and try again.",
+  "@errorTooManyJoinAttempts": {},
+  "joinTriesLeft": "{count, plural, =0{No tries left for now: wait a few minutes.} =1{One try left.} other{{count} tries left.}}",
+  "@joinTriesLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "joinUnknownNote": "Check it against the message you were sent.",
+  "@joinUnknownNote": {},
+  "joinTryAgain": "Try again",
+  "@joinTryAgain": {},
+  "joinPaste": "Paste what you were sent",
+  "@joinPaste": {},
+  "joinRotatedNote": "Nothing wrong with what you typed: the household changed its code after the message you were sent.",
+  "@joinRotatedNote": {},
+  "joinAskTitle": "Ask for the new six characters",
+  "@joinAskTitle": {},
+  "joinAskNote": "Whoever invited you can see the current code on their members screen. Codes don't expire on their own; this one was changed on purpose.",
+  "@joinAskNote": {},
+  "joinAskAction": "Send them a request",
+  "@joinAskAction": {},
+  "joinAskShareText": "Could you send me the new code for our household on Open Basket?",
+  "@joinAskShareText": {},
+  "joinEnterDifferent": "Enter a different code",
+  "@joinEnterDifferent": {},
+  "joinNeverIn": "Nobody has removed you from anything: you were never in yet.",
+  "@joinNeverIn": {},
+  "joinNoCode": "No code yet?",
+  "@joinNoCode": {},
+  "joinStartOwn": "Start your own household",
+  "@joinStartOwn": {}
 }

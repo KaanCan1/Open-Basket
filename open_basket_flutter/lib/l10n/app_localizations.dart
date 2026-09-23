@@ -1953,6 +1953,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open Basket {version} · {email}'**
   String settingsFooterEmail(String version, String email);
+
+  /// No description provided for @errorHouseholdCodeRotated.
+  ///
+  /// In en, this message translates to:
+  /// **'That code has been replaced'**
+  String get errorHouseholdCodeRotated;
+
+  /// No description provided for @errorTooManyJoinAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many tries. Wait a few minutes and try again.'**
+  String get errorTooManyJoinAttempts;
+
+  /// No description provided for @joinTriesLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No tries left for now: wait a few minutes.} =1{One try left.} other{{count} tries left.}}'**
+  String joinTriesLeft(int count);
+
+  /// No description provided for @joinUnknownNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Check it against the message you were sent.'**
+  String get joinUnknownNote;
+
+  /// No description provided for @joinTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get joinTryAgain;
+
+  /// No description provided for @joinPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste what you were sent'**
+  String get joinPaste;
+
+  /// No description provided for @joinRotatedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing wrong with what you typed: the household changed its code after the message you were sent.'**
+  String get joinRotatedNote;
+
+  /// No description provided for @joinAskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for the new six characters'**
+  String get joinAskTitle;
+
+  /// No description provided for @joinAskNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Whoever invited you can see the current code on their members screen. Codes don\'t expire on their own; this one was changed on purpose.'**
+  String get joinAskNote;
+
+  /// No description provided for @joinAskAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send them a request'**
+  String get joinAskAction;
+
+  /// No description provided for @joinAskShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Could you send me the new code for our household on Open Basket?'**
+  String get joinAskShareText;
+
+  /// No description provided for @joinEnterDifferent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a different code'**
+  String get joinEnterDifferent;
+
+  /// No description provided for @joinNeverIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody has removed you from anything: you were never in yet.'**
+  String get joinNeverIn;
+
+  /// No description provided for @joinNoCode.
+  ///
+  /// In en, this message translates to:
+  /// **'No code yet?'**
+  String get joinNoCode;
+
+  /// No description provided for @joinStartOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your own household'**
+  String get joinStartOwn;
 }
 
 class _AppLocalizationsDelegate

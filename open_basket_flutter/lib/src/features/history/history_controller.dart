@@ -6,6 +6,7 @@ import '../../core/client_provider.dart';
 /// Finished runs, newest first. Fifty is more than a household shops in the
 /// weeks this app has been running; the header's totals are over these.
 final historyProvider = FutureProvider<List<PastRun>>((final ref) async {
+  if (ref.watch(sessionUserProvider) == null) return const [];
   return ref.watch(clientProvider).history.list(limit: 50);
 });
 

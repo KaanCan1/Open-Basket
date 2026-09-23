@@ -7,3 +7,6 @@ fields:
   ### English, safe to show. Built from `app_en.arb` on the client where the
   ### wording matters; this is the fallback.
   message: String
+  ### How many more tries a failed join has left before the account has to
+  ### wait (ADR-045). Null for every other error.
+  triesLeft: int?
