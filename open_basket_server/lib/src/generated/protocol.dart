@@ -38,6 +38,7 @@ import 'future_calls_generated_models/closing_soon_future_call_remind_model.dart
 import 'household.dart' as _ijonbu5t;
 import 'household_member.dart' as _iv10erpj;
 import 'item_status.dart' as _ibbyonnn;
+import 'item_unit.dart' as _iplumtmx;
 import 'join_attempt.dart' as _ira1fzaj;
 import 'member_role.dart' as _insyygng;
 import 'open_basket_exception.dart' as _ityrezdb;
@@ -57,6 +58,7 @@ export 'device_token.dart';
 export 'household.dart';
 export 'household_member.dart';
 export 'item_status.dart';
+export 'item_unit.dart';
 export 'join_attempt.dart';
 export 'member_role.dart';
 export 'open_basket_exception.dart';
@@ -304,6 +306,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: false,
           dartType: 'int',
           columnDefault: '1',
+        ),
+        _isp.ColumnDefinition(
+          name: 'unit',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:ItemUnit',
+          columnDefault: '\'piece\'',
         ),
         _isp.ColumnDefinition(
           name: 'note',
@@ -971,6 +980,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ibbyonnn.ItemStatus) {
       return _ibbyonnn.ItemStatus.fromJson(data) as T;
     }
+    if (t == _iplumtmx.ItemUnit) {
+      return _iplumtmx.ItemUnit.fromJson(data) as T;
+    }
     if (t == _ira1fzaj.JoinAttempt) {
       return _ira1fzaj.JoinAttempt.fromJson(data) as T;
     }
@@ -1042,6 +1054,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_ibbyonnn.ItemStatus?>()) {
       return (data != null ? _ibbyonnn.ItemStatus.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iplumtmx.ItemUnit?>()) {
+      return (data != null ? _iplumtmx.ItemUnit.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_ira1fzaj.JoinAttempt?>()) {
       return (data != null ? _ira1fzaj.JoinAttempt.fromJson(data) : null) as T;
@@ -1151,6 +1166,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ijonbu5t.Household => 'Household',
       _iv10erpj.HouseholdMember => 'HouseholdMember',
       _ibbyonnn.ItemStatus => 'ItemStatus',
+      _iplumtmx.ItemUnit => 'ItemUnit',
       _ira1fzaj.JoinAttempt => 'JoinAttempt',
       _insyygng.MemberRole => 'MemberRole',
       _ityrezdb.OpenBasketException => 'OpenBasketException',
@@ -1199,6 +1215,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'HouseholdMember';
       case _ibbyonnn.ItemStatus():
         return 'ItemStatus';
+      case _iplumtmx.ItemUnit():
+        return 'ItemUnit';
       case _ira1fzaj.JoinAttempt():
         return 'JoinAttempt';
       case _insyygng.MemberRole():
@@ -1283,6 +1301,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'ItemStatus') {
       return deserialize<_ibbyonnn.ItemStatus>(data['data']);
+    }
+    if (dataClassName == 'ItemUnit') {
+      return deserialize<_iplumtmx.ItemUnit>(data['data']);
     }
     if (dataClassName == 'JoinAttempt') {
       return deserialize<_ira1fzaj.JoinAttempt>(data['data']);

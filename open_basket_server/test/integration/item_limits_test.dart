@@ -104,5 +104,90 @@ void main() {
       expect(await endpoints.basket.suggestions(member, limit: 1), ['Milk']);
       expect(await endpoints.basket.suggestions(shopper), ['Coffee']);
     });
+
+    group('units (screen 09)', () {
+      test(
+        'an item is counted in pieces unless someone says otherwise',
+        () async {
+          final (_, member, basket) = await aBasket();
+          final eggs = await endpoints.basket.addItem(
+            member,
+            basket.id!,
+            'Eggs',
+            quantity: 10,
+          );
+          expect(eggs.unit, ItemUnit.piece);
+          expect(eggs.quantity, 10);
+        },
+      );
+
+      test('weights and volumes keep their unit', () async {
+        final (_, member, basket) = await aBasket();
+        final tomatoes = await endpoints.basket.addItem(
+          member,
+          basket.id!,
+          'Tomatoes',
+          quantity: 1,
+          unit: ItemUnit.kg,
+        );
+        final cheese = await endpoints.basket.addItem(
+          member,
+          basket.id!,
+          'Cheese',
+          quantity: 250,
+          unit: ItemUnit.g,
+        );
+        expect(tomatoes.unit, ItemUnit.kg);
+        expect(cheese.quantity, 250);
+        expect(cheese.unit, ItemUnit.g);
+      });
+
+      test('the range follows the unit: 500 is grams, not kilos', () async {
+        final (_, member, basket) = await aBasket();
+        await expectLater(
+          endpoints.basket.addItem(
+            member,
+            basket.id!,
+            'Flour',
+            quantity: 500,
+            unit: ItemUnit.kg,
+          ),
+          _fails(BasketError.invalidItem),
+        );
+        await expectLater(
+          endpoints.basket.addItem(
+            member,
+            basket.id!,
+            'Flour',
+            quantity: 5001,
+            unit: ItemUnit.g,
+          ),
+          _fails(BasketError.invalidItem),
+        );
+      });
+
+      test('changing the unit re-checks the quantity it keeps', () async {
+        final (_, member, basket) = await aBasket();
+        final flour = await endpoints.basket.addItem(
+          member,
+          basket.id!,
+          'Flour',
+          quantity: 500,
+          unit: ItemUnit.g,
+        );
+        await expectLater(
+          endpoints.basket.updateItem(member, flour.id!, unit: ItemUnit.kg),
+          _fails(BasketError.invalidItem),
+        );
+        final kilo = await endpoints.basket.updateItem(
+          member,
+          flour.id!,
+          quantity: 1,
+          unit: ItemUnit.kg,
+        );
+        expect(kilo.unit, ItemUnit.kg);
+        expect(kilo.quantity, 1);
+      });
+    });
   });
 }

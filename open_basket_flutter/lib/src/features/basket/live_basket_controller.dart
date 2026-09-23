@@ -87,11 +87,17 @@ class LiveBasketController extends Notifier<LiveBasketState> {
   ///
   /// A refusal from the server — the basket closed, the name is empty — is
   /// not a connection problem and is rethrown for the add bar to show.
-  Future<bool> add(String name, {String? note, int? quantity}) async {
+  Future<bool> add(
+    String name, {
+    String? note,
+    int? quantity,
+    ItemUnit? unit,
+  }) async {
     final queued = QueuedItem(
       name: name,
       note: note,
       quantity: quantity,
+      unit: unit,
       queuedAt: DateTime.now(),
     );
     if (state.connection != LiveConnection.live) {
@@ -101,7 +107,13 @@ class LiveBasketController extends Notifier<LiveBasketState> {
     try {
       await ref
           .read(basketControllerProvider)
-          .addItem(basketId, name, note: note, quantity: quantity);
+          .addItem(
+            basketId,
+            name,
+            note: note,
+            quantity: quantity,
+            unit: unit,
+          );
       return false;
     } on OpenBasketException {
       rethrow;
@@ -137,6 +149,7 @@ class LiveBasketController extends Notifier<LiveBasketState> {
                 next.name,
                 note: next.note,
                 quantity: next.quantity,
+                unit: next.unit,
               );
           sent.add(next.name);
           state = state.dequeue();

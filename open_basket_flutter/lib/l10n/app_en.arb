@@ -165,7 +165,7 @@
   },
   "liveBasketAddHint": "Add an item",
   "@liveBasketAddHint": {},
-  "liveBasketNoteHint": "Note (optional)",
+  "liveBasketNoteHint": "Brand, size, \"only if fresh\"",
   "@liveBasketNoteHint": {},
   "liveBasketAdd": "Add",
   "@liveBasketAdd": {},
@@ -173,11 +173,9 @@
   "@liveBasketEmpty": {},
   "liveBasketEmptyNote": "Type what you need. Everyone sees it the moment you add it.",
   "@liveBasketEmptyNote": {},
-  "liveBasketExtend": "Extend once",
-  "@liveBasketExtend": {},
   "liveBasketExtendUsed": "Extend used",
   "@liveBasketExtendUsed": {},
-  "liveBasketCheckout": "At checkout",
+  "liveBasketCheckout": "At checkout — freeze basket",
   "@liveBasketCheckout": {},
   "liveBasketCancel": "Cancel the run",
   "@liveBasketCancel": {},
@@ -1151,32 +1149,6 @@
   "@joinNoCode": {},
   "joinStartOwn": "Start your own household",
   "@joinStartOwn": {},
-  "liveBasketQuantityDone": "Done",
-  "@liveBasketQuantityDone": {},
-  "liveBasketQuantityLabel": "Quantity {count}",
-  "@liveBasketQuantityLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "countdownClosesAt": "CLOSES {time}",
-  "@countdownClosesAt": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "countdownExtendedTo": "EXTENDED TO {time}",
-  "@countdownExtendedTo": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "liveBasketGot": "{count} got",
   "@liveBasketGot": {
     "placeholders": {
@@ -1204,5 +1176,89 @@
     }
   },
   "householdChoiceNotYou": "Not you?",
-  "@householdChoiceNotYou": {}
+  "@householdChoiceNotYou": {},
+  "liveBasketQuantityLabel": "Amount {amount}. Tap to change the unit.",
+  "@liveBasketQuantityLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketUnitTitle": "Count it in",
+  "@liveBasketUnitTitle": {},
+  "unitPieces": "Pieces",
+  "@unitPieces": {},
+  "unitKilograms": "Kilograms",
+  "@unitKilograms": {},
+  "unitGrams": "Grams",
+  "@unitGrams": {},
+  "unitLitres": "Litres",
+  "@unitLitres": {},
+  "unitMillilitres": "Millilitres",
+  "@unitMillilitres": {},
+  "unitPacks": "Packs",
+  "@unitPacks": {},
+  "liveBasketAddNote": "Add a note",
+  "@liveBasketAddNote": {},
+  "noteAnyBrand": "any brand",
+  "@noteAnyBrand": {},
+  "noteOnlyIfFresh": "only if fresh",
+  "@noteOnlyIfFresh": {},
+  "noteCheapest": "the cheapest",
+  "@noteCheapest": {},
+  "noteOrganic": "organic",
+  "@noteOrganic": {},
+  "noteBigPack": "big pack",
+  "@noteBigPack": {},
+  "countdownYoureAt": "You're at {store} · closes {time}",
+  "@countdownYoureAt": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownCloses": "Closes {time}",
+  "@countdownCloses": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownExtendedLast": "Extended to {time} · this is the last of it",
+  "@countdownExtendedLast": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownHeadingToTill": "You're heading to the till",
+  "@countdownHeadingToTill": {},
+  "countdownMemberLine": "Closes {time} · only {name} can change the clock",
+  "@countdownMemberLine": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownRunOf": "{name}'s run",
+  "@countdownRunOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketExtendPlus": "Extend +5",
+  "@liveBasketExtendPlus": {}
 }

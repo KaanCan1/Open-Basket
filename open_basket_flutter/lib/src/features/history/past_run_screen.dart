@@ -12,6 +12,7 @@ import '../household/household_controller.dart';
 import '../stores/stores_controller.dart';
 import 'history_controller.dart';
 import 'history_screen.dart';
+import '../../shared/widgets/item_name.dart';
 
 /// Screens 29 and 30. One finished run, read-only: settled with its prices
 /// and who paid whom, or cancelled with what was dropped.
@@ -326,13 +327,12 @@ class _ItemLine extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${item.name} ×${item.quantity}',
-                  style: gone
-                      ? OpenBasketText.item(
-                          muted,
-                        ).copyWith(decoration: TextDecoration.lineThrough)
-                      : OpenBasketText.item(theme.textTheme.bodyLarge!.color!),
+                ItemName.of(
+                  item,
+                  style: OpenBasketText.item(
+                    gone ? muted : theme.textTheme.bodyLarge!.color!,
+                  ),
+                  struck: gone,
                 ),
                 if (subtitle != null)
                   Text(subtitle!, style: OpenBasketText.meta(muted)),

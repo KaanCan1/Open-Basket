@@ -244,6 +244,9 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
             TextField(
               controller: _customMinutes,
               focusNode: _customFocus,
+              // The number pad has no return key and covered the Open
+              // button; a tap anywhere else is the way out.
+              onTapOutside: (_) => _customFocus.unfocus(),
               keyboardType: TextInputType.number,
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(hintText: '30'),

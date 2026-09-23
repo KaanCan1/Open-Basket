@@ -17,6 +17,7 @@ import 'countdown_banner.dart';
 import 'live_basket_controller.dart';
 import 'live_basket_state.dart';
 import '../../core/failure_message.dart';
+import '../../shared/widgets/item_name.dart';
 
 /// Screens 08 and 09. The live basket, for the shopper and for everyone else.
 ///
@@ -97,6 +98,14 @@ class LiveBasketScreen extends ConsumerWidget {
             compact: typing,
             shopperName: shopperName,
             storeName: storeName,
+            isShopper: isShopper,
+            onExtend: isShopper && basket.extendCount == 0
+                ? () => _ShopperActions._run(
+                    context,
+                    ref,
+                    (c) => c.extend(basket.id!),
+                  )
+                : null,
           ),
           // Screen 25: the countdown stays at full strength while offline,
           // because it is the server's clock and not this phone's; the strip
@@ -296,15 +305,10 @@ class _ItemRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.quantity > 1
-                      ? '${item.name}  ×${item.quantity}'
-                      : item.name,
-                  style: gone
-                      ? OpenBasketText.item(
-                          muted,
-                        ).copyWith(decoration: TextDecoration.lineThrough)
-                      : OpenBasketText.item(ink),
+                ItemName.of(
+                  item,
+                  style: OpenBasketText.item(gone ? muted : ink),
+                  struck: gone,
                 ),
                 if (gone || got) ...[
                   const SizedBox(height: 2),
@@ -433,23 +437,13 @@ class _ShopperActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final extended = basket.extendCount >= 1;
 
+    // Extend lives on the countdown card now (screen 08); what is left here
+    // is the one step forward and the way out.
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Row(
         children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: extended
-                  ? null
-                  : () => _run(context, ref, (c) => c.extend(basket.id!)),
-              child: Text(
-                extended ? l10n.liveBasketExtendUsed : l10n.liveBasketExtend,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
           Expanded(
             child: FilledButton(
               onPressed: () => _run(context, ref, (c) => c.freeze(basket.id!)),
@@ -666,10 +660,10 @@ class _QueuedRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.quantity != null && item.quantity! > 1
-                      ? '${item.name}  ×${item.quantity}'
-                      : item.name,
+                ItemName(
+                  name: item.name,
+                  quantity: item.quantity ?? 1,
+                  unit: item.unit ?? ItemUnit.piece,
                   style: OpenBasketText.item(muted),
                 ),
                 const SizedBox(height: 2),

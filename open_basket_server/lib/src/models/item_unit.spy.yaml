@@ -1,0 +1,11 @@
+### What a quantity counts (screen 09's "×1 kg"). Integers only, like money:
+### half a kilo is 500 g, not 0.5 kg.
+enum: ItemUnit
+serialized: byName
+values:
+  - piece
+  - kg
+  - g
+  - l
+  - ml
+  - pack

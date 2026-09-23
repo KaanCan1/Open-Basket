@@ -12,6 +12,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'item_status.dart' as _ibbyonnn;
+import 'item_unit.dart' as _iplumtmx;
 
 /// Something a member asked for on a run.
 abstract class BasketItem
@@ -22,11 +23,13 @@ abstract class BasketItem
     required this.requesterMemberId,
     required this.name,
     int? quantity,
+    _iplumtmx.ItemUnit? unit,
     this.note,
     _ibbyonnn.ItemStatus? status,
     this.priceMinor,
     DateTime? addedAt,
   }) : quantity = quantity ?? 1,
+       unit = unit ?? _iplumtmx.ItemUnit.piece,
        status = status ?? _ibbyonnn.ItemStatus.requested,
        addedAt = addedAt ?? DateTime.now();
 
@@ -36,6 +39,7 @@ abstract class BasketItem
     required int requesterMemberId,
     required String name,
     int? quantity,
+    _iplumtmx.ItemUnit? unit,
     String? note,
     _ibbyonnn.ItemStatus? status,
     int? priceMinor,
@@ -49,6 +53,9 @@ abstract class BasketItem
       requesterMemberId: jsonSerialization['requesterMemberId'] as int,
       name: jsonSerialization['name'] as String,
       quantity: jsonSerialization['quantity'] as int?,
+      unit: jsonSerialization['unit'] == null
+          ? null
+          : _iplumtmx.ItemUnit.fromJson((jsonSerialization['unit'] as String)),
       note: jsonSerialization['note'] as String?,
       status: jsonSerialization['status'] == null
           ? null
@@ -76,6 +83,9 @@ abstract class BasketItem
 
   int quantity;
 
+  /// What the quantity counts. Pieces unless someone says otherwise.
+  _iplumtmx.ItemUnit unit;
+
   /// Free text: brand, size, "only if fresh".
   String? note;
 
@@ -96,6 +106,7 @@ abstract class BasketItem
     int? requesterMemberId,
     String? name,
     int? quantity,
+    _iplumtmx.ItemUnit? unit,
     String? note,
     _ibbyonnn.ItemStatus? status,
     int? priceMinor,
@@ -110,6 +121,7 @@ abstract class BasketItem
       'requesterMemberId': requesterMemberId,
       'name': name,
       'quantity': quantity,
+      'unit': unit.toJson(),
       if (note != null) 'note': note,
       'status': status.toJson(),
       if (priceMinor != null) 'priceMinor': priceMinor,
@@ -126,6 +138,7 @@ abstract class BasketItem
       'requesterMemberId': requesterMemberId,
       'name': name,
       'quantity': quantity,
+      'unit': unit.toJson(),
       if (note != null) 'note': note,
       'status': status.toJson(),
       if (priceMinor != null) 'priceMinor': priceMinor,
@@ -148,6 +161,7 @@ class _BasketItemImpl extends BasketItem {
     required int requesterMemberId,
     required String name,
     int? quantity,
+    _iplumtmx.ItemUnit? unit,
     String? note,
     _ibbyonnn.ItemStatus? status,
     int? priceMinor,
@@ -158,6 +172,7 @@ class _BasketItemImpl extends BasketItem {
          requesterMemberId: requesterMemberId,
          name: name,
          quantity: quantity,
+         unit: unit,
          note: note,
          status: status,
          priceMinor: priceMinor,
@@ -174,6 +189,7 @@ class _BasketItemImpl extends BasketItem {
     int? requesterMemberId,
     String? name,
     int? quantity,
+    _iplumtmx.ItemUnit? unit,
     Object? note = _Undefined,
     _ibbyonnn.ItemStatus? status,
     Object? priceMinor = _Undefined,
@@ -185,6 +201,7 @@ class _BasketItemImpl extends BasketItem {
       requesterMemberId: requesterMemberId ?? this.requesterMemberId,
       name: name ?? this.name,
       quantity: quantity ?? this.quantity,
+      unit: unit ?? this.unit,
       note: note is String? ? note : this.note,
       status: status ?? this.status,
       priceMinor: priceMinor is int? ? priceMinor : this.priceMinor,

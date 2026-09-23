@@ -990,3 +990,29 @@ reads the device clock only to display dates; the countdown is server time (rule
   whole frozen list with their items tagged, which answers the same question.
 - *Notification actions* ("Add an item", "Nothing for me"): with the app half of push (ADR-043).
 
+## ADR-048: Quantities have units; the countdown is the design's card
+
+From Kaan's first look at the build on his own phone.
+
+- **Units.** "×1, ×2" only counts. People buy a kilo of tomatoes and 250 g of cheese, so an item
+  now has a `unit` — pieces, kg, g, L, ml or packs — next to its quantity. Still integers, like
+  money (rule 5): half a kilo is 500 g. The server caps each unit on its own terms (99 of a count,
+  5000 g or ml) and re-checks the quantity when the unit changes. Migration `20260923220224576`
+  adds the column with `piece` as the default, so every existing item stays what it was; the rule
+  4 index is re-added by hand, as always.
+- **The add bar** is screen 09's: name, a − amount + stepper, and a square + button. Tapping the
+  amount picks the unit; a new unit starts where people start with it (1 kg, 500 g), and grams and
+  millilitres step by 50. The note folds away behind "Add a note" — most items are just a name —
+  and when opened offers one-tap phrases ("any brand", "only if fresh", "the cheapest", "organic",
+  "big pack") that append without repeating.
+- **Every row shows the amount as a pill beside the name** ("Tomatoes  2 kg"), live, at checkout,
+  and in history, as screen 08 draws it.
+- **The countdown is the design's dark card** (screens 08-12), in both themes: the time as `8:00`,
+  a Signal bar of the time left with the extension hatched, and — for the shopper — "You're at
+  Migros · closes 18:42" with Extend +5 on the card itself; for everyone else "Kaan's run" and
+  "only Kaan can change the clock". At last call the label and digits turn Signal. While typing it
+  collapses to a single dark strip. The bottom row keeps only "At checkout — freeze basket" and
+  cancel.
+- The custom-minutes number pad on the open sheet now closes on a tap outside; it has no return
+  key and covered the Open button.
+

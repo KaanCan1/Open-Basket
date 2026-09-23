@@ -20,6 +20,7 @@ import 'package:open_basket_client/src/protocol/household.dart' as _iig1c7mf;
 import 'package:open_basket_client/src/protocol/household_member.dart'
     as _i5id5rp2;
 import 'package:open_basket_client/src/protocol/item_status.dart' as _i3z6uioy;
+import 'package:open_basket_client/src/protocol/item_unit.dart' as _iohcgx2c;
 import 'package:open_basket_client/src/protocol/past_run.dart' as _igqoy608;
 import 'package:open_basket_client/src/protocol/settlement_line.dart'
     as _i27lt87a;
@@ -344,6 +345,7 @@ class EndpointBasket extends _isc.EndpointRef {
     int basketId,
     String name, {
     int? quantity,
+    _iohcgx2c.ItemUnit? unit,
     String? note,
   }) => caller.callServerEndpoint<_iuuhmcji.BasketItem>(
     'basket',
@@ -352,6 +354,7 @@ class EndpointBasket extends _isc.EndpointRef {
       'basketId': basketId,
       'name': name,
       'quantity': quantity,
+      'unit': unit,
       'note': note,
     },
   );
@@ -361,6 +364,7 @@ class EndpointBasket extends _isc.EndpointRef {
     int itemId, {
     String? name,
     int? quantity,
+    _iohcgx2c.ItemUnit? unit,
     String? note,
   }) => caller.callServerEndpoint<_iuuhmcji.BasketItem>(
     'basket',
@@ -369,6 +373,7 @@ class EndpointBasket extends _isc.EndpointRef {
       'itemId': itemId,
       'name': name,
       'quantity': quantity,
+      'unit': unit,
       'note': note,
     },
   );

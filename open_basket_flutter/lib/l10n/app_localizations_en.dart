@@ -268,7 +268,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveBasketAddHint => 'Add an item';
 
   @override
-  String get liveBasketNoteHint => 'Note (optional)';
+  String get liveBasketNoteHint => 'Brand, size, \"only if fresh\"';
 
   @override
   String get liveBasketAdd => 'Add';
@@ -281,13 +281,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type what you need. Everyone sees it the moment you add it.';
 
   @override
-  String get liveBasketExtend => 'Extend once';
-
-  @override
   String get liveBasketExtendUsed => 'Extend used';
 
   @override
-  String get liveBasketCheckout => 'At checkout';
+  String get liveBasketCheckout => 'At checkout — freeze basket';
 
   @override
   String get liveBasketCancel => 'Cancel the run';
@@ -1277,24 +1274,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joinStartOwn => 'Start your own household';
 
   @override
-  String get liveBasketQuantityDone => 'Done';
-
-  @override
-  String liveBasketQuantityLabel(int count) {
-    return 'Quantity $count';
-  }
-
-  @override
-  String countdownClosesAt(String time) {
-    return 'CLOSES $time';
-  }
-
-  @override
-  String countdownExtendedTo(String time) {
-    return 'EXTENDED TO $time';
-  }
-
-  @override
   String liveBasketGot(int count) {
     return '$count got';
   }
@@ -1320,4 +1299,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get householdChoiceNotYou => 'Not you?';
+
+  @override
+  String liveBasketQuantityLabel(String amount) {
+    return 'Amount $amount. Tap to change the unit.';
+  }
+
+  @override
+  String get liveBasketUnitTitle => 'Count it in';
+
+  @override
+  String get unitPieces => 'Pieces';
+
+  @override
+  String get unitKilograms => 'Kilograms';
+
+  @override
+  String get unitGrams => 'Grams';
+
+  @override
+  String get unitLitres => 'Litres';
+
+  @override
+  String get unitMillilitres => 'Millilitres';
+
+  @override
+  String get unitPacks => 'Packs';
+
+  @override
+  String get liveBasketAddNote => 'Add a note';
+
+  @override
+  String get noteAnyBrand => 'any brand';
+
+  @override
+  String get noteOnlyIfFresh => 'only if fresh';
+
+  @override
+  String get noteCheapest => 'the cheapest';
+
+  @override
+  String get noteOrganic => 'organic';
+
+  @override
+  String get noteBigPack => 'big pack';
+
+  @override
+  String countdownYoureAt(String store, String time) {
+    return 'You\'re at $store · closes $time';
+  }
+
+  @override
+  String countdownCloses(String time) {
+    return 'Closes $time';
+  }
+
+  @override
+  String countdownExtendedLast(String time) {
+    return 'Extended to $time · this is the last of it';
+  }
+
+  @override
+  String get countdownHeadingToTill => 'You\'re heading to the till';
+
+  @override
+  String countdownMemberLine(String time, String name) {
+    return 'Closes $time · only $name can change the clock';
+  }
+
+  @override
+  String countdownRunOf(String name) {
+    return '$name\'s run';
+  }
+
+  @override
+  String get liveBasketExtendPlus => 'Extend +5';
 }
