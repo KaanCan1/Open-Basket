@@ -29,7 +29,6 @@ import '../endpoints/settlement_endpoint.dart' as _ioestwe6;
 import '../endpoints/sign_in_endpoint.dart' as _ihicvi3m;
 import '../endpoints/stats_endpoint.dart' as _ii1l42ti;
 import '../endpoints/store_endpoint.dart' as _iaxecmt0;
-import '../greetings/greeting_endpoint.dart' as _il624ik7;
 export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
 class Endpoints extends _is.EndpointDispatch {
@@ -100,12 +99,6 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'store',
-          null,
-        ),
-      'greeting': _il624ik7.GreetingEndpoint()
-        ..initialize(
-          server,
-          'greeting',
           null,
         ),
     };
@@ -1090,31 +1083,6 @@ class Endpoints extends _is.EndpointDispatch {
                 session,
                 params['storeId'],
               ),
-        ),
-      },
-    );
-    connectors['greeting'] = _is.EndpointConnector(
-      name: 'greeting',
-      endpoint: endpoints['greeting']!,
-      methodConnectors: {
-        'hello': _is.MethodConnector(
-          name: 'hello',
-          params: {
-            'name': _is.ParameterDescription(
-              name: 'name',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['greeting'] as _il624ik7.GreetingEndpoint).hello(
-                    session,
-                    params['name'],
-                  ),
         ),
       },
     );

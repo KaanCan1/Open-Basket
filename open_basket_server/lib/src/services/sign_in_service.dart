@@ -2,6 +2,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart';
 
 import '../generated/protocol.dart';
+import '../util/clock.dart';
 import '../util/sign_in_code_policy.dart';
 import 'sign_in_email_sender.dart';
 
@@ -49,7 +50,7 @@ abstract final class SignInService {
 
     final latest = await _latestCodeFor(session, address);
     if (latest != null &&
-        DateTime.now().toUtc().difference(latest.createdAt) <
+        ServerClock.now().difference(latest.createdAt) <
             SignInCodePolicy.resendCooldown) {
       return;
     }
@@ -68,7 +69,7 @@ abstract final class SignInService {
           code: code,
           pepper: _pepper(session),
         ),
-        expiresAt: DateTime.now().toUtc().add(SignInCodePolicy.lifetime),
+        expiresAt: ServerClock.now().add(SignInCodePolicy.lifetime),
       ),
     );
 
@@ -102,7 +103,7 @@ abstract final class SignInService {
       );
     }
 
-    if (DateTime.now().toUtc().isAfter(record.expiresAt)) {
+    if (ServerClock.now().isAfter(record.expiresAt)) {
       throw OpenBasketException(
         error: BasketError.signInCodeExpired,
         message: 'That code has expired. We can send you a new one.',
@@ -141,7 +142,7 @@ abstract final class SignInService {
     // redeemed twice by two requests arriving together.
     await SignInCode.db.updateRow(
       session,
-      record.copyWith(consumedAt: DateTime.now().toUtc()),
+      record.copyWith(consumedAt: ServerClock.now()),
     );
 
     final authUserId = await _findOrCreateAccount(session, address);
@@ -175,7 +176,7 @@ abstract final class SignInService {
       where: (final t) => t.email.equals(address) & t.consumedAt.equals(null),
     );
     if (outstanding.isEmpty) return;
-    final now = DateTime.now().toUtc();
+    final now = ServerClock.now();
     await SignInCode.db.update(
       session,
       [for (final row in outstanding) row.copyWith(consumedAt: now)],

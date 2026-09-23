@@ -25,8 +25,6 @@ import 'package:open_basket_server/src/generated/future_calls_generated_models/c
     as _irvuqfog;
 import 'package:open_basket_server/src/generated/future_calls_generated_models/closing_soon_future_call_remind_model.dart'
     as _i9169m3k;
-import 'package:open_basket_server/src/generated/greetings/greeting.dart'
-    as _igdkecg6;
 import 'package:open_basket_server/src/generated/household.dart' as _ih69xi36;
 import 'package:open_basket_server/src/generated/household_member.dart'
     as _izwgjn1h;
@@ -190,8 +188,6 @@ class TestEndpoints {
   late final _StatsEndpoint stats;
 
   late final _StoreEndpoint store;
-
-  late final _GreetingEndpoint greeting;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -242,10 +238,6 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     store = _StoreEndpoint(
-      endpoints,
-      serializationManager,
-    );
-    greeting = _GreetingEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1850,48 +1842,6 @@ class _StoreEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-}
-
-class _GreetingEndpoint {
-  _GreetingEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
-
-  final _is.EndpointDispatch _endpointDispatch;
-
-  final _is.SerializationManager _serializationManager;
-
-  _ida.Future<_igdkecg6.Greeting> hello(
-    _ist.TestSessionBuilder sessionBuilder,
-    String name,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'greeting',
-            method: 'hello',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'greeting',
-          methodName: 'hello',
-          parameters: _ist.testObjectToJson({'name': name}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<_igdkecg6.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
