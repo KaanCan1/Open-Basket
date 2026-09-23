@@ -91,125 +91,52 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — Day 10, 2026-09-22 — **deployed**
+## Status — 2026-09-23 (calendar Day 9) — plan Days 1-25 done, deployed
 
-Backend, Days 1-6, all merged:
+The plan ran ahead of the calendar: everything through the Day 24-25 code freeze is merged and
+live on Serverpod Cloud. B has still not committed; A wrote every screen (ADR-012, ADR-020).
 
-- Serverpod 4 workspace; 14 models; migrations applied. `main` holds 96 server tests and 27
-  Flutter tests, all green.
-- **Sign-in** (ADR-004): six digits by email, no passwords. The bundled provider is password-only,
-  so the flow is ours — `SignInService` for the policy, `SignInCodePolicy` for the hashing and
-  normalisation, `SignInEmailSender` for delivery (console in development).
-- **Households**: create, join by code, rotate the code, members, rename, currency, per-member
-  notification preferences, leave. An owner who leaves hands the household to the longest-standing
-  member. A non-member cannot read another household — tested.
-- Services in place: `Authz`, `AnalyticsService`, `Money.splitEvenly` (ADR-007's arithmetic,
-  property-tested), `HouseholdCode`.
+What works, walked on simulators and deployed:
 
-Flutter, the skeleton A built for B (ADR-012):
+- **Sign-in** by a six-digit emailed code, no passwords (ADR-004). Judges can sign in on
+  production: Serverpod Cloud delivers the email.
+- **Households**: create, join by code, rotate it, rename, currency (TRY/EUR/GBP/USD/CHF/JPY),
+  leave. Leaving marks the member, it never deletes history (ADR-036).
+- **The whole run**: open a basket for N minutes at a store, with a duration suggested from a
+  one-off location read (ADR-034); everyone adds items over the stream; the basket **closes
+  itself on the server** (future call, verified on Cloud with the app backgrounded); the shopper
+  marks items and enters prices; the server settles who owes whom (ADR-028/029/030).
+- **History** of every settled or cancelled run, and each run in full (ADR-035).
+- **Resilience**: offline adds queue and flush on reconnect; resync on resume (ADR-032).
+- **Polish**: usual-item chips, rate limits, arrival animation, last-minute haptic (ADR-038);
+  every server refusal worded by the app, not the server (ADR-039).
+- Checked on an iPhone SE-sized frame in dark mode (ADR-039). Installed on Kaan's iPhone by
+  cable; the free provisioning profile expires 2026-09-29 22:05 Turkey time.
 
-- Riverpod, go_router, l10n, the design tokens as a real theme, the client behind a provider.
-- Screens 01-03 wired to the real endpoints, **verified end to end against a running server** by
-  an `integration_test` suite that found two bugs a screenshot could not: the session token was
-  never adopted after a correct code, and both auth screens overflowed.
-
-Design: finished. 30 screens, light and dark, every contrast ratio measured and verified.
-
-Basket lifecycle, Day 8:
-
-- `BasketEndpoint`: `open`, `extend`, `freeze`, `cancel`, `getActive`, `getServerTime`. Every one
-  checks authorization; extend, freeze and cancel are shopper-only. An unknown basket id and
-  another household's basket id give the same error, so nothing can be enumerated.
-- **Rule 4 is enforced by a partial unique index** written by hand into the migration (ADR-013),
-  not by the transaction check alone. A real two-caller race is tested, and so is the index itself
-  — including the constraint name `open` matches on to turn a violation back into a friendly error.
-- **`CloseBasketFutureCall` closes a basket on the server**, whether or not any phone is awake.
-  Idempotent (rule 2), plus a startup sweep in `server.dart` for calls lost to a restart.
-- `ServerClock` over `package:clock` (ADR-014), so "a five minute basket closes on time" is a test
-  that runs in milliseconds rather than five minutes.
-
-The live basket, Day 9:
-
-- `BasketStreamEndpoint.watch(basketId)` — a WebSocket whose first event is always a full
-  snapshot, so a reconnect resyncs from the stream itself and never needs a second call
-  (ADR-016). The stream ends itself once the basket is `settled` or `cancelled` (ADR-017).
-- `addItem` / `updateItem` / `removeItem`. Anyone in the household may add while the basket
-  is open; only the person who asked for an item may change or remove it.
-- Every mutation publishes to `basket:<id>`, including the **future call's own auto-close** —
-  the house watches the basket lock itself with nothing running on any phone.
-- Publishing is best-effort and never fails the action behind it (ADR-018). Delivery is
-  local to one server process until Redis is enabled.
-
-**Submission rules read on Day 9** (`docs/SUBMISSION.md`): the deadline is 2026-10-14 23:59
-CEST with no extensions, the demo video must be under **two** minutes rather than the three
-the BuilderBase page shows, AI-tool use must be disclosed in the description, and judges
-must be able to run the app free of charge until 2026-10-20 17:00.
-
-The app, Day 10 (A is writing the screens; B has still not committed — ADR-020):
-
-- **The core loop runs end to end on a phone.** Sign in, create or join a household, open a
-  basket for a chosen duration, add items, watch them arrive over the stream, extend once,
-  check out. Walked on the simulator, not inferred from tests.
-- `ServerClock` corrects for device clock drift from the stream's own `serverTime`, and the
-  countdown is always recomputed rather than decremented locally (ADR-021).
-- A basket that is not open shows no countdown at all, because a ticking number under the
-  word FROZEN reads as "still counting" (ADR-022).
-- Items are not applied optimistically: a row appears when the stream echoes it back
-  (ADR-023).
-
-Deployed (ADR-024):
-
-- Serverpod Cloud, project `open-basket`, starter plan. API at
-  `https://open-basket.api.serverpod.space/`, web at `https://open-basket.serverpod.space/`.
-- **Judges can sign in.** Serverpod Cloud manages `scloudAuthEmailKey`, so the six-digit
-  code goes out as a real email — the single biggest submission risk, now closed.
-- Every auth password is platform-managed; none is set by hand or stored anywhere.
-- The CLI cannot deploy from a path with a space in it, so deploys run from a clone at a
-  space-free path until the checkout is renamed. Deploy from `main`, after merging, so
-  what is live is what is on `main`.
-
-Verified on production, 2026-09-22, on the iOS simulator:
-
-- The emailed code arrives and signs in.
-- **A basket closes itself on Serverpod Cloud** with the app in the background — twice. The
-  pod had not restarted, so it was the future call and not the startup sweep.
-- The stream works through Cloud's ingress: an added item comes back over the WebSocket.
-- Not yet on production: two clients watching one basket (covered by `basket_stream_test`).
-
-That walk found three bugs, all fixed and deployed: a frozen basket locked the household out
-of ever opening another (ADR-025), the home screen went stale after a freeze, and a server
-slower than two seconds left the app on a permanent white screen (ADR-026).
+Tests: 175+ server, 60+ Flutter, CI on every PR to `main`.
 
 Open:
 
-- ~~Return in the web build's email field does not send a code~~ — **not a bug.** The
-  browser automation used for testing delivers Enter as a trusted keydown with `keyCode: 0`,
-  and Flutter web submits on `keyCode == 13`, which every real keyboard sends. A synthetic
-  event with keyCode 13 submits normally. Recorded so nobody chases it again.
-- The web build is a secondary, no-install way to try the app; **the product is the phone
-  app** (decided 2026-09-22).
-- Branch protection on `main` still not enabled.
-- Day 7 (stores) not started. Not on the critical path — a basket can open without a store — but
-  the ETA suggestion depends on it.
-- **Everything B owns past the skeleton is unstarted**, and B has not worked on the repo yet.
-- Marking items, prices and settlement are not built, so the run ends at "At checkout".
-- Push notifications are not built, so "everyone is told" is currently only true for
-  whoever has the app open.
-- The Claude simulator panel only offers iOS 26.5 devices; anything booted on iOS 27 is invisible
-  to it. The app runs on the iPhone 17 it can see.
+- **Push notifications are not built** (Days 11-12). A free Apple account cannot push to an
+  iPhone; the decision — a paid developer account, or Android-only push — is Kaan's.
+- **Real household use has not started**, and the report (Day 26) depends on it.
+- A refresh of the session token takes 3-4 s on Cloud (Serverpod feedback finding 8); access
+  tokens now last an hour so it happens once a run at most.
+- Rule 4's partial index makes the local dev server exit silently; `scripts/dev_db_unblock.sh`
+  (ADR-037).
+- Deploys run from a space-free clone: the Cloud CLI cannot handle `Open Basket` (ADR-024).
+- The web build is only a no-install trial; **the product is the phone app**. Its Return key
+  "not submitting" under browser automation is a synthetic-event artefact, not a bug.
+- Branch protection on `main` is not enabled.
+- The Claude simulator panel only offers devices the user has granted.
 
 ## Next
 
-**Day 10 is the critical path, and it is now entirely client-side plus a deploy.** Both halves of
-what justifies Serverpod are built and tested on the server: a basket that closes itself, and a
-stream that puts an item on every phone at once. Neither is reachable from the app.
+M5 is reached: no new features. What is left is the submission:
 
-The official judging puts 30% on "does it work — the core flow completes, nothing critical is
-faked", and it is also the tie-breaker. That argues for finishing the one loop end to end —
-open, add, watch it close, settle — over starting anything new.
-
-`CLAUDE.md` calls Days 8-10 pair work for a reason: `basket_stream_endpoint` and
-`live_basket_controller` share event types, snapshot ordering and reconnect behaviour.
-
-Day 10 is M2 — deploy plus real usage in both homes — and it buys the ~18 days of data the report
-rests on. It is the one date that cannot slip.
+1. Day 26 — `stats_endpoint.dart`, `scripts/report.sql`, `docs/REPORT.md` from real use.
+2. Day 27 — the demo script and a video **under two minutes**.
+3. Day 28 — `README.md`, screenshots.
+4. Day 29 — submit by **2026-10-14 23:59 CEST**, with the AI-use disclosure.
+5. The two side prizes: Most Valuable Feedback (nine findings in `docs/SUBMISSION.md`) and Best
+   Hackathon Post, both due the same day.

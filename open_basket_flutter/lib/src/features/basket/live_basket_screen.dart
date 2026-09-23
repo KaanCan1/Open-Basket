@@ -69,7 +69,11 @@ class LiveBasketScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          state.queued.isEmpty
+          // "No items yet" promises items that can no longer come once the
+          // basket has closed.
+          !isOpen && state.items.isEmpty
+              ? l10n.liveBasketNoItems
+              : state.queued.isEmpty
               ? l10n.liveBasketItems(state.items.length)
               : '${l10n.liveBasketItems(state.items.length)} · '
                     '${l10n.liveBasketQueuedCount(state.queued.length)}',
@@ -469,7 +473,10 @@ class _Empty extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.liveBasketEmpty, style: theme.textTheme.titleMedium),
+            Text(
+              isOpen ? l10n.liveBasketEmpty : l10n.liveBasketEmptyClosed,
+              style: theme.textTheme.titleMedium,
+            ),
             if (isOpen) ...[
               const SizedBox(height: 8),
               Text(

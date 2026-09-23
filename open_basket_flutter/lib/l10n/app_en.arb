@@ -173,7 +173,7 @@
   "@liveBasketAdd": {},
   "liveBasketEmpty": "Nothing in the basket yet.",
   "@liveBasketEmpty": {},
-  "liveBasketEmptyNote": "Type what you need. Everyone else sees it as you type it.",
+  "liveBasketEmptyNote": "Type what you need. Everyone sees it the moment you add it.",
   "@liveBasketEmptyNote": {},
   "liveBasketExtend": "Extend once",
   "@liveBasketExtend": {},
@@ -945,5 +945,9 @@
   "checkoutEmpty": "Nobody added anything this time.",
   "@checkoutEmpty": {},
   "checkoutEmptyNote": "Settle to close the run. If you enter a receipt total, it's split evenly across the household.",
-  "@checkoutEmptyNote": {}
+  "@checkoutEmptyNote": {},
+  "liveBasketNoItems": "No items",
+  "@liveBasketNoItems": {},
+  "liveBasketEmptyClosed": "Nobody added anything.",
+  "@liveBasketEmptyClosed": {}
 }

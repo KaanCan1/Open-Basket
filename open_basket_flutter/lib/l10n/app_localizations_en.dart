@@ -281,7 +281,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketEmptyNote =>
-      'Type what you need. Everyone else sees it as you type it.';
+      'Type what you need. Everyone sees it the moment you add it.';
 
   @override
   String get liveBasketExtend => 'Extend once';
@@ -1032,4 +1032,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get checkoutEmptyNote =>
       'Settle to close the run. If you enter a receipt total, it\'s split evenly across the household.';
+
+  @override
+  String get liveBasketNoItems => 'No items';
+
+  @override
+  String get liveBasketEmptyClosed => 'Nobody added anything.';
 }

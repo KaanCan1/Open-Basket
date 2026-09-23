@@ -772,3 +772,32 @@ outside a true two-phone race. Reported as Serverpod feedback finding 7 (`docs/S
   your own rows just appear.
 - **Last-minute haptic:** one firm tap when the countdown actually crosses into its last minute —
   not when a screen is opened already inside it.
+
+## ADR-039: Code freeze checks (Days 24-25)
+
+- **Every refusal is worded by the app.** `core/failure_message.dart` maps each `BasketError` to
+  an `app_en.arb` sentence in a switch with no default, so a new server code does not compile
+  until someone words it. Before, each screen mapped the one or two codes it expected and showed
+  "Something went wrong" for the rest — settling an unpriced basket said "That didn't save" — and
+  the stores screen showed the server's English message, which rule 11 forbids. A dropped
+  connection says "Can't reach the basket"; a server that answered with a crash does not.
+- **Access tokens last an hour, refresh tokens ninety days (sliding).** The production log showed
+  `jwtRefresh` at 3-4.5 s on every call, and the client makes the next request wait for it; with
+  the default ten minutes, a run longer than that stalled mid-add. Two Argon2id hashes per
+  refresh cost about 60 ms on a laptop, and `JwtConfig` cannot tune them (Serverpod feedback
+  finding 8), so the lever left is how often it happens. The cost: a signed-out session stays
+  usable for up to an hour. Ninety days, because a household that shops fortnightly should not
+  be signed out between runs.
+- **Empty states.** A checkout nobody added to says so and how to close it; a settled empty run
+  is a valid result, with any receipt total split evenly (rule 6, now tested). A closed basket no
+  longer says "No items yet".
+- **Dark mode** gets its own destructive red: the light one was 3.4:1 on ink (now 8.3:1, tested).
+- **Small screens**: walked in dark mode inside a 375 x 667 frame (iPhone SE) — sign-in, home, the
+  open sheet, the live basket with the keyboard up, checkout, settlement, history, settings. No
+  overflow. The frame is a local patch to `main.dart`, never committed.
+- **Loading skeletons: not built.** Every list here returns in well under a second on a warm
+  connection; a skeleton would flash. The spinner stays.
+- **Production log scan**: besides the slow refresh, only `.test` addresses failing to receive
+  email (our own checks) and `WebSocketConnectionClosed` logged at ERROR on ordinary disconnects
+  (Serverpod feedback finding 9). No error from our code.
+

@@ -559,7 +559,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketEmptyNote.
   ///
   /// In en, this message translates to:
-  /// **'Type what you need. Everyone else sees it as you type it.'**
+  /// **'Type what you need. Everyone sees it the moment you add it.'**
   String get liveBasketEmptyNote;
 
   /// No description provided for @liveBasketExtend.
@@ -1683,6 +1683,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settle to close the run. If you enter a receipt total, it\'s split evenly across the household.'**
   String get checkoutEmptyNote;
+
+  /// No description provided for @liveBasketNoItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No items'**
+  String get liveBasketNoItems;
+
+  /// No description provided for @liveBasketEmptyClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody added anything.'**
+  String get liveBasketEmptyClosed;
 }
 
 class _AppLocalizationsDelegate
