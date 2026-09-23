@@ -1,0 +1,13 @@
+### One finished run as the history list shows it: the basket plus the few
+### numbers its row needs, so the list is one call rather than one per row.
+### Not a table.
+class: PastRun
+fields:
+  basket: Basket
+  ### What the run cost the house, in minor units: the receipt total if the
+  ### shopper entered one, else the priced items. Zero for a cancelled run.
+  totalMinor: int
+  itemCount: int
+  unavailableCount: int
+  ### Member id → how many items they asked for. The row's person chips.
+  itemsByMember: Map<int, int>

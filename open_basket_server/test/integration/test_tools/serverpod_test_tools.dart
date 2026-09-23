@@ -29,6 +29,7 @@ import 'package:open_basket_server/src/generated/household.dart' as _ih69xi36;
 import 'package:open_basket_server/src/generated/household_member.dart'
     as _izwgjn1h;
 import 'package:open_basket_server/src/generated/item_status.dart' as _i8v2xtko;
+import 'package:open_basket_server/src/generated/past_run.dart' as _iprw808a;
 import 'package:open_basket_server/src/generated/settlement_line.dart'
     as _iw375zr9;
 import 'package:open_basket_server/src/generated/store.dart' as _ie3cdud7;
@@ -1078,7 +1079,7 @@ class _HistoryEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<List<_i4kvfuua.Basket>> list(
+  _ida.Future<List<_iprw808a.PastRun>> list(
     _ist.TestSessionBuilder sessionBuilder, {
     int? limit,
   }) async {
@@ -1101,7 +1102,7 @@ class _HistoryEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_i4kvfuua.Basket>>);
+                as _ida.Future<List<_iprw808a.PastRun>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

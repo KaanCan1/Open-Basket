@@ -12,6 +12,7 @@ import '../../core/theme.dart';
 import '../basket/basket_controller.dart';
 import '../basket/open_basket_sheet.dart';
 import '../../../l10n/app_localizations.dart';
+import '../history/history_controller.dart';
 import '../stores/stores_controller.dart';
 import 'create_or_join_screen.dart';
 import 'household_controller.dart';
@@ -46,6 +47,7 @@ class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
         ref.invalidate(myHouseholdProvider);
         ref.invalidate(activeBasketProvider);
         ref.invalidate(lastSettledRunProvider);
+        ref.invalidate(historyProvider);
       },
     );
   }
@@ -98,6 +100,7 @@ class _Home extends ConsumerWidget {
             // basket they were told about is not on the screen.
             ref.invalidate(activeBasketProvider);
             ref.invalidate(lastSettledRunProvider);
+            ref.invalidate(historyProvider);
             await ref.read(membersProvider.future);
           },
           child: ListView(
@@ -114,6 +117,7 @@ class _Home extends ConsumerWidget {
               const _BasketSection(),
               const SizedBox(height: 32),
               const _StoresRow(),
+              const _HistoryRow(),
               const SizedBox(height: 24),
               _CodeCard(code: household.code),
               const SizedBox(height: 32),
@@ -439,19 +443,63 @@ class _StoresRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final stores = ref.watch(storesProvider).value ?? const <Store>[];
+    return _NavRow(
+      label: l10n.homeStoresLabel,
+      value: stores.isEmpty
+          ? l10n.homeStoresNone
+          : stores.map((s) => s.name).join(', '),
+      onTap: () => context.push(Routes.stores),
+    );
+  }
+}
+
+/// The way to screen 16.
+class _HistoryRow extends ConsumerWidget {
+  const _HistoryRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final runs = ref.watch(historyProvider).value ?? const <PastRun>[];
+    return _NavRow(
+      label: l10n.homeHistoryLabel,
+      value: runs.isEmpty
+          ? l10n.homeHistoryNone
+          : l10n.historySummary(
+              runs.length,
+              MoneyFormat.format(
+                runs.fold(0, (sum, r) => sum + r.totalMinor),
+                runs.first.basket.currencyCode,
+              ),
+            ),
+      onTap: () => context.push(Routes.history),
+    );
+  }
+}
+
+class _NavRow extends StatelessWidget {
+  const _NavRow({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
     return InkWell(
-      onTap: () => context.push(Routes.stores),
+      onTap: onTap,
       child: Container(
         constraints: const BoxConstraints(minHeight: kMinTapTarget),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: theme.dividerColor),
-            bottom: BorderSide(color: theme.dividerColor),
-          ),
+          border: Border(bottom: BorderSide(color: theme.dividerColor)),
         ),
         child: Row(
           children: [
@@ -459,12 +507,10 @@ class _StoresRow extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.homeStoresLabel, style: theme.textTheme.labelSmall),
+                  Text(label, style: theme.textTheme.labelSmall),
                   const SizedBox(height: 4),
                   Text(
-                    stores.isEmpty
-                        ? l10n.homeStoresNone
-                        : stores.map((s) => s.name).join(', '),
+                    value,
                     style: theme.textTheme.titleMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

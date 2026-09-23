@@ -11,9 +11,9 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:open_basket_server/src/generated/basket.dart' as _i4kvfuua;
 import 'package:open_basket_server/src/generated/household_member.dart'
     as _izwgjn1h;
+import 'package:open_basket_server/src/generated/past_run.dart' as _iprw808a;
 import 'package:open_basket_server/src/generated/settlement_line.dart'
     as _iw375zr9;
 import 'package:open_basket_server/src/generated/store.dart' as _ie3cdud7;
@@ -39,6 +39,7 @@ import 'household_member.dart' as _iv10erpj;
 import 'item_status.dart' as _ibbyonnn;
 import 'member_role.dart' as _insyygng;
 import 'open_basket_exception.dart' as _ityrezdb;
+import 'past_run.dart' as _ilcj9n2a;
 import 'settlement_line.dart' as _i7gf6igf;
 import 'sign_in_code.dart' as _iy6eg0ya;
 import 'store.dart' as _ixrn3cz3;
@@ -56,6 +57,7 @@ export 'household_member.dart';
 export 'item_status.dart';
 export 'member_role.dart';
 export 'open_basket_exception.dart';
+export 'past_run.dart';
 export 'settlement_line.dart';
 export 'sign_in_code.dart';
 export 'store.dart';
@@ -856,6 +858,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ityrezdb.OpenBasketException) {
       return _ityrezdb.OpenBasketException.fromJson(data) as T;
     }
+    if (t == _ilcj9n2a.PastRun) {
+      return _ilcj9n2a.PastRun.fromJson(data) as T;
+    }
     if (t == _i7gf6igf.SettlementLine) {
       return _i7gf6igf.SettlementLine.fromJson(data) as T;
     }
@@ -919,6 +924,9 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
+    if (t == _is.getType<_ilcj9n2a.PastRun?>()) {
+      return (data != null ? _ilcj9n2a.PastRun.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_i7gf6igf.SettlementLine?>()) {
       return (data != null ? _i7gf6igf.SettlementLine.fromJson(data) : null)
           as T;
@@ -943,9 +951,18 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
-    if (t == List<_i4kvfuua.Basket>) {
+    if (t == Map<int, int>) {
+      return Map.fromEntries(
+            (data as List).map(
+              (e) =>
+                  MapEntry(deserialize<int>(e['k']), deserialize<int>(e['v'])),
+            ),
+          )
+          as T;
+    }
+    if (t == List<_iprw808a.PastRun>) {
       return (data as List)
-              .map((e) => deserialize<_i4kvfuua.Basket>(e))
+              .map((e) => deserialize<_iprw808a.PastRun>(e))
               .toList()
           as T;
     }
@@ -995,6 +1012,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ibbyonnn.ItemStatus => 'ItemStatus',
       _insyygng.MemberRole => 'MemberRole',
       _ityrezdb.OpenBasketException => 'OpenBasketException',
+      _ilcj9n2a.PastRun => 'PastRun',
       _i7gf6igf.SettlementLine => 'SettlementLine',
       _iy6eg0ya.SignInCode => 'SignInCode',
       _ixrn3cz3.Store => 'Store',
@@ -1042,6 +1060,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'MemberRole';
       case _ityrezdb.OpenBasketException():
         return 'OpenBasketException';
+      case _ilcj9n2a.PastRun():
+        return 'PastRun';
       case _i7gf6igf.SettlementLine():
         return 'SettlementLine';
       case _iy6eg0ya.SignInCode():
@@ -1120,6 +1140,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'OpenBasketException') {
       return deserialize<_ityrezdb.OpenBasketException>(data['data']);
+    }
+    if (dataClassName == 'PastRun') {
+      return deserialize<_ilcj9n2a.PastRun>(data['data']);
     }
     if (dataClassName == 'SettlementLine') {
       return deserialize<_i7gf6igf.SettlementLine>(data['data']);

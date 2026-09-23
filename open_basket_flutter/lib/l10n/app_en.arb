@@ -190,8 +190,6 @@
   "@liveBasketReconnecting": {},
   "liveBasketClosedTitle": "This basket closed",
   "@liveBasketClosedTitle": {},
-  "liveBasketClosedNote": "It closed while you were away.",
-  "@liveBasketClosedNote": {},
   "liveBasketBack": "Back",
   "@liveBasketBack": {},
   "liveBasketRemove": "Remove",
@@ -662,5 +660,136 @@
         "type": "String"
       }
     }
-  }
+  },
+  "historyTitle": "History",
+  "@historyTitle": {},
+  "historySummary": "{count, plural, =1{1 run} other{{count} runs}} · {total} through the house",
+  "@historySummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "historyEmpty": "No finished runs yet. They show up here once a basket is settled or cancelled.",
+  "@historyEmpty": {},
+  "historyToday": "Today, {time}",
+  "@historyToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "historyYesterday": "Yesterday, {time}",
+  "@historyYesterday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "historyWhen": "{when} · {name} shopped",
+  "@historyWhen": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "historyRan": "ran {minutes} min",
+  "@historyRan": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "historyNoStore": "A run",
+  "@historyNoStore": {},
+  "historySettled": "Settled",
+  "@historySettled": {},
+  "historyCancelled": "Cancelled",
+  "@historyCancelled": {},
+  "historyStatItems": "items",
+  "@historyStatItems": {},
+  "historyStatUnavailable": "unavailable",
+  "@historyStatUnavailable": {},
+  "historyStatReceipt": "receipt",
+  "@historyStatReceipt": {},
+  "historyHowSettled": "HOW IT SETTLED",
+  "@historyHowSettled": {},
+  "historyLine": "{from} → {to}",
+  "@historyLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "historyGapNote": "Includes {each} each of the {gap} receipt gap.",
+  "@historyGapNote": {
+    "placeholders": {
+      "each": {
+        "type": "String"
+      },
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "historyNobody": "Nobody owes anybody",
+  "@historyNobody": {},
+  "historyCancelledNote": "{name} cancelled before the till, so nothing was priced and no settlement was made.",
+  "@historyCancelledNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "historyWhatWasInIt": "WHAT WAS IN IT",
+  "@historyWhatWasInIt": {},
+  "historyAskedDropped": "{name} asked · dropped",
+  "@historyAskedDropped": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "historyHowItRan": "HOW IT RAN",
+  "@historyHowItRan": {},
+  "historyOpened": "Opened",
+  "@historyOpened": {},
+  "historyOpenedFor": "{time} · for {minutes} min",
+  "@historyOpenedFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "historyClosed": "Closed",
+  "@historyClosed": {},
+  "historyPriced": "Priced",
+  "@historyPriced": {},
+  "historyNothing": "nothing",
+  "@historyNothing": {},
+  "homeHistoryLabel": "HISTORY",
+  "@homeHistoryLabel": {},
+  "homeHistoryNone": "Nothing finished yet",
+  "@homeHistoryNone": {}
 }

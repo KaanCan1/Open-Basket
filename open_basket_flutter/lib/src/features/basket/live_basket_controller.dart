@@ -7,6 +7,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../core/client_provider.dart';
 import '../../core/server_clock.dart';
+import '../history/history_controller.dart';
 import '../household/household_controller.dart';
 import 'basket_controller.dart';
 import 'live_basket_state.dart';
@@ -249,6 +250,9 @@ class LiveBasketController extends Notifier<LiveBasketState> {
         event.type != BasketEventType.itemRemoved) {
       ref.invalidate(activeBasketProvider);
       ref.invalidate(lastSettledRunProvider);
+      // A run that just settled or was cancelled is history now; without this
+      // the history screen kept the list it had before (found on screen 16).
+      ref.invalidate(historyProvider);
     }
   }
 

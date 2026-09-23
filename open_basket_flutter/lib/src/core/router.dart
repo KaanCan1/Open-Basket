@@ -6,6 +6,8 @@ import '../features/auth/sign_in_screen.dart';
 import '../features/basket/checkout_screen.dart';
 import '../features/basket/live_basket_screen.dart';
 import '../features/household/create_household_screen.dart';
+import '../features/history/history_screen.dart';
+import '../features/history/past_run_screen.dart';
 import '../features/household/household_home_screen.dart';
 import '../features/household/join_household_screen.dart';
 import '../features/settlement/settlement_screen.dart';
@@ -20,6 +22,7 @@ abstract final class Routes {
   static const joinHousehold = '/household/join';
   static const basket = '/basket';
   static const stores = '/stores';
+  static const history = '/history';
 }
 
 final routerProvider = Provider<GoRouter>((final ref) {
@@ -52,6 +55,18 @@ final routerProvider = Provider<GoRouter>((final ref) {
             path: 'household/join',
             builder: (final context, final state) =>
                 const JoinHouseholdScreen(),
+          ),
+          GoRoute(
+            path: 'history',
+            builder: (final context, final state) => const HistoryScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (final context, final state) => PastRunScreen(
+                  basketId: int.parse(state.pathParameters['id']!),
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: 'stores',

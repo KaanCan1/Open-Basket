@@ -145,7 +145,13 @@ class LiveBasketScreen extends ConsumerWidget {
                   context.push('${Routes.basket}/$basketId/settlement'),
             )
           else if (state.connection == LiveConnection.over)
-            _Closed(onBack: () => context.pop())
+            // The header already says how it ended (ADR-033). A second line
+            // here said "it closed while you were away" to the person who had
+            // just cancelled it themselves.
+            _BottomAction(
+              label: l10n.liveBasketBack,
+              onPressed: () => context.pop(),
+            )
           else if (isOpen) ...[
             if (isShopper && !typing) _ShopperActions(basket: basket),
             AddItemBar(basketId: basketId),
@@ -330,33 +336,66 @@ class _ShopperActions extends ConsumerWidget {
 
   final Basket basket;
 
+  /// Runs a shopper action and says so if the server refused it.
+  ///
+  /// Everything it needs is read before the first await. The basket can close
+  /// itself while a dialog is up, which takes these buttons off the screen;
+  /// touching `ref` or `context` after that threw "Using ref when a widget is
+  /// about to or has been unmounted" and the refusal was never shown — found
+  /// by tapping cancel with three seconds left.
+  static Future<void> _run(
+    BuildContext context,
+    WidgetRef ref,
+    Future<void> Function(BasketController controller) action,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = ref.read(basketControllerProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await action(controller);
+    } on OpenBasketException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            e.error == BasketError.basketNotOpen
+                ? l10n.liveBasketClosedTitle
+                : l10n.commonSomethingWentWrong,
+          ),
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.commonOffline)));
+    }
+  }
+
   Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showCupertinoDialog<bool>(
       context: context,
-      builder: (final context) => AlertDialog(
+      builder: (final context) => CupertinoAlertDialog(
         title: Text(l10n.liveBasketCancelConfirm),
         content: Text(l10n.liveBasketCancelConfirmNote),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
+            isDefaultAction: true,
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(l10n.liveBasketCancelKeep),
           ),
-          TextButton(
+          CupertinoDialogAction(
+            isDestructiveAction: true,
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(l10n.liveBasketCancelYes),
           ),
         ],
       ),
     );
-    if (confirmed != true) return;
-    await ref.read(basketControllerProvider).cancel(basket.id!);
+    if (confirmed != true || !context.mounted) return;
+    await _run(context, ref, (c) => c.cancel(basket.id!));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final controller = ref.read(basketControllerProvider);
     final extended = basket.extendCount >= 1;
 
     return Padding(
@@ -365,7 +404,9 @@ class _ShopperActions extends ConsumerWidget {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: extended ? null : () => controller.extend(basket.id!),
+              onPressed: extended
+                  ? null
+                  : () => _run(context, ref, (c) => c.extend(basket.id!)),
               child: Text(
                 extended ? l10n.liveBasketExtendUsed : l10n.liveBasketExtend,
               ),
@@ -374,7 +415,7 @@ class _ShopperActions extends ConsumerWidget {
           const SizedBox(width: 8),
           Expanded(
             child: FilledButton(
-              onPressed: () => controller.freeze(basket.id!),
+              onPressed: () => _run(context, ref, (c) => c.freeze(basket.id!)),
               child: Text(l10n.liveBasketCheckout),
             ),
           ),
@@ -416,33 +457,6 @@ class _Empty extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Closed extends StatelessWidget {
-  const _Closed({required this.onBack});
-
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(l10n.liveBasketClosedTitle, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(l10n.liveBasketClosedNote, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 16),
-          FilledButton(onPressed: onBack, child: Text(l10n.liveBasketBack)),
-        ],
       ),
     );
   }
