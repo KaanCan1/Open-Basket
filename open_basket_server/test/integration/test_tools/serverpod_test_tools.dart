@@ -1275,8 +1275,9 @@ class _HouseholdEndpoint {
   }
 
   _ida.Future<List<_izwgjn1h.HouseholdMember>> listMembers(
-    _ist.TestSessionBuilder sessionBuilder,
-  ) async {
+    _ist.TestSessionBuilder sessionBuilder, {
+    bool? includeFormer,
+  }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
@@ -1288,7 +1289,7 @@ class _HouseholdEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'household',
           methodName: 'listMembers',
-          parameters: _ist.testObjectToJson({}),
+          parameters: _ist.testObjectToJson({'includeFormer': includeFormer}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

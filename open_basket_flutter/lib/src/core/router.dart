@@ -10,6 +10,8 @@ import '../features/history/history_screen.dart';
 import '../features/history/past_run_screen.dart';
 import '../features/household/household_home_screen.dart';
 import '../features/household/join_household_screen.dart';
+import '../features/settings/currency_screen.dart';
+import '../features/settings/settings_screen.dart';
 import '../features/settlement/settlement_screen.dart';
 import '../features/stores/stores_screen.dart';
 import 'client_provider.dart';
@@ -23,6 +25,8 @@ abstract final class Routes {
   static const basket = '/basket';
   static const stores = '/stores';
   static const history = '/history';
+  static const settings = '/settings';
+  static const currency = '/settings/currency';
 }
 
 final routerProvider = Provider<GoRouter>((final ref) {
@@ -55,6 +59,16 @@ final routerProvider = Provider<GoRouter>((final ref) {
             path: 'household/join',
             builder: (final context, final state) =>
                 const JoinHouseholdScreen(),
+          ),
+          GoRoute(
+            path: 'settings',
+            builder: (final context, final state) => const SettingsScreen(),
+            routes: [
+              GoRoute(
+                path: 'currency',
+                builder: (final context, final state) => const CurrencyScreen(),
+              ),
+            ],
           ),
           GoRoute(
             path: 'history',

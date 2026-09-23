@@ -60,6 +60,16 @@ enum BasketError implements _isc.SerializableModel {
   /// An empty or overlong store name, or coordinates that are not a place on
   /// Earth, or only one of the two.
   invalidStore,
+
+  /// An empty or overlong household name.
+  invalidHouseholdName,
+
+  /// Not a three-letter ISO 4217 code.
+  invalidCurrency,
+
+  /// The shopper of a basket that is still open or at the checkout cannot
+  /// leave: nobody else could finish or settle it.
+  shopperCannotLeave,
   basketNotOpen,
   basketNotFrozen,
   basketAlreadySettled,
@@ -110,6 +120,12 @@ enum BasketError implements _isc.SerializableModel {
         return BasketError.storeNotFound;
       case 'invalidStore':
         return BasketError.invalidStore;
+      case 'invalidHouseholdName':
+        return BasketError.invalidHouseholdName;
+      case 'invalidCurrency':
+        return BasketError.invalidCurrency;
+      case 'shopperCannotLeave':
+        return BasketError.shopperCannotLeave;
       case 'basketNotOpen':
         return BasketError.basketNotOpen;
       case 'basketNotFrozen':

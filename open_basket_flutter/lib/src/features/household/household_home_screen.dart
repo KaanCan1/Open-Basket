@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
-import '../../core/client_provider.dart';
 import '../../core/formatters.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
@@ -88,7 +87,7 @@ class _Home extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final members = ref.watch(membersProvider);
+    final members = ref.watch(activeMembersProvider);
     final me = ref.watch(myMembershipProvider).value;
 
     return Scaffold(
@@ -106,7 +105,15 @@ class _Home extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  onPressed: () => context.push(Routes.settings),
+                  tooltip: l10n.settingsTitle,
+                  icon: const Icon(CupertinoIcons.gear),
+                ),
+              ),
               Text(household.name, style: theme.textTheme.displayLarge),
               const SizedBox(height: 4),
               Text(
@@ -129,12 +136,8 @@ class _Home extends ConsumerWidget {
                   isYou: member.id == me?.id,
                 ),
               ),
+              // Sign out and leaving live in settings (screen 19).
               const SizedBox(height: 40),
-              TextButton(
-                onPressed: ref.watch(signOutProvider),
-                child: Text(l10n.homeSignOut),
-              ),
-              const SizedBox(height: 24),
             ],
           ),
         ),

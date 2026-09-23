@@ -29,9 +29,10 @@ abstract final class Authz {
   /// "Create or join".
   static Future<HouseholdMember?> currentMember(Session session) {
     final id = userId(session);
+    // Former memberships stay as rows (ADR-036); only a current one counts.
     return HouseholdMember.db.findFirstRow(
       session,
-      where: (t) => t.userId.equals(id),
+      where: (t) => t.userId.equals(id) & t.leftAt.equals(null),
     );
   }
 

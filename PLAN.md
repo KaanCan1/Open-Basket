@@ -154,7 +154,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **B** Empty states, loading skeletons, clear English error messages (all from ARB)
 - [ ] **B** Small animation when an item lands on another device, haptic in the last minute
 - [ ] **B** Suggestion chips from the household's frequent items (simple server query)
-- [ ] **B** `settings_screen.dart` and `currency_screen.dart` (screens 19-20), including sign out and leave household
+- [x] **A for B** `settings_screen.dart` and `currency_screen.dart` (screens 19-20), including sign out and leave household. Leaving no longer deletes history (ADR-036); notification switches wait for push
 - [ ] **B** Final app name, launcher icons from `docs/brand/open-basket-app-icon-1024.png`, store-style screenshots
 - [ ] **A** Rate limiting (item spam), input validation (name length, quantity range)
 

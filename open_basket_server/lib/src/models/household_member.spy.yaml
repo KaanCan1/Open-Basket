@@ -13,6 +13,11 @@ fields:
   notifyClosingSoon: bool, default=true
   notifySettlementReady: bool, default=true
   joinedAt: DateTime, default=now
+  ### Set when the member leaves; the row stays. Deleting it cascaded into
+  ### their items, their settlement lines and any basket they had shopped —
+  ### the history rule 6 says is immutable and the report is built from
+  ### (ADR-036). Null for everyone still in.
+  leftAt: DateTime?
 indexes:
   member_unique_idx:
     fields: householdId, userId

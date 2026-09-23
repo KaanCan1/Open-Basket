@@ -707,3 +707,32 @@ Found while walking it, and fixed here:
   a Cupertino alert, like the other iOS sheets.
 - The closed-basket footer said "It closed while you were away" to the shopper who had just
   cancelled it. The header already says how it ended (ADR-033); the footer is now just Back.
+
+## ADR-036: Leaving a household marks the member, it does not delete them
+
+`household.leave` used to delete the `household_member` row. Every relation to a member is
+`onDelete=Cascade`, so leaving silently deleted the member's items, their settlement lines, and
+**every basket they had shopped** — the immutable history of rule 6, and the data the report is
+built from. Found while building the settings screen that exposes the button.
+
+Now the row stays and `leftAt` is set:
+- `Authz.currentMember` only counts a membership with no `leftAt`, so a former member is outside
+  every endpoint exactly as before, and free to create or join another household.
+- The settlement split is across current members only; a former member's items still count and
+  land on the shopper (ADR-029's rule for a requester who is gone).
+- `listMembers(includeFormer: true)` returns everyone, so history, settlements and item rows can
+  still name who asked and who paid. The app's `membersProvider` asks for everyone;
+  `activeMembersProvider` is the household as it is now, for counts and the member list.
+- Rejoining the same household reactivates the old row (the unique index is per household and
+  user), so the person's history is theirs again.
+- The shopper of a basket that is still open or at the checkout cannot leave
+  (`shopperCannotLeave`): nobody else may extend, price or settle it.
+- An owner who leaves still hands ownership to the longest-standing current member.
+
+The migration `20260923071920244` adds the column and re-adds the rule 4 partial index by hand
+(ADR-013). Two wrong error codes were fixed on the way: a bad currency answered `notTheOwner` and a
+bad household name `notAMember`; they are now `invalidCurrency` and `invalidHouseholdName`.
+
+Screens 19 and 20 (settings, currency) are built on this. The design's notification switches are
+left out until pushes exist — a switch that turns off nothing is a promise the app does not keep.
+Sign out moved from the home screen into settings, reached by a gear on home.

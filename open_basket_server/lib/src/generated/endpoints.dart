@@ -751,13 +751,22 @@ class Endpoints extends _is.EndpointDispatch {
         ),
         'listMembers': _is.MethodConnector(
           name: 'listMembers',
-          params: {},
+          params: {
+            'includeFormer': _is.ParameterDescription(
+              name: 'includeFormer',
+              type: _is.getType<bool?>(),
+              nullable: true,
+            ),
+          },
           call:
               (
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async => (endpoints['household'] as _izqmqbob.HouseholdEndpoint)
-                  .listMembers(session),
+                  .listMembers(
+                    session,
+                    includeFormer: params['includeFormer'],
+                  ),
         ),
         'rename': _is.MethodConnector(
           name: 'rename',

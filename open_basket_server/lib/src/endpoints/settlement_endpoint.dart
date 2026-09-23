@@ -127,7 +127,10 @@ class SettlementEndpoint extends Endpoint {
     // is split across members, not across the people who asked for things.
     final members = await HouseholdMember.db.find(
       session,
-      where: (t) => t.householdId.equals(basket.householdId),
+      // Former members are not split across: they have left the household
+      // (ADR-036). Their items still count, and land on the shopper.
+      where: (t) =>
+          t.householdId.equals(basket.householdId) & t.leftAt.equals(null),
       orderBy: (t) => t.id,
     );
     return SettlementService.compute(

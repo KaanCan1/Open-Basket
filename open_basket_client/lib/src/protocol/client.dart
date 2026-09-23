@@ -583,12 +583,19 @@ class EndpointHousehold extends _isc.EndpointRef {
         {},
       );
 
-  _ida.Future<List<_i5id5rp2.HouseholdMember>> listMembers() =>
-      caller.callServerEndpoint<List<_i5id5rp2.HouseholdMember>>(
-        'household',
-        'listMembers',
-        {},
-      );
+  /// Everyone in the household, longest-standing first. With
+  /// `includeFormer` also the people who have left (their `leftAt` is set),
+  /// so history can still name who asked for what and who paid whom.
+  ///
+  /// Nullable rather than defaulted, for the same generated-client reason as
+  /// `addItem`'s quantity.
+  _ida.Future<List<_i5id5rp2.HouseholdMember>> listMembers({
+    bool? includeFormer,
+  }) => caller.callServerEndpoint<List<_i5id5rp2.HouseholdMember>>(
+    'household',
+    'listMembers',
+    {'includeFormer': includeFormer},
+  );
 
   /// Owner only.
   _ida.Future<_iig1c7mf.Household> rename(String name) =>
@@ -635,12 +642,19 @@ class EndpointHousehold extends _isc.EndpointRef {
     },
   );
 
-  /// Leaves the household. The caller loses access to its history.
+  /// Leaves the household. The caller loses access to its history; the
+  /// household keeps it (ADR-036).
+  ///
+  /// The row is marked, not deleted. Deleting it cascaded into the member's
+  /// items, their settlement lines and every basket they had shopped — the
+  /// immutable history of rule 6, and the data the report is built from.
+  ///
+  /// The shopper of a basket that is still open or at the checkout cannot
+  /// leave: nobody else may extend, price or settle it (rule 3).
   ///
   /// An owner who leaves hands ownership to the longest-standing member left,
   /// so a household can never end up with nobody able to rotate the code or
-  /// change the currency. The last member out leaves the household empty
-  /// rather than deleted: its baskets are what the report is built from.
+  /// change the currency.
   _ida.Future<void> leave() => caller.callServerEndpoint<void>(
     'household',
     'leave',

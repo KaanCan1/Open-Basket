@@ -436,12 +436,6 @@ abstract class AppLocalizations {
   /// **'Open one when you are heading out, and the house has until it closes to add things.'**
   String get homeNoBasketNote;
 
-  /// No description provided for @homeSignOut.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign out'**
-  String get homeSignOut;
-
   /// No description provided for @homeMembersTitle.
   ///
   /// In en, this message translates to:
@@ -1389,6 +1383,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing finished yet'**
   String get homeHistoryNone;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsHousehold.
+  ///
+  /// In en, this message translates to:
+  /// **'HOUSEHOLD'**
+  String get settingsHousehold;
+
+  /// No description provided for @settingsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get settingsName;
+
+  /// No description provided for @settingsCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get settingsCurrency;
+
+  /// No description provided for @settingsCurrencyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · every price and settlement'**
+  String settingsCurrencyNote(String name);
+
+  /// No description provided for @settingsStores.
+  ///
+  /// In en, this message translates to:
+  /// **'Stores'**
+  String get settingsStores;
+
+  /// No description provided for @settingsMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members and code'**
+  String get settingsMembers;
+
+  /// No description provided for @settingsMembersValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 member} other{{count} members}} · {code}'**
+  String settingsMembersValue(int count, String code);
+
+  /// No description provided for @settingsOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the owner can change this.'**
+  String get settingsOwnerOnly;
+
+  /// No description provided for @settingsRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename the household'**
+  String get settingsRenameTitle;
+
+  /// No description provided for @settingsRenameSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get settingsRenameSave;
+
+  /// No description provided for @settingsSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get settingsSignOut;
+
+  /// No description provided for @settingsLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave {name}'**
+  String settingsLeave(String name);
+
+  /// No description provided for @settingsLeaveNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll lose access to its history.'**
+  String get settingsLeaveNote;
+
+  /// No description provided for @settingsLeaveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave {name}?'**
+  String settingsLeaveConfirm(String name);
+
+  /// No description provided for @settingsLeaveConfirmNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The household keeps every run you were part of. You can come back with its code.'**
+  String get settingsLeaveConfirmNote;
+
+  /// No description provided for @settingsLeaveYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get settingsLeaveYes;
+
+  /// No description provided for @settingsShopperCannotLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish or cancel your basket before you leave.'**
+  String get settingsShopperCannotLeave;
+
+  /// No description provided for @currencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currencyTitle;
+
+  /// No description provided for @currencyBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'One for the whole household. Every price, settlement and shared summary uses it.'**
+  String get currencyBlurb;
+
+  /// No description provided for @currencyInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'In use'**
+  String get currencyInUse;
+
+  /// No description provided for @currencySample.
+  ///
+  /// In en, this message translates to:
+  /// **'{code} · {sample}'**
+  String currencySample(String code, String sample);
+
+  /// No description provided for @currencyNoCents.
+  ///
+  /// In en, this message translates to:
+  /// **'{code} · {sample} · no cents'**
+  String currencyNoCents(String code, String sample);
+
+  /// No description provided for @currencyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing this doesn\'t convert anything. Past runs keep the currency they were settled in.'**
+  String get currencyNote;
+
+  /// No description provided for @currencySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save currency'**
+  String get currencySave;
+
+  /// No description provided for @currencyNameTRY.
+  ///
+  /// In en, this message translates to:
+  /// **'Turkish lira'**
+  String get currencyNameTRY;
+
+  /// No description provided for @currencyNameEUR.
+  ///
+  /// In en, this message translates to:
+  /// **'Euro'**
+  String get currencyNameEUR;
+
+  /// No description provided for @currencyNameGBP.
+  ///
+  /// In en, this message translates to:
+  /// **'Pound sterling'**
+  String get currencyNameGBP;
+
+  /// No description provided for @currencyNameUSD.
+  ///
+  /// In en, this message translates to:
+  /// **'US dollar'**
+  String get currencyNameUSD;
+
+  /// No description provided for @currencyNameJPY.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese yen'**
+  String get currencyNameJPY;
+
+  /// No description provided for @currencyNameCHF.
+  ///
+  /// In en, this message translates to:
+  /// **'Swiss franc'**
+  String get currencyNameCHF;
 }
 
 class _AppLocalizationsDelegate

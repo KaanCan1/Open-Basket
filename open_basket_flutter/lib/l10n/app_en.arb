@@ -102,8 +102,6 @@
   "@homeNoBasket": {},
   "homeNoBasketNote": "Open one when you are heading out, and the house has until it closes to add things.",
   "@homeNoBasketNote": {},
-  "homeSignOut": "Sign out",
-  "@homeSignOut": {},
   "homeMembersTitle": "IN THIS HOUSEHOLD",
   "@homeMembersTitle": {},
   "homeOwnerTag": "OWNER",
@@ -791,5 +789,112 @@
   "homeHistoryLabel": "HISTORY",
   "@homeHistoryLabel": {},
   "homeHistoryNone": "Nothing finished yet",
-  "@homeHistoryNone": {}
+  "@homeHistoryNone": {},
+  "settingsTitle": "Settings",
+  "@settingsTitle": {},
+  "settingsHousehold": "HOUSEHOLD",
+  "@settingsHousehold": {},
+  "settingsName": "Name",
+  "@settingsName": {},
+  "settingsCurrency": "Currency",
+  "@settingsCurrency": {},
+  "settingsCurrencyNote": "{name} · every price and settlement",
+  "@settingsCurrencyNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsStores": "Stores",
+  "@settingsStores": {},
+  "settingsMembers": "Members and code",
+  "@settingsMembers": {},
+  "settingsMembersValue": "{count, plural, =1{1 member} other{{count} members}} · {code}",
+  "@settingsMembersValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsOwnerOnly": "Only the owner can change this.",
+  "@settingsOwnerOnly": {},
+  "settingsRenameTitle": "Rename the household",
+  "@settingsRenameTitle": {},
+  "settingsRenameSave": "Save",
+  "@settingsRenameSave": {},
+  "settingsSignOut": "Sign out",
+  "@settingsSignOut": {},
+  "settingsLeave": "Leave {name}",
+  "@settingsLeave": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLeaveNote": "You'll lose access to its history.",
+  "@settingsLeaveNote": {},
+  "settingsLeaveConfirm": "Leave {name}?",
+  "@settingsLeaveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLeaveConfirmNote": "The household keeps every run you were part of. You can come back with its code.",
+  "@settingsLeaveConfirmNote": {},
+  "settingsLeaveYes": "Leave",
+  "@settingsLeaveYes": {},
+  "settingsShopperCannotLeave": "Finish or cancel your basket before you leave.",
+  "@settingsShopperCannotLeave": {},
+  "currencyTitle": "Currency",
+  "@currencyTitle": {},
+  "currencyBlurb": "One for the whole household. Every price, settlement and shared summary uses it.",
+  "@currencyBlurb": {},
+  "currencyInUse": "In use",
+  "@currencyInUse": {},
+  "currencySample": "{code} · {sample}",
+  "@currencySample": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "sample": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyNoCents": "{code} · {sample} · no cents",
+  "@currencyNoCents": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "sample": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyNote": "Changing this doesn't convert anything. Past runs keep the currency they were settled in.",
+  "@currencyNote": {},
+  "currencySave": "Save currency",
+  "@currencySave": {},
+  "currencyNameTRY": "Turkish lira",
+  "@currencyNameTRY": {},
+  "currencyNameEUR": "Euro",
+  "@currencyNameEUR": {},
+  "currencyNameGBP": "Pound sterling",
+  "@currencyNameGBP": {},
+  "currencyNameUSD": "US dollar",
+  "@currencyNameUSD": {},
+  "currencyNameJPY": "Japanese yen",
+  "@currencyNameJPY": {},
+  "currencyNameCHF": "Swiss franc",
+  "@currencyNameCHF": {}
 }

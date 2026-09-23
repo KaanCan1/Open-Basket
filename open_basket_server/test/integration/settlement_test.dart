@@ -323,6 +323,26 @@ void main() {
       await _until(() => ended);
     });
 
+    test('someone who has left is not split across', () async {
+      final run = await _aFrozenRun(asUser, endpoints);
+      await endpoints.household.leave(asUser(mert));
+      await _priceEverything(endpoints, run);
+
+      final lines = await endpoints.settlement.settle(
+        run.shopper,
+        run.basket.id!,
+      );
+
+      // Two members left in: Ayşe owes her milk plus half of the 3-unit gap
+      // (1), and Mert — gone — owes nothing.
+      final mertMember = await HouseholdMember.db.findFirstRow(
+        sessionBuilder.build(),
+        where: (t) => t.userId.equals(UuidValue.fromString(mert)),
+      );
+      expect(lines.where((l) => l.fromMemberId == mertMember!.id), isEmpty);
+      expect(lines.single.amountMinor, 4251);
+    });
+
     test('settling is written to analytics (rule 8)', () async {
       final run = await _aFrozenRun(asUser, endpoints);
       await _priceEverything(endpoints, run);

@@ -528,6 +528,12 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'DateTime',
           columnDefault: 'now',
         ),
+        _isp.ColumnDefinition(
+          name: 'leftAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
       ],
       foreignKeys: [
         _isp.ForeignKeyDefinition(
