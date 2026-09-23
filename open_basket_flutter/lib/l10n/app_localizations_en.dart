@@ -1193,4 +1193,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rotateNewDone => 'yours from now on';
+
+  @override
+  String get settingsNotifications => 'NOTIFICATIONS';
+
+  @override
+  String get settingsNotifyOpened => 'A basket opens';
+
+  @override
+  String get settingsNotifyClosingSoon => 'Two minutes left';
+
+  @override
+  String get settingsNotifySettled => 'Settlement is ready';
+
+  @override
+  String get settingsNotificationsNote =>
+      'Kept on the server for when this phone can receive notifications; it can\'t yet.';
+
+  @override
+  String settingsFooter(String version) {
+    return 'Open Basket $version';
+  }
+
+  @override
+  String settingsFooterEmail(String version, String email) {
+    return 'Open Basket $version · $email';
+  }
 }

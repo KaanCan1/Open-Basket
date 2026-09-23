@@ -92,6 +92,22 @@ class HouseholdController {
     return household;
   }
 
+  /// Any member: which of the three notifications they want (ADR-010). The
+  /// server checks these before sending anything (ADR-043).
+  Future<HouseholdMember> setNotifications({
+    required bool basketOpened,
+    required bool closingSoon,
+    required bool settlementReady,
+  }) async {
+    final member = await _client.household.setNotificationPreferences(
+      basketOpened: basketOpened,
+      closingSoon: closingSoon,
+      settlementReady: settlementReady,
+    );
+    _invalidate();
+    return member;
+  }
+
   /// Any member: what the house calls you (ADR-041).
   Future<HouseholdMember> setMyName(String name) async {
     final member = await _client.household.setMyName(name);
@@ -117,3 +133,19 @@ class HouseholdController {
 final householdControllerProvider = Provider<HouseholdController>(
   HouseholdController.new,
 );
+
+/// The signed-in account's email, for the footer of the settings screen.
+/// Null when it cannot be read; the footer then shows the version alone.
+final myEmailProvider = FutureProvider<String?>((final ref) async {
+  try {
+    final profile = await ref
+        .watch(clientProvider)
+        .modules
+        .serverpod_auth_core
+        .userProfileInfo
+        .get();
+    return profile.email;
+  } on Exception {
+    return null;
+  }
+});

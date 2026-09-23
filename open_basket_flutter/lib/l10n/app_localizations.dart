@@ -1911,6 +1911,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'yours from now on'**
   String get rotateNewDone;
+
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTIFICATIONS'**
+  String get settingsNotifications;
+
+  /// No description provided for @settingsNotifyOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'A basket opens'**
+  String get settingsNotifyOpened;
+
+  /// No description provided for @settingsNotifyClosingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Two minutes left'**
+  String get settingsNotifyClosingSoon;
+
+  /// No description provided for @settingsNotifySettled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement is ready'**
+  String get settingsNotifySettled;
+
+  /// No description provided for @settingsNotificationsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept on the server for when this phone can receive notifications; it can\'t yet.'**
+  String get settingsNotificationsNote;
+
+  /// No description provided for @settingsFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Basket {version}'**
+  String settingsFooter(String version);
+
+  /// No description provided for @settingsFooterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Basket {version} · {email}'**
+  String settingsFooterEmail(String version, String email);
 }
 
 class _AppLocalizationsDelegate

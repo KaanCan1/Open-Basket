@@ -1087,5 +1087,34 @@
     }
   },
   "rotateNewDone": "yours from now on",
-  "@rotateNewDone": {}
+  "@rotateNewDone": {},
+  "settingsNotifications": "NOTIFICATIONS",
+  "@settingsNotifications": {},
+  "settingsNotifyOpened": "A basket opens",
+  "@settingsNotifyOpened": {},
+  "settingsNotifyClosingSoon": "Two minutes left",
+  "@settingsNotifyClosingSoon": {},
+  "settingsNotifySettled": "Settlement is ready",
+  "@settingsNotifySettled": {},
+  "settingsNotificationsNote": "Kept on the server for when this phone can receive notifications; it can't yet.",
+  "@settingsNotificationsNote": {},
+  "settingsFooter": "Open Basket {version}",
+  "@settingsFooter": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsFooterEmail": "Open Basket {version} · {email}",
+  "@settingsFooterEmail": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "email": {
+        "type": "String"
+      }
+    }
+  }
 }
