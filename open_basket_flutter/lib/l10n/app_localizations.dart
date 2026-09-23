@@ -1749,6 +1749,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settle'**
   String get checkoutConfirmYes;
+
+  /// No description provided for @membersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HOUSEHOLD'**
+  String get membersLabel;
+
+  /// No description provided for @membersCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HOUSEHOLD CODE'**
+  String get membersCodeLabel;
+
+  /// No description provided for @membersPermanent.
+  ///
+  /// In en, this message translates to:
+  /// **'PERMANENT'**
+  String get membersPermanent;
+
+  /// No description provided for @membersShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get membersShare;
+
+  /// No description provided for @membersRotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate'**
+  String get membersRotate;
+
+  /// No description provided for @membersCodeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone with this code can join.'**
+  String get membersCodeNote;
+
+  /// No description provided for @membersRotateOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the owner can change the code.'**
+  String get membersRotateOwnerOnly;
+
+  /// No description provided for @membersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 MEMBER} other{{count} MEMBERS}}'**
+  String membersCount(int count);
+
+  /// No description provided for @membersYou.
+  ///
+  /// In en, this message translates to:
+  /// **'· you'**
+  String get membersYou;
+
+  /// No description provided for @membersJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{when, select, thisWeek{Joined this week} lastWeek{Joined last week} other{Joined {month}}}'**
+  String membersJoined(String when, String month);
+
+  /// No description provided for @membersOwnerJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{when, select, thisWeek{Owner · joined this week} lastWeek{Owner · joined last week} other{Owner · joined {month}}}'**
+  String membersOwnerJoined(String when, String month);
+
+  /// No description provided for @membersShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {household} on Open Basket'**
+  String membersShareSubject(String household);
+
+  /// No description provided for @membersShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {household} on Open Basket. The code is {code}. Get the app at https://open-basket.serverpod.space'**
+  String membersShareText(String household, String code);
+
+  /// No description provided for @rotateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate the household code?'**
+  String get rotateTitle;
+
+  /// No description provided for @rotateBlurb.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone already in stays in. Only new joins are affected.'**
+  String get rotateBlurb;
+
+  /// No description provided for @rotateOld.
+  ///
+  /// In en, this message translates to:
+  /// **'OLD'**
+  String get rotateOld;
+
+  /// No description provided for @rotateOldNote.
+  ///
+  /// In en, this message translates to:
+  /// **'stops working now'**
+  String get rotateOldNote;
+
+  /// No description provided for @rotateNew.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get rotateNew;
+
+  /// No description provided for @rotateNewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'picked when you rotate'**
+  String get rotateNewNote;
+
+  /// No description provided for @rotateWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone holding the old code can no longer join, including any message you already sent.'**
+  String get rotateWarning;
+
+  /// No description provided for @rotateKeepPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} keep their place. Nothing in history changes.'**
+  String rotateKeepPlace(String names);
+
+  /// No description provided for @rotateKeepPlaceOne.
+  ///
+  /// In en, this message translates to:
+  /// **'You keep your place. Nothing in history changes.'**
+  String get rotateKeepPlaceOne;
+
+  /// No description provided for @namesAnd.
+  ///
+  /// In en, this message translates to:
+  /// **'{first} and {last}'**
+  String namesAnd(String first, String last);
+
+  /// No description provided for @rotateOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner only. There\'s no expiry: rotate as often as you like.'**
+  String get rotateOwnerOnly;
+
+  /// No description provided for @rotateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate and share the new code'**
+  String get rotateAction;
+
+  /// No description provided for @rotateKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep {code}'**
+  String rotateKeep(String code);
+
+  /// No description provided for @rotateNewDone.
+  ///
+  /// In en, this message translates to:
+  /// **'yours from now on'**
+  String get rotateNewDone;
 }
 
 class _AppLocalizationsDelegate

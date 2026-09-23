@@ -973,5 +973,119 @@
   "checkoutConfirmNote": "Who owes what is worked out from these prices and can't be changed afterwards.",
   "@checkoutConfirmNote": {},
   "checkoutConfirmYes": "Settle",
-  "@checkoutConfirmYes": {}
+  "@checkoutConfirmYes": {},
+  "membersLabel": "HOUSEHOLD",
+  "@membersLabel": {},
+  "membersCodeLabel": "HOUSEHOLD CODE",
+  "@membersCodeLabel": {},
+  "membersPermanent": "PERMANENT",
+  "@membersPermanent": {},
+  "membersShare": "Share",
+  "@membersShare": {},
+  "membersRotate": "Rotate",
+  "@membersRotate": {},
+  "membersCodeNote": "Anyone with this code can join.",
+  "@membersCodeNote": {},
+  "membersRotateOwnerOnly": "Only the owner can change the code.",
+  "@membersRotateOwnerOnly": {},
+  "membersCount": "{count, plural, =1{1 MEMBER} other{{count} MEMBERS}}",
+  "@membersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "membersYou": "· you",
+  "@membersYou": {},
+  "membersJoined": "{when, select, thisWeek{Joined this week} lastWeek{Joined last week} other{Joined {month}}}",
+  "@membersJoined": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "membersOwnerJoined": "{when, select, thisWeek{Owner · joined this week} lastWeek{Owner · joined last week} other{Owner · joined {month}}}",
+  "@membersOwnerJoined": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "membersShareSubject": "Join {household} on Open Basket",
+  "@membersShareSubject": {
+    "placeholders": {
+      "household": {
+        "type": "String"
+      }
+    }
+  },
+  "membersShareText": "Join {household} on Open Basket. The code is {code}. Get the app at https://open-basket.serverpod.space",
+  "@membersShareText": {
+    "placeholders": {
+      "household": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "rotateTitle": "Rotate the household code?",
+  "@rotateTitle": {},
+  "rotateBlurb": "Everyone already in stays in. Only new joins are affected.",
+  "@rotateBlurb": {},
+  "rotateOld": "OLD",
+  "@rotateOld": {},
+  "rotateOldNote": "stops working now",
+  "@rotateOldNote": {},
+  "rotateNew": "NEW",
+  "@rotateNew": {},
+  "rotateNewNote": "picked when you rotate",
+  "@rotateNewNote": {},
+  "rotateWarning": "Anyone holding the old code can no longer join, including any message you already sent.",
+  "@rotateWarning": {},
+  "rotateKeepPlace": "{names} keep their place. Nothing in history changes.",
+  "@rotateKeepPlace": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "rotateKeepPlaceOne": "You keep your place. Nothing in history changes.",
+  "@rotateKeepPlaceOne": {},
+  "namesAnd": "{first} and {last}",
+  "@namesAnd": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "rotateOwnerOnly": "Owner only. There's no expiry: rotate as often as you like.",
+  "@rotateOwnerOnly": {},
+  "rotateAction": "Rotate and share the new code",
+  "@rotateAction": {},
+  "rotateKeep": "Keep {code}",
+  "@rotateKeep": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "rotateNewDone": "yours from now on",
+  "@rotateNewDone": {}
 }

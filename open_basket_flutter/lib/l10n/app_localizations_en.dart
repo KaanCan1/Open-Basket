@@ -1070,4 +1070,127 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkoutConfirmYes => 'Settle';
+
+  @override
+  String get membersLabel => 'HOUSEHOLD';
+
+  @override
+  String get membersCodeLabel => 'HOUSEHOLD CODE';
+
+  @override
+  String get membersPermanent => 'PERMANENT';
+
+  @override
+  String get membersShare => 'Share';
+
+  @override
+  String get membersRotate => 'Rotate';
+
+  @override
+  String get membersCodeNote => 'Anyone with this code can join.';
+
+  @override
+  String get membersRotateOwnerOnly => 'Only the owner can change the code.';
+
+  @override
+  String membersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count MEMBERS',
+      one: '1 MEMBER',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get membersYou => '· you';
+
+  @override
+  String membersJoined(String when, String month) {
+    String _temp0 = intl.Intl.selectLogic(
+      when,
+      {
+        'thisWeek': 'Joined this week',
+        'lastWeek': 'Joined last week',
+        'other': 'Joined $month',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String membersOwnerJoined(String when, String month) {
+    String _temp0 = intl.Intl.selectLogic(
+      when,
+      {
+        'thisWeek': 'Owner · joined this week',
+        'lastWeek': 'Owner · joined last week',
+        'other': 'Owner · joined $month',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String membersShareSubject(String household) {
+    return 'Join $household on Open Basket';
+  }
+
+  @override
+  String membersShareText(String household, String code) {
+    return 'Join $household on Open Basket. The code is $code. Get the app at https://open-basket.serverpod.space';
+  }
+
+  @override
+  String get rotateTitle => 'Rotate the household code?';
+
+  @override
+  String get rotateBlurb =>
+      'Everyone already in stays in. Only new joins are affected.';
+
+  @override
+  String get rotateOld => 'OLD';
+
+  @override
+  String get rotateOldNote => 'stops working now';
+
+  @override
+  String get rotateNew => 'NEW';
+
+  @override
+  String get rotateNewNote => 'picked when you rotate';
+
+  @override
+  String get rotateWarning =>
+      'Anyone holding the old code can no longer join, including any message you already sent.';
+
+  @override
+  String rotateKeepPlace(String names) {
+    return '$names keep their place. Nothing in history changes.';
+  }
+
+  @override
+  String get rotateKeepPlaceOne =>
+      'You keep your place. Nothing in history changes.';
+
+  @override
+  String namesAnd(String first, String last) {
+    return '$first and $last';
+  }
+
+  @override
+  String get rotateOwnerOnly =>
+      'Owner only. There\'s no expiry: rotate as often as you like.';
+
+  @override
+  String get rotateAction => 'Rotate and share the new code';
+
+  @override
+  String rotateKeep(String code) {
+    return 'Keep $code';
+  }
+
+  @override
+  String get rotateNewDone => 'yours from now on';
 }

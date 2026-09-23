@@ -204,6 +204,7 @@ class SettingsScreen extends ConsumerWidget {
           _Row(
             label: l10n.settingsMembers,
             value: l10n.settingsMembersValue(members.length, household.code),
+            onTap: () => context.push(Routes.members),
           ),
           if (!isOwner) ...[
             const SizedBox(height: 8),
