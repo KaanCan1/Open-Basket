@@ -110,10 +110,16 @@ What works, walked on simulators and deployed:
 - **Resilience**: offline adds queue and flush on reconnect; resync on resume (ADR-032).
 - **Polish**: usual-item chips, rate limits, arrival animation, last-minute haptic (ADR-038);
   every server refusal worded by the app, not the server (ADR-039).
+- **Names**: people set their own in Settings; the default is a guess from the email (ADR-041).
+- **Report tooling**: `stats.report` for your own house, `scripts/report.sql` for all (ADR-040);
+  `docs/REPORT.md` drafted with empty tables until real use.
+- **Submission docs**: README with the Serverpod table and a diagram, `docs/TESTING.md` for the
+  shipped flow, `docs/DEMO_SCRIPT.md`, seven screenshots in `docs/screenshots`.
+- A release APK from `main` is verified against production; not published yet.
 - Checked on an iPhone SE-sized frame in dark mode (ADR-039). Installed on Kaan's iPhone by
   cable; the free provisioning profile expires 2026-09-29 22:05 Turkey time.
 
-Tests: 175+ server, 60+ Flutter, CI on every PR to `main`.
+Tests: 191 server, 61 Flutter, CI on every PR to `main`.
 
 Open:
 
