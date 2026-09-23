@@ -478,5 +478,61 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveBasketJoinedTitle": "{name} opened one at {time}",
+  "@liveBasketJoinedTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketJoinedNote": "One basket at a time in a household — so here's that run instead.",
+  "@liveBasketJoinedNote": {},
+  "countdownClosedOnTime": "CLOSED ON TIME",
+  "@countdownClosedOnTime": {},
+  "countdownSettled": "SETTLED",
+  "@countdownSettled": {},
+  "countdownCancelled": "CANCELLED",
+  "@countdownCancelled": {},
+  "countdownClosedItself": "The basket closed itself at {time}",
+  "@countdownClosedItself": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownClosedItselfNote": "It ran the full {minutes, plural, =1{minute} other{{minutes} minutes}} and shut on the server.",
+  "@countdownClosedItselfNote": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownClosedBy": "{name} closed it at {time}",
+  "@countdownClosedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownCancelledBy": "{name} cancelled this run",
+  "@countdownCancelledBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownCancelledNote": "Nothing was priced and nobody owes anybody.",
+  "@countdownCancelledNote": {}
 }

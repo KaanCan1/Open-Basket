@@ -580,4 +580,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String liveBasketDropped(String names) {
     return 'The basket closed before these could be sent: $names.';
   }
+
+  @override
+  String liveBasketJoinedTitle(String name, String time) {
+    return '$name opened one at $time';
+  }
+
+  @override
+  String get liveBasketJoinedNote =>
+      'One basket at a time in a household — so here\'s that run instead.';
+
+  @override
+  String get countdownClosedOnTime => 'CLOSED ON TIME';
+
+  @override
+  String get countdownSettled => 'SETTLED';
+
+  @override
+  String get countdownCancelled => 'CANCELLED';
+
+  @override
+  String countdownClosedItself(String time) {
+    return 'The basket closed itself at $time';
+  }
+
+  @override
+  String countdownClosedItselfNote(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: 'minute',
+    );
+    return 'It ran the full $_temp0 and shut on the server.';
+  }
+
+  @override
+  String countdownClosedBy(String name, String time) {
+    return '$name closed it at $time';
+  }
+
+  @override
+  String countdownCancelledBy(String name) {
+    return '$name cancelled this run';
+  }
+
+  @override
+  String get countdownCancelledNote =>
+      'Nothing was priced and nobody owes anybody.';
 }

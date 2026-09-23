@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -19,10 +20,14 @@ class CountdownBanner extends ConsumerStatefulWidget {
   const CountdownBanner({
     required this.basket,
     this.compact = false,
+    this.shopperName = '',
     super.key,
   });
 
   final Basket basket;
+
+  /// For "Kaan closed it at 18:40" once the basket is no longer open.
+  final String shopperName;
 
   /// One line instead of the full card, for when the keyboard is up and the
   /// list needs the room. The number is still the server's (rule 1).
@@ -84,18 +89,7 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
     // that on screen as a number that keeps moving reads as "still counting"
     // when the list is already final.
     if (basket.status != BasketStatus.open) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.countdownFrozen, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 4),
-            Text(l10n.countdownListFinal, style: theme.textTheme.titleMedium),
-          ],
-        ),
-      );
+      return _Closed(basket: basket, shopperName: widget.shopperName);
     }
 
     final left = basket.closesAt.difference(
@@ -171,5 +165,70 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
     final minutes = left.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = left.inSeconds.remainder(60).toString().padLeft(2, '0');
     return hours > 0 ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
+  }
+}
+
+/// Screens 22-23: arriving at a basket that is no longer open. It says how it
+/// ended and when — the question someone opening the app after a run is
+/// actually asking — instead of a bare "frozen".
+class _Closed extends StatelessWidget {
+  const _Closed({required this.basket, required this.shopperName});
+
+  final Basket basket;
+  final String shopperName;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final ended = (basket.frozenAt ?? basket.closesAt).toLocal();
+    final at = DateFormat.Hm().format(ended);
+    final ran = (basket.frozenAt ?? basket.closesAt)
+        .difference(basket.openedAt)
+        .inMinutes;
+
+    final String label;
+    final String title;
+    final String? note;
+    switch (basket.status) {
+      case BasketStatus.cancelled:
+        label = l10n.countdownCancelled;
+        title = l10n.countdownCancelledBy(shopperName);
+        note = l10n.countdownCancelledNote;
+      case BasketStatus.settled:
+        label = l10n.countdownSettled;
+        title = basket.closedAutomatically
+            ? l10n.countdownClosedItself(at)
+            : l10n.countdownClosedBy(shopperName, at);
+        note = null;
+      case BasketStatus.frozen:
+      case BasketStatus.open:
+        label = basket.closedAutomatically
+            ? l10n.countdownClosedOnTime
+            : l10n.countdownFrozen;
+        title = basket.closedAutomatically
+            ? l10n.countdownClosedItself(at)
+            : l10n.countdownClosedBy(shopperName, at);
+        note = basket.closedAutomatically
+            ? l10n.countdownClosedItselfNote(ran < 1 ? 1 : ran)
+            : l10n.countdownListFinal;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: theme.textTheme.labelSmall),
+          const SizedBox(height: 4),
+          Text(title, style: theme.textTheme.titleMedium),
+          if (note != null) ...[
+            const SizedBox(height: 2),
+            Text(note, style: theme.textTheme.bodySmall),
+          ],
+        ],
+      ),
+    );
   }
 }

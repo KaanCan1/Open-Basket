@@ -61,6 +61,17 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
       Navigator.of(context).pop(basket);
     } on OpenBasketException catch (error) {
       if (!mounted) return;
+      // Screen 24: not an error. Someone else got there first, so hand back
+      // their run and let the caller take this person into it, add bar and
+      // all. Only if that fails does the old sentence appear.
+      if (error.error == BasketError.householdAlreadyHasOpenBasket) {
+        final running = await _runningBasket();
+        if (!mounted) return;
+        if (running != null) {
+          Navigator.of(context).pop(running);
+          return;
+        }
+      }
       setState(() {
         _error = switch (error.error) {
           BasketError.householdAlreadyHasOpenBasket =>
@@ -76,6 +87,16 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
       setState(() => _error = l10n.commonOffline);
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<Basket?> _runningBasket() async {
+    try {
+      ref.invalidate(activeBasketProvider);
+      final running = await ref.read(activeBasketProvider.future);
+      return running?.status == BasketStatus.open ? running : null;
+    } catch (_) {
+      return null;
     }
   }
 

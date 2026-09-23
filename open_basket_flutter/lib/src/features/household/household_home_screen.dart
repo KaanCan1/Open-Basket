@@ -282,7 +282,13 @@ class _BasketSection extends ConsumerWidget {
       onPressed: () async {
         final opened = await OpenBasketSheet.show(context);
         if (opened == null || !context.mounted) return;
-        context.push('${Routes.basket}/${opened.id}');
+        // Someone else's run means the sheet lost the race (screen 24): say
+        // so on arrival rather than dropping them in without a word.
+        final me = ref.read(myMembershipProvider).value;
+        final joined = me != null && opened.shopperMemberId != me.id;
+        context.push(
+          '${Routes.basket}/${opened.id}${joined ? '?joined=1' : ''}',
+        );
       },
       child: Text(l10n.homeOpenBasket),
     );
