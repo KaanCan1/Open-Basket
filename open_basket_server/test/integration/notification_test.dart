@@ -85,11 +85,11 @@ void main() {
         await openAtNoon();
 
         expect(push.tokens, unorderedEquals(['phone-Ayşe', 'phone-Mert']));
+        expect(push.sent.first.message.title, 'Kaan is going shopping');
         expect(
           push.sent.first.message.body,
-          'Kaan is going shopping. Add what you need in the next 10 min.',
+          'Add what you need in the next 10 min.',
         );
-        expect(push.sent.first.message.title, 'Kaya household');
       });
 
       test('the store is named when there is one', () async {
@@ -104,9 +104,10 @@ void main() {
           ),
         );
 
+        expect(push.sent.first.message.title, 'Kaan is heading to Migros');
         expect(
           push.sent.first.message.body,
-          'Kaan is heading to Migros. Add what you need in the next 12 min.',
+          'Add what you need in the next 12 min.',
         );
       });
 
@@ -167,7 +168,10 @@ void main() {
 
         expect(sent, isTrue);
         expect(push.tokens, ['phone-Mert']);
-        expect(push.sent.single.message.body, '2 minutes left on the basket.');
+        expect(
+          push.sent.single.message.title,
+          '2 minutes left on the basket',
+        );
       });
 
       test('a reminder left over from before an extension does nothing '
@@ -235,10 +239,8 @@ void main() {
         // Mert asked for nothing and there is no receipt gap: he owes
         // nothing, so he hears nothing. The shopper is owed, not owing.
         expect(push.tokens, ['phone-Ayşe']);
-        expect(
-          push.sent.single.message.body,
-          "You owe Kaan ₺84.50 for today's run.",
-        );
+        expect(push.sent.single.message.title, 'You owe Kaan ₺84.50');
+        expect(push.sent.single.message.body, '₺84.50 of items.');
       });
     });
 

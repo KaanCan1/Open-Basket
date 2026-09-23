@@ -32,7 +32,6 @@ abstract final class NotificationService {
           ? null
           : await Store.db.findById(session, basket.storeId!);
       final message = NotificationCopy.basketOpened(
-        household: await _householdName(session, basket.householdId),
         shopper: shopper?.displayName ?? '',
         store: store?.name,
         minutes: basket.closesAt.difference(basket.openedAt).inMinutes,
@@ -69,7 +68,7 @@ abstract final class NotificationService {
       );
       final asked = {for (final item in items) item.requesterMemberId};
       final message = NotificationCopy.closingSoon(
-        household: await _householdName(session, basket.householdId),
+        shopper: _byId(members, basket.shopperMemberId)?.displayName ?? '',
         basketId: basketId,
       );
       await _deliver(session, {
@@ -98,15 +97,15 @@ abstract final class NotificationService {
         session,
         where: (t) => t.householdId.equals(basket.householdId),
       );
-      final household = await _householdName(session, basket.householdId);
       await _deliver(session, {
         for (final line in lines)
           if (_byId(members, line.fromMemberId) case final debtor?)
             if (debtor.leftAt == null && debtor.notifySettlementReady)
               debtor: NotificationCopy.settlementReady(
-                household: household,
                 shopper: _byId(members, line.toMemberId)?.displayName ?? '',
                 amountMinor: line.amountMinor,
+                itemsMinor: line.itemsMinor,
+                receiptGapMinor: line.receiptGapMinor,
                 currencyCode: basket.currencyCode,
                 basketId: basket.id!,
               ),
@@ -173,7 +172,4 @@ abstract final class NotificationService {
     }
     return null;
   }
-
-  static Future<String> _householdName(Session session, int id) async =>
-      (await Household.db.findById(session, id))?.name ?? 'Open Basket';
 }
