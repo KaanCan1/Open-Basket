@@ -1080,7 +1080,7 @@ class _HistoryEndpoint {
 
   _ida.Future<List<_i4kvfuua.Basket>> list(
     _ist.TestSessionBuilder sessionBuilder, {
-    required int limit,
+    int? limit,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =

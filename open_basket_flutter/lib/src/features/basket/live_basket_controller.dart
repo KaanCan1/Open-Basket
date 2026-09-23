@@ -129,6 +129,7 @@ class LiveBasketController extends Notifier<LiveBasketState> {
         event.type != BasketEventType.itemUpdated &&
         event.type != BasketEventType.itemRemoved) {
       ref.invalidate(activeBasketProvider);
+      ref.invalidate(lastSettledRunProvider);
     }
   }
 
