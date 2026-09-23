@@ -981,6 +981,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The basket closed before these could be sent: {names}.'**
   String liveBasketDropped(String names);
+
+  /// No description provided for @liveBasketJoinedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} opened one at {time}'**
+  String liveBasketJoinedTitle(String name, String time);
+
+  /// No description provided for @liveBasketJoinedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'One basket at a time in a household — so here\'s that run instead.'**
+  String get liveBasketJoinedNote;
+
+  /// No description provided for @countdownClosedOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'CLOSED ON TIME'**
+  String get countdownClosedOnTime;
+
+  /// No description provided for @countdownSettled.
+  ///
+  /// In en, this message translates to:
+  /// **'SETTLED'**
+  String get countdownSettled;
+
+  /// No description provided for @countdownCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'CANCELLED'**
+  String get countdownCancelled;
+
+  /// No description provided for @countdownClosedItself.
+  ///
+  /// In en, this message translates to:
+  /// **'The basket closed itself at {time}'**
+  String countdownClosedItself(String time);
+
+  /// No description provided for @countdownClosedItselfNote.
+  ///
+  /// In en, this message translates to:
+  /// **'It ran the full {minutes, plural, =1{minute} other{{minutes} minutes}} and shut on the server.'**
+  String countdownClosedItselfNote(int minutes);
+
+  /// No description provided for @countdownClosedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} closed it at {time}'**
+  String countdownClosedBy(String name, String time);
+
+  /// No description provided for @countdownCancelledBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} cancelled this run'**
+  String countdownCancelledBy(String name);
+
+  /// No description provided for @countdownCancelledNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was priced and nobody owes anybody.'**
+  String get countdownCancelledNote;
 }
 
 class _AppLocalizationsDelegate

@@ -55,6 +55,7 @@ final routerProvider = Provider<GoRouter>((final ref) {
             path: 'basket/:id',
             builder: (final context, final state) => LiveBasketScreen(
               basketId: int.parse(state.pathParameters['id']!),
+              joined: state.uri.queryParameters['joined'] == '1',
             ),
             routes: [
               GoRoute(

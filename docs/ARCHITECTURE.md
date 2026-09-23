@@ -638,3 +638,22 @@ who does not open the app.
 
 Tested by stopping the local server under a live simulator: strip appears, "Butter" is queued,
 the server comes back, Butter lands as an ordinary row.
+
+## ADR-033: Arriving at a basket you did not see happen
+
+- **Someone else already has one open (screen 24).** Opening a basket while another member's run
+  is open is not an error. The sheet catches `householdAlreadyHasOpenBasket`, fetches the running
+  basket and hands it back; the home screen sees that the shopper is someone else and opens the
+  live basket with a strip: "Ayşe opened one at 08:06 — One basket at a time in a household — so
+  here's that run instead." The add bar is right there. Only if the running basket cannot be
+  fetched does the old sentence appear in the sheet.
+- **Closed while you were away (screens 22–23).** A basket that is no longer open says how it ended
+  instead of a bare "frozen": "Closed on time — The basket closed itself at 23:32 — It ran the full
+  10 minutes and shut on the server" when the future call closed it, "Kaan closed it at 23:30" when
+  the shopper did, and "Kaan cancelled this run — Nothing was priced and nobody owes anybody" for a
+  cancelled one. It is the question someone opening the app after a run is actually asking, and
+  the server already knew the answer (`closedAutomatically`, `frozenAt`).
+
+Both walked on two simulators against a local server: a basket that auto-closed overnight showed
+the screen 23 header, and opening a basket on one phone while the other had one open landed in
+that run with the strip.

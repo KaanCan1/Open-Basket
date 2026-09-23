@@ -22,9 +22,17 @@ import 'live_basket_state.dart';
 /// them would mean two places to fix every layout problem for a difference
 /// that is three buttons.
 class LiveBasketScreen extends ConsumerWidget {
-  const LiveBasketScreen({required this.basketId, super.key});
+  const LiveBasketScreen({
+    required this.basketId,
+    this.joined = false,
+    super.key,
+  });
 
   final int basketId;
+
+  /// Arrived here because opening a basket found this one already running
+  /// (screen 24).
+  final bool joined;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,7 +71,11 @@ class LiveBasketScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          CountdownBanner(basket: basket, compact: typing),
+          CountdownBanner(
+            basket: basket,
+            compact: typing,
+            shopperName: shopperName,
+          ),
           // Screen 25: the countdown stays at full strength while offline,
           // because it is the server's clock and not this phone's; the strip
           // says why the list may be behind.
@@ -78,7 +90,15 @@ class LiveBasketScreen extends ConsumerWidget {
                     ),
             )
           else if (state.report != null)
-            _ReportStrip(report: state.report!),
+            _ReportStrip(report: state.report!)
+          else if (joined && isOpen && !isShopper && !typing)
+            _Strip(
+              title: l10n.liveBasketJoinedTitle(
+                shopperName,
+                DateFormat.Hm().format(basket.openedAt.toLocal()),
+              ),
+              note: l10n.liveBasketJoinedNote,
+            ),
           Expanded(
             child: state.items.isEmpty && state.queued.isEmpty
                 ? _Empty(isOpen: isOpen)
