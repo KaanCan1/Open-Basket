@@ -1152,5 +1152,15 @@
   "joinNoCode": "No code yet?",
   "@joinNoCode": {},
   "joinStartOwn": "Start your own household",
-  "@joinStartOwn": {}
+  "@joinStartOwn": {},
+  "liveBasketQuantityDone": "Done",
+  "@liveBasketQuantityDone": {},
+  "liveBasketQuantityLabel": "Quantity {count}",
+  "@liveBasketQuantityLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

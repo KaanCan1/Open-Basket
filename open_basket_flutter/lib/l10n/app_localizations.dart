@@ -2043,6 +2043,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start your own household'**
   String get joinStartOwn;
+
+  /// No description provided for @liveBasketQuantityDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get liveBasketQuantityDone;
+
+  /// No description provided for @liveBasketQuantityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity {count}'**
+  String liveBasketQuantityLabel(int count);
 }
 
 class _AppLocalizationsDelegate

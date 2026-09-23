@@ -1278,4 +1278,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinStartOwn => 'Start your own household';
+
+  @override
+  String get liveBasketQuantityDone => 'Done';
+
+  @override
+  String liveBasketQuantityLabel(int count) {
+    return 'Quantity $count';
+  }
 }
