@@ -859,3 +859,38 @@ Also seen, not changed: *Extend once* sits directly above the add field, and a t
 the field extends the basket — one-way, once per run. Low harm (five more minutes), so it stays;
 worth a look if real use shows it happening.
 
+## ADR-043: Push, the server half
+
+The server now decides and sends every notification the plan lists; the phone half (Firebase in
+the app, the permission prompt, uploading the token, opening the basket from a tap) waits on a
+Firebase project and on Kaan's call about iPhones. Built first because none of it depends on
+either.
+
+- **Who hears what** is decided in `NotificationService`, on the server, with each member's
+  switches (ADR-010) applied before anything is sent:
+  - basket opened → everyone in the house but the shopper;
+  - two minutes left → members who have not added anything yet — the ones the nudge is for;
+  - settled → each member who owes, with the amount and to whom.
+  Members who left the house are never told about a new run.
+- **The reminder is a second future call**, `ClosingSoonFutureCall`, booked and cancelled next
+  to the close by `BasketService.scheduleClose`. It is idempotent the way closing is (rule 2):
+  it reloads the basket and sends nothing unless it is still open and about two minutes from its
+  close, so the one left over from before an extension is a no-op. Baskets of two minutes or less
+  get no reminder.
+- **Copy lives in one file**, `notification_copy.dart`, English only, titled with the household.
+  Money is formatted with the same `NumberFormat` the app uses, so the push and the screen it
+  opens print "₺84.50" identically.
+- **FCM HTTP v1** through `googleapis_auth` with a service account read from the password
+  `fcmServiceAccountJson`. With no such password the sender logs and sends nothing, so this is
+  safe to deploy before Firebase exists. A token FCM reports as unregistered is deleted.
+- **Never fails the action.** Every send is caught and logged; opening a basket or settling
+  does not depend on Firebase being up. Sends to all phones go out in parallel with a five-second
+  timeout each.
+- **A token follows the last person to sign in on the phone**, so a shared phone stops getting
+  the previous person's notifications at once; only your own token can be removed.
+
+To switch it on in production: create a Firebase project, add the Android and iOS apps
+(`com.kaancankurt.openbasket`), download a service account key, then
+`serverpod cloud password set fcmServiceAccountJson --from-file <key.json> -p open-basket` and
+redeploy. The key file never goes into the repository.
+

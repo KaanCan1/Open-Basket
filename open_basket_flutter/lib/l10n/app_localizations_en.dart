@@ -1054,4 +1054,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsYou => 'YOU';
+
+  @override
+  String get errorInvalidDeviceToken =>
+      'This phone couldn\'t sign up for notifications.';
 }

@@ -15,8 +15,11 @@ import 'dart:async' as _ida;
 import 'package:clock/clock.dart' as _io0w16m8;
 import 'package:serverpod/serverpod.dart' as _is;
 import '../future_calls/close_basket_future_call.dart' as _iessf30a;
+import '../future_calls/closing_soon_future_call.dart' as _i501sqqf;
 import 'future_calls_generated_models/close_basket_future_call_close_model.dart'
     as _itt3vjix;
+import 'future_calls_generated_models/closing_soon_future_call_remind_model.dart'
+    as _i9kzwx4t;
 
 /// Invokes a future call.
 typedef _InvokeFutureCall =
@@ -61,6 +64,7 @@ class FutureCalls extends _is.FutureCallDispatch<_FutureCallRef> {
   ) {
     var registeredFutureCalls = <String, _is.InvokableFutureCall>{
       'CloseBasketCloseFutureCall': CloseBasketCloseFutureCall(),
+      'ClosingSoonRemindFutureCall': ClosingSoonRemindFutureCall(),
     };
     _futureCallManager = futureCallManager;
     _serverId = serverId;
@@ -182,6 +186,8 @@ class _FutureCallRef {
   final _InvokeFutureCall _invokeFutureCall;
 
   late final closeBasket = _CloseBasketFutureCallDispatcher(_invokeFutureCall);
+
+  late final closingSoon = _ClosingSoonFutureCallDispatcher(_invokeFutureCall);
 }
 
 class _CloseBasketFutureCallDispatcher {
@@ -198,6 +204,20 @@ class _CloseBasketFutureCallDispatcher {
   }
 }
 
+class _ClosingSoonFutureCallDispatcher {
+  _ClosingSoonFutureCallDispatcher(this._invokeFutureCall);
+
+  final _InvokeFutureCall _invokeFutureCall;
+
+  Future<void> remind(int basketId) {
+    var object = _i9kzwx4t.ClosingSoonFutureCallRemindModel(basketId: basketId);
+    return _invokeFutureCall(
+      'ClosingSoonRemindFutureCall',
+      object,
+    );
+  }
+}
+
 class CloseBasketCloseFutureCall
     extends _is.FutureCall<_itt3vjix.CloseBasketFutureCallCloseModel>
     implements
@@ -209,6 +229,24 @@ class CloseBasketCloseFutureCall
   ) async {
     if (object != null) {
       await _iessf30a.CloseBasketFutureCall().close(
+        session,
+        object.basketId,
+      );
+    }
+  }
+}
+
+class ClosingSoonRemindFutureCall
+    extends _is.FutureCall<_i9kzwx4t.ClosingSoonFutureCallRemindModel>
+    implements
+        _is.InvokableFutureCall<_i9kzwx4t.ClosingSoonFutureCallRemindModel> {
+  @override
+  _ida.Future<void> invoke(
+    _is.Session session,
+    _i9kzwx4t.ClosingSoonFutureCallRemindModel? object,
+  ) async {
+    if (object != null) {
+      await _i501sqqf.ClosingSoonFutureCall().remind(
         session,
         object.basketId,
       );

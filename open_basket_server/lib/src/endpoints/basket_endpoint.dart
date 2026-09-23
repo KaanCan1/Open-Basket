@@ -5,6 +5,7 @@ import '../services/analytics_service.dart';
 import '../services/authz.dart';
 import '../services/basket_channels.dart';
 import '../services/basket_service.dart';
+import '../services/notification_service.dart';
 import '../util/clock.dart';
 
 /// The basket lifecycle: open, extend, freeze, cancel, and everything that
@@ -90,6 +91,7 @@ class BasketEndpoint extends Endpoint {
     }
 
     await BasketService.scheduleClose(session, basket);
+    await NotificationService.basketOpened(session, basket);
     await AnalyticsService.track(
       session,
       AnalyticsType.basketOpened,

@@ -96,13 +96,13 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - ✅ **M2: real usage starts.** Keep notes in `docs/usage_log.md`
 
 ### Days 11-12: Push notifications
-- [ ] **A** `device_endpoint.dart`: register/remove FCM tokens; per-member notification preferences for the three types, checked server-side before sending (ADR-010)
-- [ ] **A** `notification_service.dart`: send via FCM HTTP v1 (service account key in `passwords.yaml`)
+- [x] **A** `device_endpoint.dart`: register/remove FCM tokens; per-member notification preferences for the three types, checked server-side before sending (ADR-010)
+- [x] **A** `notification_service.dart`: send via FCM HTTP v1 (service account key in `passwords.yaml`) — ADR-043; off until `fcmServiceAccountJson` is set
   - Basket opened → all members except shopper: "Kaan is heading to Migros. Add what you need in the next 10 min."
   - 2 minutes left → members who haven't added anything yet (`closing_soon_future_call.dart`, same idempotency rule)
   - Settlement ready → members who owe money: "You owe Kaan ₺84.50 for today's run."
-- [ ] **A** Notification text is built on the server in English; keep templates in one file so they can be localized later
-- [ ] **B** `fcm_service.dart`: permission prompt, token upload, tap → deep link to the live basket
+- [x] **A** Notification text is built on the server in English; keep templates in one file so they can be localized later
+- [ ] **B** `fcm_service.dart`: permission prompt, token upload, tap → deep link to the live basket — needs a Firebase project and the iPhone decision
 
 ### Days 13-14: Resilience
 - [x] **A** Race between two simultaneous `open` calls: the partial unique index guarantees a single basket (done early on Day 8, with the index — ADR-013)

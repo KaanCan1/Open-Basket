@@ -23,6 +23,8 @@ import 'package:open_basket_server/src/generated/future_calls.dart'
     as _i875cjzu;
 import 'package:open_basket_server/src/generated/future_calls_generated_models/close_basket_future_call_close_model.dart'
     as _irvuqfog;
+import 'package:open_basket_server/src/generated/future_calls_generated_models/closing_soon_future_call_remind_model.dart'
+    as _i9169m3k;
 import 'package:open_basket_server/src/generated/greetings/greeting.dart'
     as _igdkecg6;
 import 'package:open_basket_server/src/generated/household.dart' as _ih69xi36;
@@ -252,6 +254,8 @@ class _InternalTestEndpoints extends TestEndpoints
 
 class _FutureCalls {
   late final closeBasket = _CloseBasketFutureCall();
+
+  late final closingSoon = _ClosingSoonFutureCall();
 }
 
 class _EmailIdpEndpoint {
@@ -1906,6 +1910,25 @@ class _CloseBasketFutureCall {
         (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
     try {
       await _i875cjzu.CloseBasketCloseFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+}
+
+class _ClosingSoonFutureCall {
+  Future<void> remind(
+    _ist.TestSessionBuilder sessionBuilder,
+    int basketId,
+  ) async {
+    var object = _i9169m3k.ClosingSoonFutureCallRemindModel(basketId: basketId);
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _i875cjzu.ClosingSoonRemindFutureCall().invoke(
         _localUniqueSession,
         object,
       );

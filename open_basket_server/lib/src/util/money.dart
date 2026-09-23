@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 /// Money helpers. Everything is an `int` in minor units — kuruş, cents, or
 /// whole yen. No `double` anywhere near a price (rule 5).
 abstract final class Money {
@@ -15,6 +17,21 @@ abstract final class Money {
     if (_zeroDecimal.contains(code)) return 0;
     if (_threeDecimal.contains(code)) return 3;
     return 2;
+  }
+
+  /// `₺84.50`, `$1,204.00`, `¥1,003` — the app's `MoneyFormat.format`, so a
+  /// push and the screen it opens print the same amount the same way.
+  static String format(int minor, String currencyCode) {
+    final digits = minorUnitDigits(currencyCode);
+    var divisor = 1;
+    for (var i = 0; i < digits; i++) {
+      divisor *= 10;
+    }
+    return NumberFormat.simpleCurrency(
+      locale: 'en',
+      name: currencyCode.toUpperCase(),
+      decimalDigits: digits,
+    ).format(minor / divisor);
   }
 
   /// Splits [totalMinor] evenly across [shareCount] people, giving the whole

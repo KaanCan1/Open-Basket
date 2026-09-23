@@ -5,6 +5,7 @@ import '../generated/protocol.dart';
 import '../util/clock.dart';
 import 'analytics_service.dart';
 import 'basket_channels.dart';
+import 'notification_service.dart';
 
 /// The basket lifecycle, in one place.
 ///
@@ -30,6 +31,10 @@ abstract final class BasketService {
   /// Identifies the scheduled close so extending can cancel and replace it.
   /// One basket, one pending close.
   static String closeIdentifier(int basketId) => 'basket-close-$basketId';
+
+  /// The "2 minutes left" reminder that goes with each close (ADR-043).
+  static String closingSoonIdentifier(int basketId) =>
+      'basket-closing-soon-$basketId';
 
   /// The household's basket that is still going: `open`, or `frozen` and
   /// waiting for prices. A `settled` or `cancelled` one is history.
@@ -105,6 +110,33 @@ abstract final class BasketService {
         stackTrace: stackTrace,
       );
     }
+    await _scheduleClosingSoon(session, basket);
+  }
+
+  /// A reminder that would land at or before now — a basket of two minutes
+  /// or less — is not scheduled at all. Never throws, for the same reason as
+  /// the close; a missing reminder costs a nudge, nothing more.
+  static Future<void> _scheduleClosingSoon(
+    Session session,
+    Basket basket,
+  ) async {
+    final id = basket.id!;
+    try {
+      await session.serverpod.futureCalls.cancel(closingSoonIdentifier(id));
+      final at = basket.closesAt.subtract(NotificationService.closingSoonLead);
+      if (!at.isAfter(ServerClock.now())) return;
+      await session.serverpod.futureCalls
+          .callAtTime(at, identifier: closingSoonIdentifier(id))
+          .closingSoon
+          .remind(id);
+    } catch (e, stackTrace) {
+      session.log(
+        'could not schedule the closing-soon reminder for basket $id',
+        level: LogLevel.warning,
+        exception: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   /// Drops a pending close. Used when the shopper freezes or cancels early —
@@ -116,6 +148,9 @@ abstract final class BasketService {
   ) async {
     try {
       await session.serverpod.futureCalls.cancel(closeIdentifier(basketId));
+      await session.serverpod.futureCalls.cancel(
+        closingSoonIdentifier(basketId),
+      );
     } catch (e, stackTrace) {
       session.log(
         'could not cancel the scheduled close for basket $basketId',

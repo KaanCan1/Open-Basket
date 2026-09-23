@@ -70,6 +70,9 @@ enum BasketError implements _isc.SerializableModel {
   /// An empty or overlong name for yourself (ADR-041).
   invalidMemberName,
 
+  /// An empty or absurdly long FCM token (ADR-043).
+  invalidDeviceToken,
+
   /// The shopper of a basket that is still open or at the checkout cannot
   /// leave: nobody else could finish or settle it.
   shopperCannotLeave,
@@ -133,6 +136,8 @@ enum BasketError implements _isc.SerializableModel {
         return BasketError.invalidCurrency;
       case 'invalidMemberName':
         return BasketError.invalidMemberName;
+      case 'invalidDeviceToken':
+        return BasketError.invalidDeviceToken;
       case 'shopperCannotLeave':
         return BasketError.shopperCannotLeave;
       case 'tooManyItems':
