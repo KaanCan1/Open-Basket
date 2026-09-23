@@ -25,9 +25,9 @@ Open Basket replaces that with a **basket that is open for a few minutes and the
 by itself.**
 
 The shopper opens a basket, picks a store and a duration — "checkout in 10 minutes".
-Everyone in the household is notified and adds what they need, with a note if it matters
-("the glass bottle one"). Items appear on every phone the moment they are added. Two minutes
-before the end everyone is told, and the shopper can buy one more five-minute extension.
+Everyone in the household sees the open basket and adds what they need, with a note if it
+matters ("the glass bottle one"). Items appear on every phone the moment they are added. The
+shopper can buy one more five-minute extension, once.
 Then the list is final. At the till the shopper marks what they found and enters the
 receipt total, and the server works out who owes whom.
 

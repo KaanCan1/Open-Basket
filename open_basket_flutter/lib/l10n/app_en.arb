@@ -961,5 +961,17 @@
   "settingsYou": "YOU",
   "@settingsYou": {},
   "errorInvalidDeviceToken": "This phone couldn't sign up for notifications.",
-  "@errorInvalidDeviceToken": {}
+  "@errorInvalidDeviceToken": {},
+  "checkoutConfirmTitle": "Settle {amount}?",
+  "@checkoutConfirmTitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutConfirmNote": "Who owes what is worked out from these prices and can't be changed afterwards.",
+  "@checkoutConfirmNote": {},
+  "checkoutConfirmYes": "Settle",
+  "@checkoutConfirmYes": {}
 }

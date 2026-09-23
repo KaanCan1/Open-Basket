@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -35,7 +35,41 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _settling = false;
 
+  /// Settling is final (rule 6: a settled run is immutable), and the one
+  /// typo that matters — a price typed without its decimal point is a
+  /// hundred times too big — only shows in the total. So the total is asked
+  /// about once, in words, before anything is written.
   Future<void> _settle() async {
+    final l10n = AppLocalizations.of(context);
+    final state = ref.read(liveBasketProvider(widget.basketId));
+    final basket = state.basket;
+    if (basket == null) return;
+    final itemSum = state.items
+        .where((i) => i.status == ItemStatus.picked && i.priceMinor != null)
+        .fold<int>(0, (sum, i) => sum + i.priceMinor!);
+    final total = MoneyFormat.format(
+      basket.receiptTotalMinor ?? itemSum,
+      basket.currencyCode,
+    );
+    final go = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (final context) => CupertinoAlertDialog(
+        title: Text(l10n.checkoutConfirmTitle(total)),
+        content: Text(l10n.checkoutConfirmNote),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.itemMarkCancel),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.checkoutConfirmYes),
+          ),
+        ],
+      ),
+    );
+    if (go != true || !mounted) return;
     setState(() => _settling = true);
     try {
       await ref.read(basketControllerProvider).settle(widget.basketId);
@@ -525,11 +559,59 @@ class _MoneyField extends StatelessWidget {
     final muted = theme.textTheme.bodySmall!.color!;
     final zeroDecimal = MoneyFormat.minorUnitDigits(currency) == 0;
 
+    // A field sized for "54.50" clipped "8990.00" to "8990.0" — and a price
+    // with a digit hidden is the one thing this screen must not show. So the
+    // amount, symbol included, is measured against the room the field has
+    // and shrunk to fit, down to half size for the ten characters it takes.
+    return LayoutBuilder(
+      builder: (context, constraints) => ValueListenableBuilder(
+        valueListenable: controller,
+        builder: (context, value, _) {
+          final base = OpenBasketText.money(ink);
+          final symbol = OpenBasketText.money(muted);
+          final painter = TextPainter(
+            text: TextSpan(
+              children: [
+                TextSpan(text: MoneyFormat.symbol(currency), style: symbol),
+                TextSpan(text: value.text, style: base),
+              ],
+            ),
+            textDirection: TextDirection.ltr,
+            textScaler: MediaQuery.textScalerOf(context),
+          )..layout();
+          // Content padding either side, and a little for the cursor.
+          final room = constraints.maxWidth - 2 * _padding - 6;
+          final scale = painter.width <= room
+              ? 1.0
+              : (room / painter.width).clamp(0.5, 1.0);
+          painter.dispose();
+          final size = (base.fontSize ?? 20) * scale;
+          return _field(
+            theme,
+            ink,
+            zeroDecimal,
+            base.copyWith(fontSize: size),
+            symbol.copyWith(fontSize: size),
+          );
+        },
+      ),
+    );
+  }
+
+  static const _padding = 12.0;
+
+  Widget _field(
+    ThemeData theme,
+    Color ink,
+    bool zeroDecimal,
+    TextStyle style,
+    TextStyle symbolStyle,
+  ) {
     return TextField(
       controller: controller,
       focusNode: focusNode,
       textAlign: TextAlign.right,
-      style: OpenBasketText.money(ink),
+      style: style,
       keyboardType: TextInputType.numberWithOptions(decimal: !zeroDecimal),
       textInputAction: TextInputAction.done,
       inputFormatters: [
@@ -543,9 +625,9 @@ class _MoneyField extends StatelessWidget {
       decoration: InputDecoration(
         isDense: true,
         prefixText: MoneyFormat.symbol(currency),
-        prefixStyle: OpenBasketText.money(muted),
+        prefixStyle: symbolStyle,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
+          horizontal: _padding,
           vertical: 12,
         ),
         enabledBorder: OutlineInputBorder(

@@ -79,9 +79,10 @@ default is a local one.
 
 Said plainly so no one hunts for a screen that does not exist:
 
-- **Push notifications.** Opening a basket does not notify the household, and there is no
-  "two minutes left" reminder; people see a basket when they open the app. The per-member
-  preferences are on the data model; the sending is not built.
+- **Push notifications, on the phone.** The server side is built — who is told about a new
+  basket, the "two minutes left" reminder for whoever has not added anything, and "you owe"
+  after settling (ADR-043) — but the app does not register for notifications yet, so none
+  arrive. People see a basket when they open the app.
 - **Quantity in the add-item bar.** The endpoint takes it; the bar does not offer it yet.
 - **One open basket per household at a time.** Deliberate (rule 4), not a missing feature: a
   second *Open a basket* takes you into the one already running.
