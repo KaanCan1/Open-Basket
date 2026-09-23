@@ -119,7 +119,7 @@ What works, walked on simulators and deployed:
 - Checked on an iPhone SE-sized frame in dark mode (ADR-039). Installed on Kaan's iPhone by
   cable; the free provisioning profile expires 2026-09-29 22:05 Turkey time.
 
-Tests: 210 server, 61 Flutter, CI on every PR to `main`.
+Tests: 214 server, 68 Flutter, CI on every PR to `main`.
 
 Open:
 

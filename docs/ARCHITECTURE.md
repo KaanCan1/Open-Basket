@@ -940,3 +940,18 @@ Screens 27 and 28, and a privacy bug found while testing them.
   data watches it, so a change of account throws them all away. Verified on the simulator by
   signing out of a household member and in as a new account without restarting.
 
+## ADR-046: What is left of the design set, and one screen detail not built
+
+After screens 17-20 and 27-28 (ADR-045), every screen in the design set exists except the
+parts of 21 that need the app half of push. Recorded so the gap is a decision, not an oversight:
+
+- **Screen 21, the lock screen.** The server now words all three notifications as the design
+  does — the title says what happened, the body why ("₺84.50 of items plus ₺0.50 of the receipt
+  gap."). The "Add an item" and "Nothing for me" buttons on the basket-opened push are
+  notification actions, which live in the app's push setup; they come with Firebase.
+- **Screen 07's "Typical run from home: 12 min" is not built.** It needs to know where home is,
+  and rule 7 keeps a location on the phone, read once, only when a basket opens. At the moment a
+  store is saved its pinned location is where the person is standing — usually the store itself —
+  so any estimate there would be about nothing. The estimate the design is after is shown where
+  it matters, on the open sheet (screen 06), from wherever the shopper is at that moment.
+
