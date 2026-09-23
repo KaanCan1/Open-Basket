@@ -31,6 +31,16 @@ The only thing shared is the remaining time. Live location is never sent to the 
 **Not built:** push notifications. Opening a basket does not yet notify the house; people see it
 when they open the app (`docs/TESTING.md` lists what is missing).
 
+## Screenshots
+
+| A basket is open | Everyone adds | At the till | Who owes whom |
+|---|---|---|---|
+| <img src="docs/screenshots/01-a-basket-is-open.png" width="200"> | <img src="docs/screenshots/03-the-live-basket.png" width="200"> | <img src="docs/screenshots/04-at-the-till.png" width="200"> | <img src="docs/screenshots/05-who-owes-whom.png" width="200"> |
+
+Two test accounts on the iOS simulator, one run end to end. The rest — opening a basket with a
+suggested time, the house afterwards, one run in history — are in
+[`docs/screenshots`](docs/screenshots).
+
 ## Where Serverpod does the work
 
 | Serverpod feature | What it does here | Why it had to be the server |

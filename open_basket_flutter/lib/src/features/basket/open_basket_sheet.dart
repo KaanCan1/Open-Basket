@@ -40,6 +40,11 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
   int _minutes = 10;
   bool _custom = false;
   final _customMinutes = TextEditingController();
+
+  /// Focused only when the shopper taps *Custom*. An estimate that lands on a
+  /// custom number fills the field too, and a keyboard jumping up over the
+  /// open button because a store was tapped is the wrong answer.
+  final _customFocus = FocusNode();
   bool _busy = false;
   String? _error;
 
@@ -103,6 +108,7 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
   @override
   void dispose() {
     _customMinutes.dispose();
+    _customFocus.dispose();
     super.dispose();
   }
 
@@ -224,7 +230,12 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
               _Pick(
                 label: l10n.openSheetCustom,
                 selected: _custom,
-                onTap: () => setState(() => _custom = true),
+                onTap: () {
+                  setState(() => _custom = true);
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => _customFocus.requestFocus(),
+                  );
+                },
               ),
             ],
           ),
@@ -232,7 +243,7 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
             const SizedBox(height: 16),
             TextField(
               controller: _customMinutes,
-              autofocus: true,
+              focusNode: _customFocus,
               keyboardType: TextInputType.number,
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(hintText: '30'),
