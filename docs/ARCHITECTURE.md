@@ -894,3 +894,21 @@ To switch it on in production: create a Firebase project, add the Android and iO
 `serverpod cloud password set fcmServiceAccountJson --from-file <key.json> -p open-basket` and
 redeploy. The key file never goes into the repository.
 
+## ADR-044: Settling asks once, and no amount is ever cut off
+
+Both found on the simulator on Day 28.
+
+- **Settling asks first.** "Work out who owes what" wrote the settlement at once, and a settled
+  run is immutable (rule 6). The typo that matters is a price typed without its decimal point —
+  on a Turkish phone the decimal key is a comma, and "8990" for ₺89.90 is ₺8,990.00 — and it
+  only shows in the total. So the button now asks "Settle ₺8,990.00?" and says it cannot be
+  changed afterwards. One extra tap, once per run, in front of the only step there is no undo
+  for.
+- **Amounts shrink to fit their field.** The item price field is 104pt wide; "8990.00" showed as
+  "8990.0", and at six characters the ₺ sat on top of the first digit. The field now measures the
+  symbol and the amount together against the room it has and scales both down, to half size at
+  most, which fits the ten characters it accepts. A hidden digit on a price is worse than small
+  type.
+- Push claims in `SUBMISSION.md`, `README.md` and `TESTING.md` now say what is true: the server
+  sends (ADR-043), the app does not register yet, so nothing reaches a phone.
+

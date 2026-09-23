@@ -1731,6 +1731,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This phone couldn\'t sign up for notifications.'**
   String get errorInvalidDeviceToken;
+
+  /// No description provided for @checkoutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settle {amount}?'**
+  String checkoutConfirmTitle(String amount);
+
+  /// No description provided for @checkoutConfirmNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Who owes what is worked out from these prices and can\'t be changed afterwards.'**
+  String get checkoutConfirmNote;
+
+  /// No description provided for @checkoutConfirmYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Settle'**
+  String get checkoutConfirmYes;
 }
 
 class _AppLocalizationsDelegate

@@ -28,8 +28,9 @@ remembers who owes whom for what.
 
 The only thing shared is the remaining time. Live location is never sent to the server.
 
-**Not built:** push notifications. Opening a basket does not yet notify the house; people see it
-when they open the app (`docs/TESTING.md` lists what is missing).
+**Not finished:** push notifications. The server decides who is told what and sends it through
+FCM (ADR-043), but the app does not register for pushes yet, so nothing reaches a phone; people
+see an open basket when they open the app (`docs/TESTING.md` lists what is missing).
 
 ## Screenshots
 

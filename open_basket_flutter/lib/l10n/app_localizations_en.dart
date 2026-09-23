@@ -1058,4 +1058,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorInvalidDeviceToken =>
       'This phone couldn\'t sign up for notifications.';
+
+  @override
+  String checkoutConfirmTitle(String amount) {
+    return 'Settle $amount?';
+  }
+
+  @override
+  String get checkoutConfirmNote =>
+      'Who owes what is worked out from these prices and can\'t be changed afterwards.';
+
+  @override
+  String get checkoutConfirmYes => 'Settle';
 }
