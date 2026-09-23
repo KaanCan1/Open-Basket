@@ -48,7 +48,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get codeEntryContinue => 'Continue';
 
   @override
-  String get codeEntryResendIn => 'Resend in';
+  String codeEntryResendIn(String time) {
+    return 'Resend in $time';
+  }
 
   @override
   String get codeEntryResend => 'Send a new code';
@@ -279,7 +281,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketEmptyNote =>
-      'Type what you need. Everyone else sees it as you type it.';
+      'Type what you need. Everyone sees it the moment you add it.';
 
   @override
   String get liveBasketExtend => 'Extend once';
@@ -428,9 +430,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkoutNotAPrice => 'That doesn\'t look like a price.';
-
-  @override
-  String get checkoutDidNotSave => 'That didn\'t save. Try again.';
 
   @override
   String get settlementBadge => 'SETTLED';
@@ -765,6 +764,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String historyDayAndTime(String day, String time) {
+    return '$day, $time';
+  }
+
+  @override
   String historyYesterday(String time) {
     return 'Yesterday, $time';
   }
@@ -970,4 +974,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketTooMany => 'That\'s a lot at once. Give it a moment.';
+
+  @override
+  String get errorNotAMember => 'You\'re not in this household any more.';
+
+  @override
+  String get errorNotTheShopper => 'Only the shopper can do that.';
+
+  @override
+  String get errorBasketNotFound => 'That basket is gone.';
+
+  @override
+  String get errorInvalidDuration => 'Pick between 1 and 120 minutes.';
+
+  @override
+  String get errorItemNotFound => 'That item was just removed.';
+
+  @override
+  String get errorNotYourItem =>
+      'Only the person who asked for it can change it.';
+
+  @override
+  String get errorInvalidItem =>
+      'Give the item a name, and a quantity from 1 to 99.';
+
+  @override
+  String get errorStoreNotFound => 'That store was just removed.';
+
+  @override
+  String get errorInvalidStore => 'Store names are 1 to 60 characters.';
+
+  @override
+  String get errorInvalidHouseholdName =>
+      'Household names are 1 to 60 characters.';
+
+  @override
+  String get errorInvalidCurrency => 'That currency isn\'t one we support yet.';
+
+  @override
+  String get errorBasketNotFrozen =>
+      'Prices go in once the basket is at checkout.';
+
+  @override
+  String get errorAlreadySettled => 'This basket is already settled.';
+
+  @override
+  String get errorNotFullyPriced =>
+      'Mark every item first: got it, with a price, or not available.';
+
+  @override
+  String get errorExtensionUsed =>
+      'You\'ve already added five minutes to this basket.';
+
+  @override
+  String get checkoutEmpty => 'Nobody added anything this time.';
+
+  @override
+  String get checkoutEmptyNote =>
+      'Settle to close the run. If you enter a receipt total, it\'s split evenly across the household.';
+
+  @override
+  String get liveBasketNoItems => 'No items';
+
+  @override
+  String get liveBasketEmptyClosed => 'Nobody added anything.';
 }

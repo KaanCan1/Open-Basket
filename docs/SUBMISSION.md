@@ -126,7 +126,7 @@ Source: https://github.com/KaanCan1/Open-Basket
 - [ ] GitHub repository description filled in (currently empty).
 - [ ] Project description above updated to match what actually shipped.
 - [ ] **Most Valuable Feedback submission** ($500 cash + $500 credits, one per entrant),
-      through the feedback form on BuilderBase. Seven findings so far, all hit in this
+      through the feedback form on BuilderBase. Nine findings so far, all hit in this
       build and all reproducible:
       1. `serverpod_test` 4.0.0 starts the embedded postmaster twice per test group and
          the second attempt cannot attach, because `embedded_postgres_resolver.dart`
@@ -158,5 +158,19 @@ Source: https://github.com/KaanCan1/Open-Basket
          Production only warns. It took a verbose run and reading `serverpod.dart` to
          find; a one-line "refusing to start because…" would have saved an afternoon
          (ADR-037).
+      8. On Serverpod Cloud, `jwtRefresh.refreshAccessToken` takes 3.0–4.5 s every time
+         (production session log, `slow=true`, 11 of 11 calls) and `verifySignInCode`
+         about 1.6 s. Each refresh runs two Argon2id hashes in pure Dart; the same
+         `Argon2HashUtil` takes about 30 ms per hash on a laptop, so the container's CPU
+         is doing the damage. `JwtConfig` offers no way to tune it — `Jwt` builds its
+         `Argon2HashUtil` without `parameters` — and the client makes the next call wait
+         for the refresh, so with the default ten-minute access token a shopping run
+         stalls for seconds halfway through. We lengthened the access token instead
+         (ADR-039).
+      9. When a client goes away with a stream open — a phone locking its screen —
+         Serverpod logs `WebSocketConnectionClosed` at **ERROR** with a nine-frame stack
+         trace, from trying to send the close-stream message over the socket that just
+         closed. Five in one evening of normal use; in `serverpod cloud log` they bury
+         the errors that matter.
 - [ ] A public post about the project, tagging Serverpod, during the event period
       (Best Hackathon Post, $500 in credits).

@@ -25,6 +25,11 @@ abstract final class OpenBasketColors {
   /// 6.8:1 on ink.
   static const metaDark = Color(0xFF9A9A94);
 
+  /// Destructive text ("Leave household"). 6.1:1 on paper; the same red on
+  /// ink was 3.4:1, so dark mode gets its own (8.3:1).
+  static const danger = Color(0xFFB3261E);
+  static const dangerDark = Color(0xFFFF8A80);
+
   /// Frosted layers float over content: the add-item bar, the checkout bar,
   /// bottom sheets, lock-screen notifications. Anything you read a number off
   /// stays on a solid surface, so no ratio depends on what happens to be
@@ -135,7 +140,7 @@ ThemeData buildOpenBasketTheme(Brightness brightness) {
       surfaceContainerHighest: isDark
           ? const Color(0xFF1C1C1A)
           : OpenBasketColors.tonal,
-      error: const Color(0xFFB3261E),
+      error: isDark ? OpenBasketColors.dangerDark : OpenBasketColors.danger,
       onError: OpenBasketColors.paper,
     ),
     textTheme: TextTheme(

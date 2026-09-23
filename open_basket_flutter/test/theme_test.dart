@@ -121,6 +121,13 @@ void main() {
         expect(_contrast(foreground, ground), greaterThanOrEqualTo(4.5));
       });
 
+      test('destructive text is readable on $name paper', () {
+        expect(
+          _contrast(theme.colorScheme.error, ground),
+          greaterThanOrEqualTo(4.5),
+        );
+      });
+
       test('the text button is readable on $name paper', () {
         final foreground = theme.textButtonTheme.style!.foregroundColor!
             .resolve({})!;

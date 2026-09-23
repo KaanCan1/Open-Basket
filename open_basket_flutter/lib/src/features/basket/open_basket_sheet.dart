@@ -10,6 +10,7 @@ import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../stores/stores_controller.dart';
 import 'basket_controller.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 06, as a sheet. How long the run is booked for.
 ///
@@ -135,14 +136,7 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
         }
       }
       setState(() {
-        _error = switch (error.error) {
-          BasketError.householdAlreadyHasOpenBasket =>
-            l10n.openSheetAlreadyOpen,
-          // The server's own wording for a duration outside its range is
-          // already the sentence a person needs, and it names the bounds.
-          BasketError.invalidDuration => error.message,
-          _ => l10n.commonSomethingWentWrong,
-        };
+        _error = failureMessage(l10n, error);
       });
     } catch (_) {
       if (!mounted) return;

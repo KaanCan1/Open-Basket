@@ -193,8 +193,9 @@ class _CodeEntryScreenState extends ConsumerState<CodeEntryScreen> {
                     child: Text(
                       canResend
                           ? l10n.codeEntryResend
-                          : '${l10n.codeEntryResendIn} '
-                                '0:${_secondsLeft.toString().padLeft(2, '0')}',
+                          : l10n.codeEntryResendIn(
+                              '0:${_secondsLeft.toString().padLeft(2, '0')}',
+                            ),
                       style: OpenBasketText.meta(
                         canResend ? theme.colorScheme.onSurface : muted,
                       ),

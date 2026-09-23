@@ -169,8 +169,8 @@ abstract class AppLocalizations {
   /// No description provided for @codeEntryResendIn.
   ///
   /// In en, this message translates to:
-  /// **'Resend in'**
-  String get codeEntryResendIn;
+  /// **'Resend in {time}'**
+  String codeEntryResendIn(String time);
 
   /// No description provided for @codeEntryResend.
   ///
@@ -559,7 +559,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketEmptyNote.
   ///
   /// In en, this message translates to:
-  /// **'Type what you need. Everyone else sees it as you type it.'**
+  /// **'Type what you need. Everyone sees it the moment you add it.'**
   String get liveBasketEmptyNote;
 
   /// No description provided for @liveBasketExtend.
@@ -777,12 +777,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That doesn\'t look like a price.'**
   String get checkoutNotAPrice;
-
-  /// No description provided for @checkoutDidNotSave.
-  ///
-  /// In en, this message translates to:
-  /// **'That didn\'t save. Try again.'**
-  String get checkoutDidNotSave;
 
   /// No description provided for @settlementBadge.
   ///
@@ -1240,6 +1234,12 @@ abstract class AppLocalizations {
   /// **'Today, {time}'**
   String historyToday(String time);
 
+  /// A weekday or a short date, then a time: "Sunday, 11:04", "3 Sep, 18:40".
+  ///
+  /// In en, this message translates to:
+  /// **'{day}, {time}'**
+  String historyDayAndTime(String day, String time);
+
   /// No description provided for @historyYesterday.
   ///
   /// In en, this message translates to:
@@ -1581,6 +1581,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That\'s a lot at once. Give it a moment.'**
   String get liveBasketTooMany;
+
+  /// No description provided for @errorNotAMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not in this household any more.'**
+  String get errorNotAMember;
+
+  /// No description provided for @errorNotTheShopper.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the shopper can do that.'**
+  String get errorNotTheShopper;
+
+  /// No description provided for @errorBasketNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That basket is gone.'**
+  String get errorBasketNotFound;
+
+  /// No description provided for @errorInvalidDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick between 1 and 120 minutes.'**
+  String get errorInvalidDuration;
+
+  /// No description provided for @errorItemNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That item was just removed.'**
+  String get errorItemNotFound;
+
+  /// No description provided for @errorNotYourItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the person who asked for it can change it.'**
+  String get errorNotYourItem;
+
+  /// No description provided for @errorInvalidItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the item a name, and a quantity from 1 to 99.'**
+  String get errorInvalidItem;
+
+  /// No description provided for @errorStoreNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That store was just removed.'**
+  String get errorStoreNotFound;
+
+  /// No description provided for @errorInvalidStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Store names are 1 to 60 characters.'**
+  String get errorInvalidStore;
+
+  /// No description provided for @errorInvalidHouseholdName.
+  ///
+  /// In en, this message translates to:
+  /// **'Household names are 1 to 60 characters.'**
+  String get errorInvalidHouseholdName;
+
+  /// No description provided for @errorInvalidCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'That currency isn\'t one we support yet.'**
+  String get errorInvalidCurrency;
+
+  /// No description provided for @errorBasketNotFrozen.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices go in once the basket is at checkout.'**
+  String get errorBasketNotFrozen;
+
+  /// No description provided for @errorAlreadySettled.
+  ///
+  /// In en, this message translates to:
+  /// **'This basket is already settled.'**
+  String get errorAlreadySettled;
+
+  /// No description provided for @errorNotFullyPriced.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark every item first: got it, with a price, or not available.'**
+  String get errorNotFullyPriced;
+
+  /// No description provided for @errorExtensionUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already added five minutes to this basket.'**
+  String get errorExtensionUsed;
+
+  /// No description provided for @checkoutEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody added anything this time.'**
+  String get checkoutEmpty;
+
+  /// No description provided for @checkoutEmptyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Settle to close the run. If you enter a receipt total, it\'s split evenly across the household.'**
+  String get checkoutEmptyNote;
+
+  /// No description provided for @liveBasketNoItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No items'**
+  String get liveBasketNoItems;
+
+  /// No description provided for @liveBasketEmptyClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody added anything.'**
+  String get liveBasketEmptyClosed;
 }
 
 class _AppLocalizationsDelegate

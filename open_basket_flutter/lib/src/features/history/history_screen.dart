@@ -77,8 +77,10 @@ String describeWhen(AppLocalizations l10n, DateTime when, DateTime now) {
   final daysAgo = today.difference(day).inDays;
   if (daysAgo == 0) return l10n.historyToday(time);
   if (daysAgo == 1) return l10n.historyYesterday(time);
-  if (daysAgo < 7) return '${DateFormat.EEEE().format(local)}, $time';
-  return '${DateFormat.MMMd().format(local)}, $time';
+  final label = daysAgo < 7
+      ? DateFormat.EEEE().format(local)
+      : DateFormat.MMMd().format(local);
+  return l10n.historyDayAndTime(label, time);
 }
 
 class _RunRow extends ConsumerWidget {

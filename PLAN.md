@@ -151,7 +151,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 ## Week 4 (Days 22-29): Polish, report, submission
 
 ### Days 22-23: UX polish
-- [ ] **B** Empty states, loading skeletons, clear English error messages (all from ARB)
+- [x] **A for B** Empty states, loading skeletons, clear English error messages (all from ARB) — every `BasketError` worded; skeletons skipped (ADR-039)
 - [x] **A for B** Small animation when an item lands on another device, haptic in the last minute
 - [x] **A for B** Suggestion chips from the household's frequent items (simple server query) — per member: "You usually ask for"
 - [x] **A for B** `settings_screen.dart` and `currency_screen.dart` (screens 19-20), including sign out and leave household. Leaving no longer deletes history (ADR-036); notification switches wait for push
@@ -159,9 +159,9 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [x] **A** Rate limiting (item spam), input validation (name length, quantity range) — 12 a minute and 40 per run per member
 
 ### Days 24-25: Testing and code freeze
-- [ ] **A** All integration tests green, scan production logs for errors
-- [ ] **B** Small screens and dark mode check, at least one iOS run if possible
-- [ ] **B** Grep for hardcoded strings: `grep -rn "Text('" lib/` should return nothing user-facing
+- [x] **A** All integration tests green, scan production logs for errors — slow token refresh, see ADR-039
+- [x] **A for B** Small screens and dark mode check, at least one iOS run if possible — SE-sized frame, dark; iPhone install on Day 10
+- [x] **A for B** Grep for hardcoded strings: `grep -rn "Text('" lib/` should return nothing user-facing
 - ✅ **M5: no new features after Day 25**
 
 ### Day 26: Report data

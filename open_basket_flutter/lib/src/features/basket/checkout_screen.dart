@@ -13,6 +13,7 @@ import '../../core/theme.dart';
 import '../household/household_controller.dart';
 import 'basket_controller.dart';
 import 'live_basket_controller.dart';
+import '../../core/failure_message.dart';
 
 /// Screen 14. The shopper at the till: a price for everything they got, "not
 /// available" for everything they did not, the receipt total, and the button
@@ -40,9 +41,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       await ref.read(basketControllerProvider).settle(widget.basketId);
       if (!mounted) return;
       context.pushReplacement('${Routes.basket}/${widget.basketId}/settlement');
-    } on Exception {
+    } on Exception catch (e) {
       if (!mounted) return;
-      _say(AppLocalizations.of(context).checkoutDidNotSave);
+      _say(failureMessage(AppLocalizations.of(context), e));
     } finally {
       if (mounted) setState(() => _settling = false);
     }
@@ -106,7 +107,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               children: [
                 _LockedCard(basket: basket, itemCount: items.length),
                 const SizedBox(height: 12),
-                Text(l10n.checkoutHint, style: theme.textTheme.bodySmall),
+                if (items.isEmpty) ...[
+                  Text(l10n.checkoutEmpty, style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.checkoutEmptyNote,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ] else
+                  Text(l10n.checkoutHint, style: theme.textTheme.bodySmall),
                 const SizedBox(height: 8),
                 for (final entry in groups.entries) ...[
                   _PersonHeader(
@@ -389,9 +398,9 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
       await ref
           .read(basketControllerProvider)
           .markItem(widget.item.id!, status, priceMinor: priceMinor);
-    } on Exception {
+    } on Exception catch (e) {
       if (!mounted) return;
-      widget.onError(AppLocalizations.of(context).checkoutDidNotSave);
+      widget.onError(failureMessage(AppLocalizations.of(context), e));
       _text.text = _saved;
     }
   }
@@ -632,9 +641,9 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
       await ref
           .read(basketControllerProvider)
           .setReceiptTotal(widget.basket.id!, minor);
-    } on Exception {
+    } on Exception catch (e) {
       if (!mounted) return;
-      widget.onError(l10n.checkoutDidNotSave);
+      widget.onError(failureMessage(l10n, e));
       _text.text = _saved;
     }
   }
