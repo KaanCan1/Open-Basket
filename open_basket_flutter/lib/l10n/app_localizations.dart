@@ -1695,6 +1695,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nobody added anything.'**
   String get liveBasketEmptyClosed;
+
+  /// No description provided for @settingsYourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get settingsYourName;
+
+  /// No description provided for @settingsYourNameNote.
+  ///
+  /// In en, this message translates to:
+  /// **'What the house sees on your items and in who owes whom.'**
+  String get settingsYourNameNote;
+
+  /// No description provided for @settingsYourNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What should the house call you?'**
+  String get settingsYourNameTitle;
+
+  /// No description provided for @errorInvalidMemberName.
+  ///
+  /// In en, this message translates to:
+  /// **'Names are 1 to 40 characters.'**
+  String get errorInvalidMemberName;
+
+  /// No description provided for @settingsYou.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU'**
+  String get settingsYou;
 }
 
 class _AppLocalizationsDelegate

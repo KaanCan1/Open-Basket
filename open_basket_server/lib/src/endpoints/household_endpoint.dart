@@ -6,6 +6,7 @@ import '../services/analytics_service.dart';
 import '../services/authz.dart';
 import '../services/basket_service.dart';
 import '../util/clock.dart';
+import '../util/display_name.dart';
 import '../util/household_code.dart';
 import '../util/money.dart';
 
@@ -194,6 +195,25 @@ class HouseholdEndpoint extends Endpoint {
     );
   }
 
+  /// Any member. What the house calls you: on your items, and in "Ayşe owes
+  /// Kaan". Until this is called it is a guess from your email (ADR-041).
+  /// Applies everywhere at once, past runs included — a settlement stores
+  /// member ids, not names.
+  Future<HouseholdMember> setMyName(Session session, String name) async {
+    final member = await Authz.requireMember(session);
+    final cleaned = DisplayName.clean(name);
+    if (cleaned == null) {
+      throw OpenBasketException(
+        error: BasketError.invalidMemberName,
+        message: 'Names are 1 to ${DisplayName.maxLength} characters.',
+      );
+    }
+    return HouseholdMember.db.updateRow(
+      session,
+      member.copyWith(displayName: cleaned),
+    );
+  }
+
   /// How many minor units make one major unit for the household's currency —
   /// 2 for lira, 0 for yen. The client needs it to format and to show the
   /// receipt gap in the right granularity.
@@ -330,12 +350,10 @@ class HouseholdEndpoint extends Endpoint {
     final profile = await AuthServices.instance.userProfiles
         .maybeFindUserProfileByUserId(session, Authz.userId(session));
     final named = profile?.fullName ?? profile?.userName;
-    if (named != null && named.trim().isNotEmpty) return named.trim();
-
-    final email = profile?.email;
-    if (email != null && email.contains('@')) {
-      return email.substring(0, email.indexOf('@'));
+    if (named != null) {
+      final cleaned = DisplayName.clean(named);
+      if (cleaned != null) return cleaned;
     }
-    return 'Member';
+    return DisplayName.fromEmail(profile?.email);
   }
 }

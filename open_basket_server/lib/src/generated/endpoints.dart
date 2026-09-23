@@ -825,6 +825,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['currencyCode'],
                   ),
         ),
+        'setMyName': _is.MethodConnector(
+          name: 'setMyName',
+          params: {
+            'name': _is.ParameterDescription(
+              name: 'name',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['household'] as _izqmqbob.HouseholdEndpoint)
+                  .setMyName(
+                    session,
+                    params['name'],
+                  ),
+        ),
         'currencyMinorUnitDigits': _is.MethodConnector(
           name: 'currencyMinorUnitDigits',
           params: {},

@@ -949,5 +949,15 @@
   "liveBasketNoItems": "No items",
   "@liveBasketNoItems": {},
   "liveBasketEmptyClosed": "Nobody added anything.",
-  "@liveBasketEmptyClosed": {}
+  "@liveBasketEmptyClosed": {},
+  "settingsYourName": "Your name",
+  "@settingsYourName": {},
+  "settingsYourNameNote": "What the house sees on your items and in who owes whom.",
+  "@settingsYourNameNote": {},
+  "settingsYourNameTitle": "What should the house call you?",
+  "@settingsYourNameTitle": {},
+  "errorInvalidMemberName": "Names are 1 to 40 characters.",
+  "@errorInvalidMemberName": {},
+  "settingsYou": "YOU",
+  "@settingsYou": {}
 }

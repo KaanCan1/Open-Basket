@@ -36,6 +36,7 @@ String errorMessage(AppLocalizations l10n, BasketError error) =>
       BasketError.invalidStore => l10n.errorInvalidStore,
       BasketError.invalidHouseholdName => l10n.errorInvalidHouseholdName,
       BasketError.invalidCurrency => l10n.errorInvalidCurrency,
+      BasketError.invalidMemberName => l10n.errorInvalidMemberName,
       BasketError.shopperCannotLeave => l10n.settingsShopperCannotLeave,
       BasketError.tooManyItems => l10n.liveBasketTooMany,
       BasketError.basketNotOpen => l10n.liveBasketClosedTitle,

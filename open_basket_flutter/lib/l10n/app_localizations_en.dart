@@ -1038,4 +1038,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketEmptyClosed => 'Nobody added anything.';
+
+  @override
+  String get settingsYourName => 'Your name';
+
+  @override
+  String get settingsYourNameNote =>
+      'What the house sees on your items and in who owes whom.';
+
+  @override
+  String get settingsYourNameTitle => 'What should the house call you?';
+
+  @override
+  String get errorInvalidMemberName => 'Names are 1 to 40 characters.';
+
+  @override
+  String get settingsYou => 'YOU';
 }

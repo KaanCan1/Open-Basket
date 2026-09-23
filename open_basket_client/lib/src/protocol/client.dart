@@ -629,6 +629,17 @@ class EndpointHousehold extends _isc.EndpointRef {
         {'currencyCode': currencyCode},
       );
 
+  /// Any member. What the house calls you: on your items, and in "Ayşe owes
+  /// Kaan". Until this is called it is a guess from your email (ADR-041).
+  /// Applies everywhere at once, past runs included — a settlement stores
+  /// member ids, not names.
+  _ida.Future<_i5id5rp2.HouseholdMember> setMyName(String name) =>
+      caller.callServerEndpoint<_i5id5rp2.HouseholdMember>(
+        'household',
+        'setMyName',
+        {'name': name},
+      );
+
   /// How many minor units make one major unit for the household's currency —
   /// 2 for lira, 0 for yen. The client needs it to format and to show the
   /// receipt gap in the right granularity.
@@ -775,9 +786,12 @@ class EndpointSignIn extends _isc.EndpointRef {
   );
 }
 
-/// Numbers for the Day 26 report, read out of `analytics_event`. Everything
-/// here depends on events having been written since Day 2 — a metric added
-/// later is data already lost.
+/// Numbers for the Day 26 report (ADR-040).
+///
+/// Only ever the caller's own household. Every household's numbers together
+/// are an operator's question, answered by `scripts/report.sql` against the
+/// database — not by an endpoint any signed-in account, a judge's included,
+/// could call to count how many houses use the app and how they shop.
 /// {@category Endpoint}
 class EndpointStats extends _isc.EndpointRef {
   EndpointStats(_isc.EndpointCaller caller) : super(caller);
@@ -788,10 +802,10 @@ class EndpointStats extends _isc.EndpointRef {
   /// Baskets opened, items per basket, how runs ended (auto-closed, frozen by
   /// hand, cancelled, settled), average chosen duration, extension rate,
   /// median time from open to first item, and the share of members who added
-  /// at least one item — the headline metric, "shared attention".
+  /// at least one item — the headline metric, "shared attention". The field
+  /// meanings are on [StatsService.headlineSql].
   ///
-  /// Returns JSON so the report script can grow new metrics without a model
-  /// change.
+  /// Returns JSON so the report can grow new metrics without a model change.
   _ida.Future<String> report() => caller.callServerEndpoint<String>(
     'stats',
     'report',
