@@ -175,7 +175,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
 - [ ] **A** Write results as tables in `docs/REPORT.md`, with an honest "what didn't work" section
 
 ### Day 27: Demo
-- [ ] **B** `docs/DEMO_SCRIPT.md`: two phones side by side, basket opens → notification → item lands instantly → app is force-killed → basket still closes on time → checkout → settlement
+- [x] **A for B** `docs/DEMO_SCRIPT.md` (without the notification beat until push exists): two phones side by side, basket opens → notification → item lands instantly → app is force-killed → basket still closes on time → checkout → settlement
 - [ ] **B** Record and edit a 2-3 minute video (English narration or captions)
 
 ### Day 28: Documentation
