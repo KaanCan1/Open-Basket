@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,6 +36,10 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
   bool _sending = false;
   String? _error;
 
+  /// How many of the typed item (screen 09's box beside the name). Back to
+  /// one after every add: the next thing is rarely ten of something too.
+  int _quantity = 1;
+
   @override
   void dispose() {
     _name.dispose();
@@ -56,11 +61,16 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
       final note = suggested == null ? _note.text.trim() : '';
       await ref
           .read(liveBasketProvider(widget.basketId).notifier)
-          .add(name, note: note.isEmpty ? null : note);
+          .add(
+            name,
+            note: note.isEmpty ? null : note,
+            quantity: suggested == null && _quantity > 1 ? _quantity : null,
+          );
       if (!mounted) return;
       if (suggested != null) return;
       _name.clear();
       _note.clear();
+      setState(() => _quantity = 1);
       // Keep the keyboard up: a shopping list is typed in bursts, and making
       // someone tap back into the field between "milk" and "eggs" is the
       // difference between adding three things and adding one.
@@ -93,6 +103,46 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
   }
 
   void _dismissKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
+
+  /// An iOS wheel, 1 to 99 — the server's range.
+  Future<void> _pickQuantity() async {
+    final l10n = AppLocalizations.of(context);
+    var picked = _quantity;
+    await showCupertinoModalPopup<void>(
+      context: context,
+      builder: (final context) => Container(
+        height: 280,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: CupertinoButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.liveBasketQuantityDone),
+                ),
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  itemExtent: 36,
+                  scrollController: FixedExtentScrollController(
+                    initialItem: _quantity - 1,
+                  ),
+                  onSelectedItemChanged: (index) => picked = index + 1,
+                  children: [
+                    for (var n = 1; n <= 99; n++) Center(child: Text('×$n')),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (mounted) setState(() => _quantity = picked);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +261,35 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
+                  Semantics(
+                    button: true,
+                    label: l10n.liveBasketQuantityLabel(_quantity),
+                    child: GestureDetector(
+                      onTap: _pickQuantity,
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _quantity > 1
+                                ? theme.textTheme.bodyLarge!.color!
+                                : theme.dividerColor,
+                          ),
+                        ),
+                        child: Text(
+                          '×$_quantity',
+                          style: OpenBasketText.money(
+                            theme.textTheme.bodyLarge!.color!,
+                          ).copyWith(fontSize: 15),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   SizedBox(
                     width: 84,
                     child: FilledButton(

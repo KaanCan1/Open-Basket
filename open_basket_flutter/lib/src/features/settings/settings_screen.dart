@@ -344,7 +344,11 @@ class _Switch extends StatelessWidget {
           Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
           CupertinoSwitch(
             value: value,
-            activeTrackColor: theme.textTheme.bodyLarge!.color,
+            // Ink on paper; in the dark, Signal — a white thumb on the light
+            // ink colour read as neither on nor off.
+            activeTrackColor: theme.brightness == Brightness.dark
+                ? OpenBasketColors.signal
+                : OpenBasketColors.ink,
             onChanged: onChanged,
           ),
         ],

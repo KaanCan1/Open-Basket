@@ -30,7 +30,6 @@ import 'basket_event_type.dart' as _i1f6eto5;
 import 'basket_item.dart' as _iqfe96ip;
 import 'basket_status.dart' as _iumwz8so;
 import 'device_token.dart' as _ilggw95u;
-import 'greetings/greeting.dart' as _izw8z7ou;
 import 'household.dart' as _ijonbu5t;
 import 'household_member.dart' as _iv10erpj;
 import 'item_status.dart' as _ibbyonnn;
@@ -49,7 +48,6 @@ export 'basket_event_type.dart';
 export 'basket_item.dart';
 export 'basket_status.dart';
 export 'device_token.dart';
-export 'greetings/greeting.dart';
 export 'household.dart';
 export 'household_member.dart';
 export 'item_status.dart';
@@ -120,9 +118,6 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ilggw95u.DeviceToken) {
       return _ilggw95u.DeviceToken.fromJson(data) as T;
     }
-    if (t == _izw8z7ou.Greeting) {
-      return _izw8z7ou.Greeting.fromJson(data) as T;
-    }
     if (t == _ijonbu5t.Household) {
       return _ijonbu5t.Household.fromJson(data) as T;
     }
@@ -178,9 +173,6 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ilggw95u.DeviceToken?>()) {
       return (data != null ? _ilggw95u.DeviceToken.fromJson(data) : null) as T;
-    }
-    if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
-      return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_ijonbu5t.Household?>()) {
       return (data != null ? _ijonbu5t.Household.fromJson(data) : null) as T;
@@ -287,7 +279,6 @@ class Protocol extends _isc.SerializationManager {
       _iqfe96ip.BasketItem => 'BasketItem',
       _iumwz8so.BasketStatus => 'BasketStatus',
       _ilggw95u.DeviceToken => 'DeviceToken',
-      _izw8z7ou.Greeting => 'Greeting',
       _ijonbu5t.Household => 'Household',
       _iv10erpj.HouseholdMember => 'HouseholdMember',
       _ibbyonnn.ItemStatus => 'ItemStatus',
@@ -328,8 +319,6 @@ class Protocol extends _isc.SerializationManager {
         return 'BasketStatus';
       case _ilggw95u.DeviceToken():
         return 'DeviceToken';
-      case _izw8z7ou.Greeting():
-        return 'Greeting';
       case _ijonbu5t.Household():
         return 'Household';
       case _iv10erpj.HouseholdMember():
@@ -395,9 +384,6 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'DeviceToken') {
       return deserialize<_ilggw95u.DeviceToken>(data['data']);
-    }
-    if (dataClassName == 'Greeting') {
-      return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
     if (dataClassName == 'Household') {
       return deserialize<_ijonbu5t.Household>(data['data']);

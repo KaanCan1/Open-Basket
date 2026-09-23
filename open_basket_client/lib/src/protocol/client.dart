@@ -16,8 +16,6 @@ import 'package:open_basket_client/src/protocol/basket.dart' as _ifmsley9;
 import 'package:open_basket_client/src/protocol/basket_event.dart' as _ivynb499;
 import 'package:open_basket_client/src/protocol/basket_item.dart' as _iuuhmcji;
 import 'package:open_basket_client/src/protocol/device_token.dart' as _i06kh2mj;
-import 'package:open_basket_client/src/protocol/greetings/greeting.dart'
-    as _i7bh5n7n;
 import 'package:open_basket_client/src/protocol/household.dart' as _iig1c7mf;
 import 'package:open_basket_client/src/protocol/household_member.dart'
     as _i5id5rp2;
@@ -869,24 +867,6 @@ class EndpointStore extends _isc.EndpointRef {
   );
 }
 
-/// This is an example endpoint that returns a greeting message through
-/// its [hello] method.
-/// {@category Endpoint}
-class EndpointGreeting extends _isc.EndpointRef {
-  EndpointGreeting(_isc.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'greeting';
-
-  /// Returns a personalized greeting message: "Hello {name}".
-  _ida.Future<_i7bh5n7n.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i7bh5n7n.Greeting>(
-        'greeting',
-        'hello',
-        {'name': name},
-      );
-}
-
 class Modules {
   Modules(Client client) {
     serverpod_auth_core = _iacc.Caller(client);
@@ -936,7 +916,6 @@ class Client extends _isc.ServerpodClientShared {
     signIn = EndpointSignIn(this);
     stats = EndpointStats(this);
     store = EndpointStore(this);
-    greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
 
@@ -962,8 +941,6 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointStore store;
 
-  late final EndpointGreeting greeting;
-
   late final Modules modules;
 
   @override
@@ -979,7 +956,6 @@ class Client extends _isc.ServerpodClientShared {
     'signIn': signIn,
     'stats': stats,
     'store': store,
-    'greeting': greeting,
   };
 
   @override

@@ -55,5 +55,3 @@ store:
   - add:
   - list:
   - remove:
-greeting:
-  - hello:

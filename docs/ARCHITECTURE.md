@@ -955,3 +955,38 @@ parts of 21 that need the app half of push. Recorded so the gap is a decision, n
   so any estimate there would be about nothing. The estimate the design is after is shown where
   it matters, on the open sheet (screen 06), from wherever the shopper is at that moment.
 
+## ADR-047: The full review, 2026-09-24
+
+Every screen walked against the design set on two simulators (light and dark), and the server read
+for rules 1, 3 and 5. What was found and what was done:
+
+**Fixed**
+- **The home screen went blank** once the members header got its Invite link: the theme's buttons
+  are full-width, and one inside a `Row` has no width to lay out in. Caught only by running it.
+- **Dark-mode switches** read as neither on nor off (white thumb on the light ink track); the dark
+  track is Signal now.
+- **No way out of screen 04.** Someone signed in with the wrong address had no sign-out until they
+  made a household. The screen now says who is signed in and offers sign out.
+- **Quantity in the add bar** (screen 09's box beside the name): a 1-99 wheel. The endpoint always
+  took it.
+- **Where the run stands**, as screens 08, 09 and 12 put it: the banner says when it closes as a
+  clock time ("CLOSES 18:42", "EXTENDED TO 18:47"), and the header says "1 got" to the shopper and
+  "2 are yours" to everyone else. "Already extended" wrapped onto two lines; it is "Extend used".
+- **Home → Invite**, beside the member list, as screen 05 has it.
+- **Server:** the Serverpod template's unauthenticated `greeting` endpoint was still being served;
+  removed. Sign-in was the one service reading `DateTime.now()` instead of `ServerClock`.
+
+**Checked and fine:** every endpoint checks membership first; extend, freeze, cancel, marking,
+prices and settle are shopper-only (rule 3). No `double` holds money anywhere (rule 5). The client
+reads the device clock only to display dates; the countdown is server time (rule 1).
+
+**Left, and why**
+- *Who is looking now* (screens 08 and 10's avatars, "Ayşe and Deniz are looking now") and the
+  "Ayşe added 12s ago" line need presence on the stream — the server tracking who is subscribed.
+  Real work on the one part of the app every run depends on; not worth the risk this late.
+- *Recent runs* on the home screen (screen 05): the history row already shows count and total, and
+  the whole list is one tap away.
+- *"What you asked for"* on screen 23, the member's closed-while-away view: the member sees the
+  whole frozen list with their items tagged, which answers the same question.
+- *Notification actions* ("Add an item", "Nothing for me"): with the app half of push (ADR-043).
+

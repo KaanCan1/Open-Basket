@@ -128,8 +128,25 @@ class _Home extends ConsumerWidget {
               const SizedBox(height: 24),
               _CodeCard(code: household.code),
               const SizedBox(height: 32),
-              Text(l10n.homeMembersTitle, style: theme.textTheme.labelSmall),
-              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.homeMembersTitle,
+                      style: theme.textTheme.labelSmall,
+                    ),
+                  ),
+                  // The theme's buttons are full width; in a row this one
+                  // must size to its label or the layout has no width.
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(kMinTapTarget, kMinTapTarget),
+                    ),
+                    onPressed: () => context.push(Routes.members),
+                    child: Text(l10n.homeInvite),
+                  ),
+                ],
+              ),
               ...?members.value?.map(
                 (final member) => _MemberRow(
                   member: member,

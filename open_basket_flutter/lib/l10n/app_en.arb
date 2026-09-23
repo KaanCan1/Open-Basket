@@ -163,8 +163,6 @@
       }
     }
   },
-  "liveBasketClosesByItself": "CLOSES BY ITSELF",
-  "@liveBasketClosesByItself": {},
   "liveBasketAddHint": "Add an item",
   "@liveBasketAddHint": {},
   "liveBasketNoteHint": "Note (optional)",
@@ -177,7 +175,7 @@
   "@liveBasketEmptyNote": {},
   "liveBasketExtend": "Extend once",
   "@liveBasketExtend": {},
-  "liveBasketExtendUsed": "Already extended",
+  "liveBasketExtendUsed": "Extend used",
   "@liveBasketExtendUsed": {},
   "liveBasketCheckout": "At checkout",
   "@liveBasketCheckout": {},
@@ -1152,5 +1150,59 @@
   "joinNoCode": "No code yet?",
   "@joinNoCode": {},
   "joinStartOwn": "Start your own household",
-  "@joinStartOwn": {}
+  "@joinStartOwn": {},
+  "liveBasketQuantityDone": "Done",
+  "@liveBasketQuantityDone": {},
+  "liveBasketQuantityLabel": "Quantity {count}",
+  "@liveBasketQuantityLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownClosesAt": "CLOSES {time}",
+  "@countdownClosesAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownExtendedTo": "EXTENDED TO {time}",
+  "@countdownExtendedTo": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketGot": "{count} got",
+  "@liveBasketGot": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketYours": "{count, plural, =1{1 is yours} other{{count} are yours}}",
+  "@liveBasketYours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeInvite": "Invite",
+  "@homeInvite": {},
+  "householdChoiceSignedInAs": "Signed in as {email}. Not you?",
+  "@householdChoiceSignedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "householdChoiceNotYou": "Not you?",
+  "@householdChoiceNotYou": {}
 }

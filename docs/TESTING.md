@@ -23,7 +23,7 @@ backs the phones. Nothing to install.
    store saved with a location gets a suggested duration, worked out on the device. Pick a
    duration and press *Open for N minutes*. The countdown is rendered from the server's
    clock, not the browser's.
-4. **Add items.** Type a name and an optional note, press *Add*. The row appears once the
+4. **Add items.** Type a name and an optional note, tap *×1* to pick how many, press *Add*. The row appears once the
    server has accepted it and pushed it back down the stream — it is not drawn
    optimistically.
 5. **Extend once.** *Extend once* adds five minutes to the deadline and then disables
@@ -83,7 +83,6 @@ Said plainly so no one hunts for a screen that does not exist:
   basket, the "two minutes left" reminder for whoever has not added anything, and "you owe"
   after settling (ADR-043) — but the app does not register for notifications yet, so none
   arrive. People see a basket when they open the app.
-- **Quantity in the add-item bar.** The endpoint takes it; the bar does not offer it yet.
 - **One open basket per household at a time.** Deliberate (rule 4), not a missing feature: a
   second *Open a basket* takes you into the one already running.
 

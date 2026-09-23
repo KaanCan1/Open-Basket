@@ -35,7 +35,6 @@ import 'future_calls_generated_models/close_basket_future_call_close_model.dart'
     as _itt3vjix;
 import 'future_calls_generated_models/closing_soon_future_call_remind_model.dart'
     as _i9kzwx4t;
-import 'greetings/greeting.dart' as _izw8z7ou;
 import 'household.dart' as _ijonbu5t;
 import 'household_member.dart' as _iv10erpj;
 import 'item_status.dart' as _ibbyonnn;
@@ -55,7 +54,6 @@ export 'basket_event_type.dart';
 export 'basket_item.dart';
 export 'basket_status.dart';
 export 'device_token.dart';
-export 'greetings/greeting.dart';
 export 'household.dart';
 export 'household_member.dart';
 export 'item_status.dart';
@@ -964,9 +962,6 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i9kzwx4t.ClosingSoonFutureCallRemindModel) {
       return _i9kzwx4t.ClosingSoonFutureCallRemindModel.fromJson(data) as T;
     }
-    if (t == _izw8z7ou.Greeting) {
-      return _izw8z7ou.Greeting.fromJson(data) as T;
-    }
     if (t == _ijonbu5t.Household) {
       return _ijonbu5t.Household.fromJson(data) as T;
     }
@@ -1037,9 +1032,6 @@ class Protocol extends _is.DatabaseSerializationManager {
               ? _i9kzwx4t.ClosingSoonFutureCallRemindModel.fromJson(data)
               : null)
           as T;
-    }
-    if (t == _is.getType<_izw8z7ou.Greeting?>()) {
-      return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_ijonbu5t.Household?>()) {
       return (data != null ? _ijonbu5t.Household.fromJson(data) : null) as T;
@@ -1156,7 +1148,6 @@ class Protocol extends _is.DatabaseSerializationManager {
         'CloseBasketFutureCallCloseModel',
       _i9kzwx4t.ClosingSoonFutureCallRemindModel =>
         'ClosingSoonFutureCallRemindModel',
-      _izw8z7ou.Greeting => 'Greeting',
       _ijonbu5t.Household => 'Household',
       _iv10erpj.HouseholdMember => 'HouseholdMember',
       _ibbyonnn.ItemStatus => 'ItemStatus',
@@ -1202,8 +1193,6 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'CloseBasketFutureCallCloseModel';
       case _i9kzwx4t.ClosingSoonFutureCallRemindModel():
         return 'ClosingSoonFutureCallRemindModel';
-      case _izw8z7ou.Greeting():
-        return 'Greeting';
       case _ijonbu5t.Household():
         return 'Household';
       case _iv10erpj.HouseholdMember():
@@ -1285,9 +1274,6 @@ class Protocol extends _is.DatabaseSerializationManager {
       return deserialize<_i9kzwx4t.ClosingSoonFutureCallRemindModel>(
         data['data'],
       );
-    }
-    if (dataClassName == 'Greeting') {
-      return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
     if (dataClassName == 'Household') {
       return deserialize<_ijonbu5t.Household>(data['data']);
