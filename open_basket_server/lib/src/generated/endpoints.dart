@@ -13,6 +13,7 @@
 import 'package:open_basket_server/src/generated/future_calls.dart'
     as _i875cjzu;
 import 'package:open_basket_server/src/generated/item_status.dart' as _i8v2xtko;
+import 'package:open_basket_server/src/generated/item_unit.dart' as _ioupdjx4;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -431,6 +432,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<int?>(),
               nullable: true,
             ),
+            'unit': _is.ParameterDescription(
+              name: 'unit',
+              type: _is.getType<_ioupdjx4.ItemUnit?>(),
+              nullable: true,
+            ),
             'note': _is.ParameterDescription(
               name: 'note',
               type: _is.getType<String?>(),
@@ -447,6 +453,7 @@ class Endpoints extends _is.EndpointDispatch {
                     params['basketId'],
                     params['name'],
                     quantity: params['quantity'],
+                    unit: params['unit'],
                     note: params['note'],
                   ),
         ),
@@ -468,6 +475,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<int?>(),
               nullable: true,
             ),
+            'unit': _is.ParameterDescription(
+              name: 'unit',
+              type: _is.getType<_ioupdjx4.ItemUnit?>(),
+              nullable: true,
+            ),
             'note': _is.ParameterDescription(
               name: 'note',
               type: _is.getType<String?>(),
@@ -484,6 +496,7 @@ class Endpoints extends _is.EndpointDispatch {
                     params['itemId'],
                     name: params['name'],
                     quantity: params['quantity'],
+                    unit: params['unit'],
                     note: params['note'],
                   ),
         ),

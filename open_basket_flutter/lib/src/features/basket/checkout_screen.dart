@@ -14,6 +14,7 @@ import '../household/household_controller.dart';
 import 'basket_controller.dart';
 import 'live_basket_controller.dart';
 import '../../core/failure_message.dart';
+import '../../shared/widgets/item_name.dart';
 
 /// Screen 14. The shopper at the till: a price for everything they got, "not
 /// available" for everything they did not, the receipt total, and the button
@@ -470,7 +471,6 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
     final muted = theme.textTheme.bodySmall!.color!;
     final item = widget.item;
     final gone = item.status == ItemStatus.unavailable;
-    final name = '${item.name} ×${item.quantity}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -486,13 +486,10 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: gone
-                          ? OpenBasketText.item(
-                              muted,
-                            ).copyWith(decoration: TextDecoration.lineThrough)
-                          : OpenBasketText.item(ink),
+                    ItemName.of(
+                      item,
+                      style: OpenBasketText.item(gone ? muted : ink),
+                      struck: gone,
                     ),
                     if (gone)
                       Text(

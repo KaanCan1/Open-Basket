@@ -27,11 +27,13 @@ class QueuedItem {
     required this.queuedAt,
     this.note,
     this.quantity,
+    this.unit,
   });
 
   final String name;
   final String? note;
   final int? quantity;
+  final ItemUnit? unit;
 
   /// Local time, for display only.
   final DateTime queuedAt;

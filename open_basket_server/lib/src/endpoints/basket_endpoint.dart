@@ -227,6 +227,7 @@ class BasketEndpoint extends Endpoint {
     int basketId,
     String name, {
     int? quantity,
+    ItemUnit? unit,
     String? note,
   }) async {
     final basket = await _requireVisible(session, basketId);
@@ -240,7 +241,8 @@ class BasketEndpoint extends Endpoint {
         basketId: basketId,
         requesterMemberId: member.id!,
         name: _requireItemName(name),
-        quantity: _requireQuantity(quantity ?? 1),
+        quantity: _requireQuantity(quantity ?? 1, unit ?? ItemUnit.piece),
+        unit: unit ?? ItemUnit.piece,
         note: _cleanNote(note),
         status: ItemStatus.requested,
         addedAt: ServerClock.now(),
@@ -259,7 +261,11 @@ class BasketEndpoint extends Endpoint {
       householdId: basket.householdId,
       basketId: basketId,
       memberId: member.id,
-      payload: {'quantity': item.quantity, 'hasNote': item.note != null},
+      payload: {
+        'quantity': item.quantity,
+        'unit': item.unit.name,
+        'hasNote': item.note != null,
+      },
     );
     return item;
   }
@@ -270,15 +276,20 @@ class BasketEndpoint extends Endpoint {
     int itemId, {
     String? name,
     int? quantity,
+    ItemUnit? unit,
     String? note,
   }) async {
     final (item, basket) = await _requireOwnItem(session, itemId);
+    final newUnit = unit ?? item.unit;
 
     final updated = await BasketItem.db.updateRow(
       session,
       item.copyWith(
         name: name == null ? item.name : _requireItemName(name),
-        quantity: quantity == null ? item.quantity : _requireQuantity(quantity),
+        // A new unit re-checks the quantity it comes with, or the one the
+        // item already had: 500 is fine in grams and not in kilos.
+        quantity: _requireQuantity(quantity ?? item.quantity, newUnit),
+        unit: newUnit,
         // An explicit empty string clears the note; leaving the argument out
         // keeps it. copyWith cannot express "set to null", so this is written
         // out rather than folded into the call above.
@@ -613,11 +624,19 @@ class BasketEndpoint extends Endpoint {
     return trimmed;
   }
 
-  int _requireQuantity(int quantity) {
-    if (quantity < 1 || quantity > 99) {
+  /// The largest quantity for each unit: 99 of anything counted, 5000 of
+  /// anything weighed or poured in its small unit.
+  static int maxQuantity(ItemUnit unit) => switch (unit) {
+    ItemUnit.g || ItemUnit.ml => 5000,
+    _ => 99,
+  };
+
+  int _requireQuantity(int quantity, ItemUnit unit) {
+    final max = maxQuantity(unit);
+    if (quantity < 1 || quantity > max) {
       throw OpenBasketException(
         error: BasketError.invalidItem,
-        message: 'Pick a quantity between 1 and 99.',
+        message: 'Pick a quantity between 1 and $max.',
       );
     }
     return quantity;

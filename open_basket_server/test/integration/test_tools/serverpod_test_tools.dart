@@ -29,6 +29,7 @@ import 'package:open_basket_server/src/generated/household.dart' as _ih69xi36;
 import 'package:open_basket_server/src/generated/household_member.dart'
     as _izwgjn1h;
 import 'package:open_basket_server/src/generated/item_status.dart' as _i8v2xtko;
+import 'package:open_basket_server/src/generated/item_unit.dart' as _ioupdjx4;
 import 'package:open_basket_server/src/generated/past_run.dart' as _iprw808a;
 import 'package:open_basket_server/src/generated/settlement_line.dart'
     as _iw375zr9;
@@ -771,6 +772,7 @@ class _BasketEndpoint {
     int basketId,
     String name, {
     int? quantity,
+    _ioupdjx4.ItemUnit? unit,
     String? note,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -788,6 +790,7 @@ class _BasketEndpoint {
             'basketId': basketId,
             'name': name,
             'quantity': quantity,
+            'unit': unit,
             'note': note,
           }),
           serializationManager: _serializationManager,
@@ -810,6 +813,7 @@ class _BasketEndpoint {
     int itemId, {
     String? name,
     int? quantity,
+    _ioupdjx4.ItemUnit? unit,
     String? note,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -827,6 +831,7 @@ class _BasketEndpoint {
             'itemId': itemId,
             'name': name,
             'quantity': quantity,
+            'unit': unit,
             'note': note,
           }),
           serializationManager: _serializationManager,

@@ -535,7 +535,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketNoteHint.
   ///
   /// In en, this message translates to:
-  /// **'Note (optional)'**
+  /// **'Brand, size, \"only if fresh\"'**
   String get liveBasketNoteHint;
 
   /// No description provided for @liveBasketAdd.
@@ -556,12 +556,6 @@ abstract class AppLocalizations {
   /// **'Type what you need. Everyone sees it the moment you add it.'**
   String get liveBasketEmptyNote;
 
-  /// No description provided for @liveBasketExtend.
-  ///
-  /// In en, this message translates to:
-  /// **'Extend once'**
-  String get liveBasketExtend;
-
   /// No description provided for @liveBasketExtendUsed.
   ///
   /// In en, this message translates to:
@@ -571,7 +565,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketCheckout.
   ///
   /// In en, this message translates to:
-  /// **'At checkout'**
+  /// **'At checkout — freeze basket'**
   String get liveBasketCheckout;
 
   /// No description provided for @liveBasketCancel.
@@ -2038,30 +2032,6 @@ abstract class AppLocalizations {
   /// **'Start your own household'**
   String get joinStartOwn;
 
-  /// No description provided for @liveBasketQuantityDone.
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get liveBasketQuantityDone;
-
-  /// No description provided for @liveBasketQuantityLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Quantity {count}'**
-  String liveBasketQuantityLabel(int count);
-
-  /// No description provided for @countdownClosesAt.
-  ///
-  /// In en, this message translates to:
-  /// **'CLOSES {time}'**
-  String countdownClosesAt(String time);
-
-  /// No description provided for @countdownExtendedTo.
-  ///
-  /// In en, this message translates to:
-  /// **'EXTENDED TO {time}'**
-  String countdownExtendedTo(String time);
-
   /// No description provided for @liveBasketGot.
   ///
   /// In en, this message translates to:
@@ -2091,6 +2061,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not you?'**
   String get householdChoiceNotYou;
+
+  /// No description provided for @liveBasketQuantityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount {amount}. Tap to change the unit.'**
+  String liveBasketQuantityLabel(String amount);
+
+  /// No description provided for @liveBasketUnitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Count it in'**
+  String get liveBasketUnitTitle;
+
+  /// No description provided for @unitPieces.
+  ///
+  /// In en, this message translates to:
+  /// **'Pieces'**
+  String get unitPieces;
+
+  /// No description provided for @unitKilograms.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilograms'**
+  String get unitKilograms;
+
+  /// No description provided for @unitGrams.
+  ///
+  /// In en, this message translates to:
+  /// **'Grams'**
+  String get unitGrams;
+
+  /// No description provided for @unitLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres'**
+  String get unitLitres;
+
+  /// No description provided for @unitMillilitres.
+  ///
+  /// In en, this message translates to:
+  /// **'Millilitres'**
+  String get unitMillilitres;
+
+  /// No description provided for @unitPacks.
+  ///
+  /// In en, this message translates to:
+  /// **'Packs'**
+  String get unitPacks;
+
+  /// No description provided for @liveBasketAddNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note'**
+  String get liveBasketAddNote;
+
+  /// No description provided for @noteAnyBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'any brand'**
+  String get noteAnyBrand;
+
+  /// No description provided for @noteOnlyIfFresh.
+  ///
+  /// In en, this message translates to:
+  /// **'only if fresh'**
+  String get noteOnlyIfFresh;
+
+  /// No description provided for @noteCheapest.
+  ///
+  /// In en, this message translates to:
+  /// **'the cheapest'**
+  String get noteCheapest;
+
+  /// No description provided for @noteOrganic.
+  ///
+  /// In en, this message translates to:
+  /// **'organic'**
+  String get noteOrganic;
+
+  /// No description provided for @noteBigPack.
+  ///
+  /// In en, this message translates to:
+  /// **'big pack'**
+  String get noteBigPack;
+
+  /// No description provided for @countdownYoureAt.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re at {store} · closes {time}'**
+  String countdownYoureAt(String store, String time);
+
+  /// No description provided for @countdownCloses.
+  ///
+  /// In en, this message translates to:
+  /// **'Closes {time}'**
+  String countdownCloses(String time);
+
+  /// No description provided for @countdownExtendedLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Extended to {time} · this is the last of it'**
+  String countdownExtendedLast(String time);
+
+  /// No description provided for @countdownHeadingToTill.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re heading to the till'**
+  String get countdownHeadingToTill;
+
+  /// No description provided for @countdownMemberLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Closes {time} · only {name} can change the clock'**
+  String countdownMemberLine(String time, String name);
+
+  /// No description provided for @countdownRunOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s run'**
+  String countdownRunOf(String name);
+
+  /// No description provided for @liveBasketExtendPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend +5'**
+  String get liveBasketExtendPlus;
 }
 
 class _AppLocalizationsDelegate

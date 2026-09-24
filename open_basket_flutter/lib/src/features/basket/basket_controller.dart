@@ -47,12 +47,14 @@ class BasketController {
     int basketId,
     String name, {
     int? quantity,
+    ItemUnit? unit,
     String? note,
   }) {
     return _client.basket.addItem(
       basketId,
       name,
       quantity: quantity,
+      unit: unit,
       note: note,
     );
   }

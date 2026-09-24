@@ -7,6 +7,8 @@ fields:
   requesterMemberId: int, relation(parent=household_member, onDelete=Cascade)
   name: String
   quantity: int, default=1
+  ### What the quantity counts. Pieces unless someone says otherwise.
+  unit: ItemUnit, default=piece
   ### Free text: brand, size, "only if fresh".
   note: String?
   ### The shopper may set this while the basket is still open (ADR-005).
