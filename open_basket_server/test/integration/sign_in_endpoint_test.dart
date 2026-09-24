@@ -47,7 +47,13 @@ void main() {
 
       final lifetime = success.tokenExpiresAt!.difference(before);
       expect(lifetime, greaterThan(const Duration(minutes: 59)));
-      expect(lifetime, lessThanOrEqualTo(AuthSetup.accessTokenLifetime));
+      // Issued a moment after `before`, so allow that moment.
+      expect(
+        lifetime,
+        lessThanOrEqualTo(
+          AuthSetup.accessTokenLifetime + const Duration(minutes: 1),
+        ),
+      );
       expect(success.refreshToken, isNotNull);
     });
 
