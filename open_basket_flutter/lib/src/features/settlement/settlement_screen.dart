@@ -239,7 +239,9 @@ class _Line extends StatelessWidget {
                   style: OpenBasketText.title(ink),
                 ),
                 Text(
-                  gap >= 0
+                  gap == 0
+                      ? l10n.liveBasketLineItems(items)
+                      : gap > 0
                       ? l10n.settlementBreakdown(
                           items,
                           MoneyFormat.format(gap, currency),
