@@ -1720,5 +1720,6 @@
     }
   },
   "currencyCommon": "Common",
-  "currencyBack": "Settings"
+  "currencyBack": "Settings",
+  "liveBasketDoneAdding": "Done adding"
 }

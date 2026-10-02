@@ -167,8 +167,13 @@ class ObScaffold extends StatelessWidget {
     this.onBack,
     this.bottomBar,
     this.resizeToAvoidBottomInset = true,
+    this.safeBottom = true,
     super.key,
   });
+
+  /// False when the body ends in a panel that pads the home indicator
+  /// itself (the checkout totals), so it reaches the bottom edge.
+  final bool safeBottom;
 
   final Widget body;
 
@@ -189,7 +194,7 @@ class ObScaffold extends StatelessWidget {
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       body: AmbientBackground(
         child: SafeArea(
-          bottom: bottomBar == null,
+          bottom: bottomBar == null && safeBottom,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -338,7 +343,9 @@ class GlassBar extends StatelessWidget {
             24,
             12,
             24,
-            12 + (MediaQuery.viewInsetsOf(context).bottom > 0 ? 0 : bottom),
+            // The Scaffold has already lifted the body above the keyboard and
+            // zeroed its insets, so the view says whether it is up.
+            12 + (View.of(context).viewInsets.bottom > 0 ? 0 : bottom),
           ),
           decoration: BoxDecoration(
             color: ob.glass,
@@ -1219,7 +1226,7 @@ Future<T?> showGlassSheet<T>({
             decoration: BoxDecoration(
               color: ob.dark
                   ? const Color(0xF21A1A17)
-                  : OpenBasketColors.paper.withValues(alpha: 0.92),
+                  : OpenBasketColors.paper.withValues(alpha: 0.97),
               border: Border(top: BorderSide(color: ob.glassBorder)),
             ),
             child: SafeArea(
@@ -1269,6 +1276,7 @@ class SkeletonList extends StatelessWidget {
     const widths = [0.62, 0.48, 0.7, 0.55];
     return TonalCard(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < rows; i++) ...[
             if (i > 0) const SizedBox(height: 14),
@@ -1565,10 +1573,14 @@ class ListRow extends StatelessWidget {
             ),
             if (value != null) ...[
               const SizedBox(width: 12),
-              Flexible(
+              // Not flexible: a flexible value takes half the row whatever
+              // its length, and the chevrons stop lining up.
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 170),
                 child: Text(
                   value!,
                   maxLines: 1,
+                  textAlign: TextAlign.right,
                   overflow: TextOverflow.ellipsis,
                   style: valueMono
                       ? OpenBasketText.mono(color: ob.onGround, fontSize: 14)

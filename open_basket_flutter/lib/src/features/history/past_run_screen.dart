@@ -355,13 +355,14 @@ class _Stat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ob = Ob.of(context);
-    final fg = ink ? OpenBasketColors.paper : ob.onGround;
+    // The receipt tile inverts the ground: ink on paper, paper in the dark.
+    final fg = ink ? ob.ground : ob.onGround;
     return Expanded(
       flex: ink ? 5 : 4,
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
         decoration: BoxDecoration(
-          color: ink ? ob.inkCard : ob.tonal,
+          color: ink ? ob.onGround : ob.tonal,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -378,7 +379,11 @@ class _Stat extends StatelessWidget {
             Text(
               label,
               style: OpenBasketText.meta(
-                ink ? OpenBasketColors.metaDark : ob.meta,
+                ink
+                    ? (ob.dark
+                          ? const Color(0xFF4A4A46)
+                          : OpenBasketColors.metaDark)
+                    : ob.meta,
               ).copyWith(fontSize: 11),
             ),
           ],

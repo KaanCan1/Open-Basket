@@ -1840,4 +1840,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyBack => 'Settings';
+
+  @override
+  String get liveBasketDoneAdding => 'Done adding';
 }

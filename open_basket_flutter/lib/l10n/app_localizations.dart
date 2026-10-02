@@ -2817,6 +2817,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get currencyBack;
+
+  /// No description provided for @liveBasketDoneAdding.
+  ///
+  /// In en, this message translates to:
+  /// **'Done adding'**
+  String get liveBasketDoneAdding;
 }
 
 class _AppLocalizationsDelegate

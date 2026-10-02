@@ -1016,3 +1016,52 @@ From Kaan's first look at the build on his own phone.
 - The custom-minutes number pad on the open sheet now closes on a tap outside; it has no return
   key and covered the Open button.
 
+
+## ADR-049: Who is looking, and the nudge
+
+Screens 08 and 10 show who has the basket open ("Ayşe and Deniz are looking now"), and screen 10
+offers "Nudge the ones who aren't". ADR-047 left both out as too risky on the stream; Kaan asked
+for them on 2026-10-02.
+
+- **Presence is counted in memory, per open stream** (`BasketPresence`). A member with the basket
+  open on two devices stays "looking" until both close. Nothing is persisted: presence is only
+  true for as long as a connection is, and a connection lives in one process. Like
+  `BasketChannels`, a second server instance would need Redis for this too.
+- **It travels as a `basketUpdated` with no basket and `viewerMemberIds` set.** A new event type
+  would break the builds already installed on phones, which decode only the types they know.
+  Those builds apply a `basketUpdated` as "keep your basket unless this carries a new one", so to
+  them it is nothing. The snapshot carries `viewerMemberIds` too.
+- **The announcement does not read the database.** It runs while a client is hanging up, and a
+  basket loaded at that moment could be older than one already on its way — a phone's countdown
+  would wind back. It also kept the integration tests' rollback transactions from colliding.
+- **`basket.nudge`**: any member, while open. Pushes (with the basket-opened copy switch) to
+  members who are neither looking nor on the list, never the caller or the shopper. Once a minute
+  per basket (`nudgeTooSoon`), in memory: a restart only allows one more.
+
+## ADR-050: Screen set v3 everywhere
+
+Until now only the countdown card and the add bar (ADR-048) followed the set; every other screen
+was the flat, square first pass. On 2026-10-02 every screen was rebuilt on one design layer,
+`shared/widgets/design.dart`:
+
+- **The set's materials**: the ambient wash (Signal top right, ink bottom left), frosted glass
+  for things that float (bars, sheets, the settings button) and solid cards for anything with a
+  number on it. JetBrains Mono for digits, money, codes and the small uppercase labels. The
+  wordmark and mark from the set, in `assets/brand/`.
+- **People are greys, not colours.** The person square is ink, dark grey, mid grey, chip grey,
+  then an outline, by the member's place in the household (former members included, so nobody's
+  tone moves when someone leaves). Colour belongs to time; the old per-member hues are gone.
+- **iPhone feel on both platforms**: Cupertino page transitions with edge-swipe back, no ink
+  ripples. Several screens have no visible back control because the set draws none (live basket,
+  history, members, settlement); back is the edge swipe or the system button.
+- **Behaviour that came with it**: create and join on one screen (04), a refused code moves to
+  27/28 with the code still in the boxes; cancel is a sheet that says what it drops (13); rotate
+  is a sheet (18); a member arriving at a closed basket sees "what you asked for" and their own
+  line (22/23); the shopper's add bar folds behind an ink + (08); the last two minutes split the
+  list into still-to-find and got (11).
+- **Fixed while walking it on a simulator**: the add bar cleared a second item typed while the
+  first was being sent; checkout's totals panel never stepped aside for the keyboard, because the
+  Scaffold zeroes the insets its body sees — the screen measures and passes it down now.
+- **Left on purpose**: notification actions (21) wait for the app half of push; "Typical run from
+  home" (07) per ADR-046; currencies keep one number format (`€1,234.50`) where the set shows
+  `€1.234,50`, because the server's push copy formats money too and both would have to change.

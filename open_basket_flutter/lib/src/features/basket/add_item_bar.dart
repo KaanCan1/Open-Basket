@@ -77,7 +77,9 @@ class _AddItemBarState extends ConsumerState<AddItemBar> {
           );
       if (!mounted) return;
       if (suggested != null) return;
-      _name.clear();
+      // Only what was sent: the next item may already be half typed while
+      // this one was on its way, and clearing would throw it away.
+      if (_name.text.trim() == name) _name.clear();
       _note.clear();
       setState(() {
         _quantity = 1;

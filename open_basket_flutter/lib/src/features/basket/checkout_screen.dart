@@ -135,6 +135,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ?.name;
 
     return ObScaffold(
+      safeBottom: false,
       body: Column(
         children: [
           Expanded(
@@ -192,6 +193,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             settling: _settling,
             onSettle: _settle,
             onError: _say,
+            keyboardUp: MediaQuery.viewInsetsOf(context).bottom > 0,
           ),
         ],
       ),
@@ -484,7 +486,7 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
           ),
           const SizedBox(width: 12),
           SizedBox(
-            width: 94,
+            width: 104,
             height: 44,
             child: gone
                 ? GestureDetector(
@@ -560,7 +562,9 @@ class _MoneyField extends StatelessWidget {
             textScaler: MediaQuery.textScalerOf(context),
           )..layout();
           // Content padding either side, and a little for the cursor.
-          final room = constraints.maxWidth - 2 * _padding - 6;
+          // The prefix's own gap and the cursor take a little more than the
+          // text itself; measured short, "8990.00" lost its last digit.
+          final room = constraints.maxWidth - 2 * _padding - 14;
           final scale = painter.width <= room
               ? 1.0
               : (room / painter.width).clamp(0.5, 1.0);
@@ -650,7 +654,13 @@ class _TotalsPanel extends ConsumerStatefulWidget {
     required this.settling,
     required this.onSettle,
     required this.onError,
+    required this.keyboardUp,
   });
+
+  /// Measured by the screen, above the Scaffold: the Scaffold takes the
+  /// keyboard out of the MediaQuery its body sees, so the panel itself
+  /// would always read zero.
+  final bool keyboardUp;
 
   final Basket basket;
   final int itemSum;
@@ -737,7 +747,7 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
     // and crush the list to a row or two — found on a phone, where the next
     // item to price was hidden behind the totals. It steps aside instead, and
     // stays when the keyboard is up for its own receipt field.
-    if (MediaQuery.viewInsetsOf(context).bottom > 0 && !_focus.hasFocus) {
+    if (widget.keyboardUp && !_focus.hasFocus) {
       return const SizedBox.shrink();
     }
 

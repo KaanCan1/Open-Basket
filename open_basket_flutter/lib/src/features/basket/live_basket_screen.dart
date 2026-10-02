@@ -115,7 +115,7 @@ class _LiveBasketScreenState extends ConsumerState<LiveBasketScreen> {
           if (isShopper)
             Center(
               child: LinkText(
-                AppLocalizations.of(context).liveBasketCheckout,
+                AppLocalizations.of(context).liveBasketDoneAdding,
                 onTap: () => setState(() => _shopperAdding = false),
               ),
             ),
@@ -1482,10 +1482,12 @@ class _AskedRow extends StatelessWidget {
     final name =
         '${item.name} ${QuantityFormat.label(item.quantity, item.unit)}';
     final sub = [
-      ?requesterName,
+      if (requesterName != shopperName) ?requesterName,
       if (!cancelled)
         got
-            ? l10n.itemGotBy(shopperName)
+            ? (requesterName == shopperName
+                  ? l10n.itemGotIt
+                  : l10n.itemGotBy(shopperName))
             : gone
             ? l10n.itemNotAvailable
             : l10n.itemNotPicked,
