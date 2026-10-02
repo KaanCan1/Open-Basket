@@ -1,6 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:open_basket_server/src/auth_setup.dart';
 import 'package:open_basket_server/src/generated/protocol.dart';
+import 'package:open_basket_server/src/services/basket_presence.dart';
 import 'package:open_basket_server/src/services/notification_copy.dart';
 import 'package:open_basket_server/src/services/notification_service.dart';
 import 'package:open_basket_server/src/services/push_sender.dart';
@@ -148,6 +149,68 @@ void main() {
         final basket = await openAtNoon();
 
         expect(basket.status, BasketStatus.open);
+      });
+    });
+
+    group('the nudge (screen 10)', () {
+      setUp(BasketPresence.reset);
+
+      Future<int> nudgeAt(DateTime at, String who, int basketId) => withClock(
+        Clock.fixed(at),
+        () => endpoints.basket.nudge(asUser(who), basketId),
+      );
+
+      test('reaches whoever is neither looking nor on the list, never the '
+          'caller or the shopper', () async {
+        await aHouse();
+        final basket = await openAtNoon();
+        push.sent.clear();
+
+        final count = await nudgeAt(
+          _noon.add(const Duration(minutes: 1)),
+          ayse,
+          basket.id!,
+        );
+
+        expect(count, 1);
+        expect(push.tokens, ['phone-Mert']);
+        expect(push.sent.single.message.title, 'Ayşe is waiting on your list');
+        expect(push.sent.single.message.type, NotificationCopy.nudgeType);
+      });
+
+      test('someone with the basket on screen is not nudged', () async {
+        await aHouse();
+        final basket = await openAtNoon();
+        final mertsMember = (await endpoints.household.listMembers(
+          asUser(mert),
+        )).firstWhere((m) => m.displayName == 'Mert');
+        BasketPresence.enter(basket.id!, mertsMember.id!);
+        push.sent.clear();
+
+        final count = await nudgeAt(
+          _noon.add(const Duration(minutes: 1)),
+          kaan,
+          basket.id!,
+        );
+
+        expect(count, 1);
+        expect(push.tokens, ['phone-Ayşe']);
+      });
+
+      test('a second nudge inside a minute is refused', () async {
+        await aHouse();
+        final basket = await openAtNoon();
+        final first = _noon.add(const Duration(minutes: 1));
+        await nudgeAt(first, ayse, basket.id!);
+
+        await expectLater(
+          nudgeAt(first.add(const Duration(seconds: 30)), kaan, basket.id!),
+          throwsA(
+            predicate((e) => _errorOf(e) == BasketError.nudgeTooSoon),
+          ),
+        );
+        // A minute on, it goes again.
+        await nudgeAt(first.add(const Duration(minutes: 1)), kaan, basket.id!);
       });
     });
 

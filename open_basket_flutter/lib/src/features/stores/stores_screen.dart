@@ -6,6 +6,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/location.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import 'stores_controller.dart';
 import '../../core/failure_message.dart';
 
@@ -111,99 +112,241 @@ class _StoresScreenState extends ConsumerState<StoresScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final stores = ref.watch(storesProvider);
-    final muted = theme.textTheme.bodySmall!.color!;
 
-    return Scaffold(
-      appBar: AppBar(),
+    return ObScaffold(
+      back: true,
+      bottomBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PrimaryButton(
+            label: l10n.storesSave,
+            busy: _saving,
+            onPressed: _save,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            l10n.storesSkipNote,
+            textAlign: TextAlign.center,
+            style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+          ),
+        ],
+      ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+          padding: const EdgeInsets.fromLTRB(26, 14, 26, 24),
           children: [
-            Text(l10n.storesTitle, style: theme.textTheme.displayLarge),
+            ScreenTitle(l10n.storesAddTitle, subtitle: l10n.storesBlurb),
+            const SizedBox(height: 22),
+            SectionLabel(l10n.storesNameLabel),
             const SizedBox(height: 4),
-            Text(l10n.storesBlurb, style: theme.textTheme.bodySmall),
-            const SizedBox(height: 20),
-            ...switch (stores) {
-              AsyncData(:final value) when value.isEmpty => [
-                Text(l10n.storesEmpty, style: theme.textTheme.bodySmall),
-              ],
-              AsyncData(:final value) => [
-                for (final store in value)
-                  _StoreRow(store: store, onTap: () => _offerRemove(store)),
-              ],
-              AsyncError() => [
-                Text(l10n.commonOffline, style: theme.textTheme.bodySmall),
-              ],
-              _ => [const Center(child: CircularProgressIndicator())],
-            },
-            const SizedBox(height: 32),
-            Text(l10n.storesAddTitle, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 16),
-            Text(l10n.storesNameLabel, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 8),
             TextField(
               controller: _name,
               textCapitalization: TextCapitalization.words,
               maxLength: 60,
+              style: OpenBasketText.body(ob.onGround).copyWith(fontSize: 16),
               decoration: InputDecoration(
                 hintText: l10n.storesNameHint,
                 counterText: '',
               ),
             ),
-            const SizedBox(height: 20),
-            Text(l10n.storesLocationLabel, style: theme.textTheme.labelSmall),
+            const SizedBox(height: 22),
+            SectionLabel(l10n.storesLocationLabel),
             const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: _locating ? null : _pin,
-              icon: _locating
-                  ? const SizedBox.square(
-                      dimension: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(CupertinoIcons.location, size: 18),
-              label: Text(l10n.storesUseLocation),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _pinned == null
-                  ? l10n.storesLocationNote
-                  : l10n.storesPinned(
-                      _pinned!.lat.toStringAsFixed(4),
-                      _pinned!.lng.toStringAsFixed(4),
+            GestureDetector(
+              onTap: _locating
+                  ? null
+                  : () => _pinned == null
+                        ? _pin()
+                        : setState(() => _pinned = null),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(17),
+                  border: Border.all(
+                    color: _pinned == null ? ob.faint : ob.onGround,
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      margin: const EdgeInsets.only(top: 1),
+                      decoration: BoxDecoration(
+                        color: _pinned == null ? null : ob.onGround,
+                        borderRadius: BorderRadius.circular(8),
+                        border: _pinned == null
+                            ? Border.all(color: ob.faint, width: 1.5)
+                            : null,
+                      ),
+                      child: _locating
+                          ? Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: ob.onGround,
+                              ),
+                            )
+                          : _pinned == null
+                          ? null
+                          : Icon(
+                              CupertinoIcons.checkmark_alt,
+                              size: 16,
+                              color: ob.ground,
+                            ),
                     ),
-              style: OpenBasketText.meta(muted),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.storesUseLocation,
+                            style: OpenBasketText.body(
+                              ob.onGround,
+                            ).copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            _locating
+                                ? l10n.storesLocating
+                                : l10n.storesLocationNote,
+                            style: OpenBasketText.meta(ob.meta),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
+            if (_pinned != null) ...[
+              const SizedBox(height: 12),
+              _MapPlaceholder(lat: _pinned!.lat, lng: _pinned!.lng),
+            ],
             if (_message != null) ...[
               const SizedBox(height: 12),
               Text(
                 _message!,
-                style: OpenBasketText.meta(theme.colorScheme.error),
+                style: OpenBasketText.meta(Theme.of(context).colorScheme.error),
               ),
             ],
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: _saving
-                  ? const SizedBox.square(
-                      dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l10n.storesSave),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.storesSkipNote,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall,
-            ),
+            const SizedBox(height: 28),
+            ...switch (stores) {
+              AsyncData(:final value) when value.isEmpty => [
+                Text(l10n.storesEmpty, style: OpenBasketText.meta(ob.meta)),
+              ],
+              AsyncData(:final value) => [
+                SectionLabel(l10n.storesSaved),
+                const SizedBox(height: 6),
+                for (final store in value)
+                  _StoreRow(store: store, onTap: () => _offerRemove(store)),
+              ],
+              AsyncError() => [
+                Text(l10n.commonOffline, style: OpenBasketText.meta(ob.meta)),
+              ],
+              _ => [const SkeletonList(rows: 2)],
+            },
           ],
         ),
       ),
     );
   }
+}
+
+/// The pinned spot: a hatched tile with the pin and its coordinates. There
+/// is no map tile behind it on purpose — the location is a number the
+/// estimate uses, not a place anyone needs to look at.
+class _MapPlaceholder extends StatelessWidget {
+  const _MapPlaceholder({required this.lat, required this.lng});
+
+  final double lat;
+  final double lng;
+
+  @override
+  Widget build(BuildContext context) {
+    final ob = Ob.of(context);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(17),
+      child: SizedBox(
+        height: 136,
+        child: CustomPaint(
+          painter: _HatchPainter(
+            a: ob.tonal,
+            b: ob.chip,
+          ),
+          child: Stack(
+            children: [
+              Center(
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: ob.onGround,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: ob.ground, width: 3),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 10,
+                bottom: 10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ob.glass,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}',
+                    style: OpenBasketText.mono(
+                      color: ob.meta,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HatchPainter extends CustomPainter {
+  const _HatchPainter({required this.a, required this.b});
+
+  final Color a;
+  final Color b;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = a);
+    final stripe = Paint()
+      ..color = b
+      ..strokeWidth = 9;
+    for (var x = -size.height; x < size.width + size.height; x += 18) {
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x + size.height, size.height),
+        stripe,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_HatchPainter old) => old.a != a || old.b != b;
 }
 
 class _StoreRow extends StatelessWidget {
@@ -215,41 +358,16 @@ class _StoreRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final pinned = store.lat != null && store.lng != null;
-
-    return InkWell(
+    final ob = Ob.of(context);
+    return ListRow(
+      title: store.name,
+      subtitle: pinned ? l10n.storesHasLocation : l10n.storesNoLocation,
       onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: kMinTapTarget),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: theme.dividerColor)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(store.name, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 2),
-                  Text(
-                    pinned ? l10n.storesHasLocation : l10n.storesNoLocation,
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              pinned
-                  ? CupertinoIcons.location_solid
-                  : CupertinoIcons.location_slash,
-              size: 18,
-              color: theme.textTheme.bodySmall!.color,
-            ),
-          ],
-        ),
+      trailing: Icon(
+        pinned ? CupertinoIcons.location_solid : CupertinoIcons.location_slash,
+        size: 18,
+        color: ob.meta,
       ),
     );
   }

@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/formatters.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
+import '../history/history_screen.dart';
+import '../stores/stores_controller.dart';
 import '../basket/basket_controller.dart';
 import '../basket/checkout_screen.dart';
 import '../basket/live_basket_controller.dart';
@@ -27,18 +30,13 @@ class SettlementScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final lines = ref.watch(settlementProvider(basketId));
     final live = ref.watch(liveBasketProvider(basketId));
     final members = ref.watch(membersProvider).value ?? const [];
     final basket = live.basket;
 
-    if (basket == null || !lines.hasValue) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    if (basket == null || !lines.hasValue) return const SkeletonScreen();
 
     final currency = basket.currencyCode;
     final items = live.items;
@@ -50,120 +48,154 @@ class SettlementScreen extends ConsumerWidget {
         .fold<int>(0, (sum, i) => sum + i.priceMinor!);
     final receipt = basket.receiptTotalMinor ?? itemSum;
     final gap = receipt - itemSum;
+    final count =
+        ref.watch(activeMembersProvider).value?.length ?? members.length;
+    // Display only, the same truncating division the server uses (rule 6).
+    final each = count == 0 ? 0 : gap ~/ count;
+    String money(int minor) => MoneyFormat.format(minor, currency);
 
     HouseholdMember? member(int id) =>
         members.where((m) => m.id == id).firstOrNull;
     String name(int id) => member(id)?.displayName ?? '';
+    final shopper = name(basket.shopperMemberId);
+    final store = (ref.watch(storesProvider).value ?? const <Store>[])
+        .where((s) => s.id == basket.storeId)
+        .firstOrNull
+        ?.name;
+    final day = describeDay(l10n, basket.openedAt, DateTime.now());
+    final title = store == null
+        ? l10n.settlementRunTitlePlain(day)
+        : l10n.settlementRunTitle(store, day);
 
     final summary = [
+      l10n.settlementShareHeader(title, money(receipt)),
       for (final line in lines.value!)
         l10n.settlementShareLine(
           name(line.fromMemberId),
           name(line.toMemberId),
-          MoneyFormat.format(line.amountMinor, currency),
+          money(line.amountMinor),
         ),
     ].join('\n');
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          TextButton(
-            onPressed: () => context.go(Routes.home),
-            style: TextButton.styleFrom(minimumSize: const Size(64, 44)),
-            child: Text(l10n.settlementDone),
-          ),
+    return ObScaffold(
+      bottomBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (lines.value!.isNotEmpty) ...[
+            Builder(
+              builder: (buttonContext) => PrimaryButton(
+                label: l10n.settlementShare,
+                icon: CupertinoIcons.share,
+                onPressed: () {
+                  final box = buttonContext.findRenderObject() as RenderBox?;
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text: summary,
+                      sharePositionOrigin: box == null
+                          ? null
+                          : box.localToGlobal(Offset.zero) & box.size,
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(
+              height: 28,
+              child: Center(
+                child: Text(
+                  l10n.settlementShareNote,
+                  style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+                ),
+              ),
+            ),
+          ] else
+            PrimaryButton(
+              label: l10n.settlementDone,
+              onPressed: () => context.go(Routes.home),
+            ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: theme.textTheme.bodyLarge!.color,
-                borderRadius: BorderRadius.circular(8),
+          Row(
+            children: [
+              Tag(l10n.settlementBadge, icon: CupertinoIcons.checkmark_alt),
+              const Spacer(),
+              LinkText(
+                l10n.settlementDone,
+                fontSize: 14,
+                onTap: () => context.go(Routes.home),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    CupertinoIcons.checkmark_alt,
-                    size: 13,
-                    color: theme.scaffoldBackgroundColor,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.settlementBadge,
-                    style: OpenBasketText.label(theme.scaffoldBackgroundColor),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.settlementTitle,
-            style: OpenBasketText.display(theme.textTheme.bodyLarge!.color!),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.settlementSummary(
+          const SizedBox(height: 10),
+          ScreenTitle(
+            title,
+            subtitle: l10n.settlementSummary(
               l10n.checkoutItems(items.length),
               unavailable,
-              MoneyFormat.format(receipt, currency),
+              money(receipt),
             ),
-            style: theme.textTheme.bodySmall,
           ),
-          const SizedBox(height: 28),
-          Text(l10n.settlementWhoOwes, style: theme.textTheme.labelSmall),
+          const SizedBox(height: 22),
+          SectionLabel(l10n.settlementWhoOwes),
           const SizedBox(height: 8),
           if (lines.value!.isEmpty)
             _Nobody()
           else
-            for (final line in lines.value!)
+            for (final line in lines.value!) ...[
               _Line(
                 line: line,
                 from: member(line.fromMemberId),
                 to: name(line.toMemberId),
                 currency: currency,
               ),
+              const SizedBox(height: 10),
+            ],
           if (gap != 0) ...[
-            const SizedBox(height: 28),
-            Text(l10n.settlementGapTitle, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 8),
-            _Figure(
-              label: l10n.settlementItemsPriced,
-              value: MoneyFormat.format(itemSum, currency),
-            ),
-            _Figure(
-              label: l10n.settlementReceipt,
-              value: MoneyFormat.format(receipt, currency),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.settlementGapAcross(
-                MoneyFormat.format(gap, currency),
-                ref.watch(activeMembersProvider).value?.length ??
-                    members.length,
+            const SizedBox(height: 12),
+            TonalCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionLabel(l10n.settlementGapTitle),
+                  const SizedBox(height: 4),
+                  _Figure(
+                    label: l10n.settlementItemsPriced,
+                    value: money(itemSum),
+                  ),
+                  _Figure(label: l10n.settlementReceipt, value: money(receipt)),
+                  Divider(height: 16, color: ob.faint),
+                  _Figure(
+                    label: l10n.settlementGapAcross(money(gap), count),
+                    value: l10n.settlementEach(money(each)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.settlementShopperCarries(shopper),
+                    style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+                  ),
+                ],
               ),
-              style: theme.textTheme.bodySmall,
             ),
           ],
-          const SizedBox(height: 32),
-          if (lines.value!.isNotEmpty)
-            OutlinedButton(
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: summary));
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.settlementCopied)),
-                );
-              },
-              child: Text(l10n.settlementCopy),
-            ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.settlementPaid(shopper),
+                  style: OpenBasketText.body(ob.meta).copyWith(fontSize: 14),
+                ),
+              ),
+              Text(
+                money(receipt),
+                style: OpenBasketText.money(ob.onGround).copyWith(fontSize: 18),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -186,31 +218,30 @@ class _Line extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final ink = theme.textTheme.bodyLarge!.color!;
+    final ob = Ob.of(context);
+    final ink = ob.onGround;
     final items = MoneyFormat.format(line.itemsMinor, currency);
     final gap = line.receiptGapMinor;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: theme.dividerColor)),
-      ),
+    return Glass(
+      radius: 18,
+      padding: const EdgeInsets.all(17),
       child: Row(
         children: [
-          if (from != null) MemberInitial(member: from!, size: 32),
-          const SizedBox(width: 12),
+          if (from != null) MemberInitial(member: from!, size: 38),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   l10n.settlementOwes(from?.displayName ?? '', to),
-                  style: OpenBasketText.item(ink),
+                  style: OpenBasketText.title(ink),
                 ),
-                const SizedBox(height: 2),
                 Text(
-                  gap >= 0
+                  gap == 0
+                      ? l10n.liveBasketLineItems(items)
+                      : gap > 0
                       ? l10n.settlementBreakdown(
                           items,
                           MoneyFormat.format(gap, currency),
@@ -219,11 +250,12 @@ class _Line extends StatelessWidget {
                           items,
                           MoneyFormat.format(-gap, currency),
                         ),
-                  style: theme.textTheme.bodySmall,
+                  style: OpenBasketText.meta(ob.meta),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             MoneyFormat.format(line.amountMinor, currency),
             style: OpenBasketText.money(ink).copyWith(fontSize: 20),
@@ -242,15 +274,20 @@ class _Figure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
+          Expanded(
+            child: Text(
+              label,
+              style: OpenBasketText.body(ob.meta).copyWith(fontSize: 14),
+            ),
+          ),
           Text(
             value,
-            style: OpenBasketText.money(theme.textTheme.bodyLarge!.color!),
+            style: OpenBasketText.mono(color: ob.onGround, fontSize: 14),
           ),
         ],
       ),
@@ -262,15 +299,14 @@ class _Nobody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    final ob = Ob.of(context);
+    return TonalCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.settlementNobody, style: theme.textTheme.titleMedium),
+          Text(l10n.settlementNobody, style: OpenBasketText.title(ob.onGround)),
           const SizedBox(height: 4),
-          Text(l10n.settlementNobodyNote, style: theme.textTheme.bodySmall),
+          Text(l10n.settlementNobodyNote, style: OpenBasketText.meta(ob.meta)),
         ],
       ),
     );

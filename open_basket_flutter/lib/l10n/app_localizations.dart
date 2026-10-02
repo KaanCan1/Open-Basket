@@ -283,13 +283,13 @@ abstract class AppLocalizations {
   /// No description provided for @householdChoiceHeadline.
   ///
   /// In en, this message translates to:
-  /// **'Who are you\nshopping with?'**
+  /// **'Find your people'**
   String get householdChoiceHeadline;
 
   /// No description provided for @householdChoiceBlurb.
   ///
   /// In en, this message translates to:
-  /// **'Start a household, or join one with the six characters someone already in it can read out.'**
+  /// **'A household is the group you shop for. You can be in one at a time.'**
   String get householdChoiceBlurb;
 
   /// No description provided for @householdChoiceCreate.
@@ -343,13 +343,13 @@ abstract class AppLocalizations {
   /// No description provided for @joinHouseholdTitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter the code'**
+  /// **'Join with a code'**
   String get joinHouseholdTitle;
 
   /// No description provided for @joinHouseholdBlurb.
   ///
   /// In en, this message translates to:
-  /// **'Six characters from someone already in the household. Case does not matter.'**
+  /// **'Six characters, from whoever set up the household.'**
   String get joinHouseholdBlurb;
 
   /// No description provided for @joinHouseholdLabel.
@@ -439,7 +439,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeMembersTitle.
   ///
   /// In en, this message translates to:
-  /// **'IN THIS HOUSEHOLD'**
+  /// **'In the house'**
   String get homeMembersTitle;
 
   /// No description provided for @homeOwnerTag.
@@ -481,19 +481,19 @@ abstract class AppLocalizations {
   /// No description provided for @homeBasketSee.
   ///
   /// In en, this message translates to:
-  /// **'Open it'**
+  /// **'See the basket'**
   String get homeBasketSee;
 
   /// No description provided for @openSheetTitle.
   ///
   /// In en, this message translates to:
-  /// **'How long?'**
+  /// **'Open a basket'**
   String get openSheetTitle;
 
   /// No description provided for @openSheetBlurb.
   ///
   /// In en, this message translates to:
-  /// **'The basket closes itself when the time runs out. Everyone can add until then.'**
+  /// **'The house gets a notification the second you do.'**
   String get openSheetBlurb;
 
   /// No description provided for @openSheetMinutes.
@@ -529,7 +529,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketAddHint.
   ///
   /// In en, this message translates to:
-  /// **'Add an item'**
+  /// **'Add an item…'**
   String get liveBasketAddHint;
 
   /// No description provided for @liveBasketNoteHint.
@@ -547,7 +547,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Nothing in the basket yet.'**
+  /// **'Nothing in the basket yet'**
   String get liveBasketEmpty;
 
   /// No description provided for @liveBasketEmptyNote.
@@ -931,7 +931,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketOfflineHint.
   ///
   /// In en, this message translates to:
-  /// **'Offline — anything you add is kept here and sent the moment you\'re back.'**
+  /// **'Offline — anything you add is kept here and sent the moment you are back.'**
   String get liveBasketOfflineHint;
 
   /// No description provided for @liveBasketBackOnline.
@@ -1399,7 +1399,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCurrencyNote.
   ///
   /// In en, this message translates to:
-  /// **'Every price and settlement uses it.'**
+  /// **'every price and settlement'**
   String get settingsCurrencyNote;
 
   /// No description provided for @settingsStores.
@@ -2113,7 +2113,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketAddNote.
   ///
   /// In en, this message translates to:
-  /// **'Add a note'**
+  /// **'Add a note — brand, size, \"only if fresh\"'**
   String get liveBasketAddNote;
 
   /// No description provided for @noteAnyBrand.
@@ -2187,6 +2187,642 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Extend +5'**
   String get liveBasketExtendPlus;
+
+  /// No description provided for @codeEntryMismatchTries.
+  ///
+  /// In en, this message translates to:
+  /// **'Codes expire after 10 minutes. {count, plural, =1{One try left} =2{Two tries left} other{{count} tries left}}, then we\'ll send a fresh one.'**
+  String codeEntryMismatchTries(int count);
+
+  /// No description provided for @householdChoiceCreateNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll get a permanent six-character code to send to the others.'**
+  String get householdChoiceCreateNote;
+
+  /// No description provided for @householdChoiceOr.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get householdChoiceOr;
+
+  /// No description provided for @householdChoiceJoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with a code'**
+  String get householdChoiceJoinTitle;
+
+  /// No description provided for @homeHouseholdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Household'**
+  String get homeHouseholdLabel;
+
+  /// No description provided for @homeNoBasketTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No basket open'**
+  String get homeNoBasketTitle;
+
+  /// No description provided for @homeLastRunLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Last run {day} · {amount}'**
+  String homeLastRunLine(String day, String amount);
+
+  /// No description provided for @homeNoRunsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No runs yet'**
+  String get homeNoRunsYet;
+
+  /// No description provided for @homeOpenBasketNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Heading to the shop? Give the house a few minutes to chip in.'**
+  String get homeOpenBasketNote;
+
+  /// No description provided for @homeRecentRuns.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent runs'**
+  String get homeRecentRuns;
+
+  /// No description provided for @homeAllRuns.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get homeAllRuns;
+
+  /// No description provided for @homeRecentRunTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{store} · {day}'**
+  String homeRecentRunTitle(String store, String day);
+
+  /// No description provided for @homeRecentRunMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item} other{{count} items}} · {status}'**
+  String homeRecentRunMeta(int count, String status);
+
+  /// No description provided for @dayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get dayToday;
+
+  /// No description provided for @dayYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'yesterday'**
+  String get dayYesterday;
+
+  /// No description provided for @runSettledLower.
+  ///
+  /// In en, this message translates to:
+  /// **'settled'**
+  String get runSettledLower;
+
+  /// No description provided for @runCancelledLower.
+  ///
+  /// In en, this message translates to:
+  /// **'cancelled'**
+  String get runCancelledLower;
+
+  /// No description provided for @openSheetEstimateLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated {minutes} min from your distance to {store}. Pick your own if you know better.'**
+  String openSheetEstimateLine(int minutes, String store);
+
+  /// No description provided for @openSheetClosesAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Closes at {time} · one extension of +5 min available'**
+  String openSheetClosesAt(String time);
+
+  /// No description provided for @openSheetMinUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get openSheetMinUnit;
+
+  /// No description provided for @openSheetCustomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get openSheetCustomHint;
+
+  /// No description provided for @storesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved stores'**
+  String get storesSaved;
+
+  /// No description provided for @storesLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading your location once…'**
+  String get storesLocating;
+
+  /// No description provided for @errorNudgeTooSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'The house was nudged a moment ago. Give them a minute.'**
+  String get errorNudgeTooSoon;
+
+  /// No description provided for @countdownServerTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Server time · only {name} can change the clock'**
+  String countdownServerTime(String name);
+
+  /// No description provided for @countdownStillCounting.
+  ///
+  /// In en, this message translates to:
+  /// **'Server time · still counting without your phone'**
+  String get countdownStillCounting;
+
+  /// No description provided for @countdownStoreCloses.
+  ///
+  /// In en, this message translates to:
+  /// **'{store} · closes {time}'**
+  String countdownStoreCloses(String store, String time);
+
+  /// No description provided for @countdownRunAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s {store} run'**
+  String countdownRunAt(String name, String store);
+
+  /// No description provided for @countdownRunLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{run} · ran {minutes} min · closed {time}'**
+  String countdownRunLine(String run, int minutes, String time);
+
+  /// No description provided for @countdownCancelledLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{run} · cancelled {time}'**
+  String countdownCancelledLine(String run, String time);
+
+  /// No description provided for @liveBasketEmptyTold.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} just got the notification. Add something so they know it\'s real.'**
+  String liveBasketEmptyTold(String names);
+
+  /// No description provided for @liveBasketEmptyNoOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the first thing, and everyone sees it the moment you do.'**
+  String get liveBasketEmptyNoOne;
+
+  /// No description provided for @liveBasketUsuallyFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From your last runs at {store}.'**
+  String liveBasketUsuallyFrom(String store);
+
+  /// No description provided for @liveBasketUsuallyFromAny.
+  ///
+  /// In en, this message translates to:
+  /// **'From your last runs.'**
+  String get liveBasketUsuallyFromAny;
+
+  /// No description provided for @liveBasketLookingNow.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} {count, plural, =1{is} other{are}} looking now'**
+  String liveBasketLookingNow(String names, int count);
+
+  /// No description provided for @liveBasketNobodyLooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody else has it open yet'**
+  String get liveBasketNobodyLooking;
+
+  /// No description provided for @liveBasketNudge.
+  ///
+  /// In en, this message translates to:
+  /// **'Nudge the ones who aren\'t'**
+  String get liveBasketNudge;
+
+  /// No description provided for @liveBasketNudged.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Everyone is already here.} =1{Nudged 1 person.} other{Nudged {count} people.}}'**
+  String liveBasketNudged(int count);
+
+  /// No description provided for @liveBasketAddedAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added {ago}'**
+  String liveBasketAddedAgo(String name, String ago);
+
+  /// No description provided for @agoSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}s ago'**
+  String agoSeconds(int count);
+
+  /// No description provided for @agoMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min ago'**
+  String agoMinutes(int count);
+
+  /// No description provided for @liveBasketItemsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item} other{{count} items}}'**
+  String liveBasketItemsHeader(int count);
+
+  /// No description provided for @liveBasketItemsSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item so far} other{{count} items so far}}'**
+  String liveBasketItemsSoFar(int count);
+
+  /// No description provided for @liveBasketNothingYours.
+  ///
+  /// In en, this message translates to:
+  /// **'nothing of yours yet'**
+  String get liveBasketNothingYours;
+
+  /// No description provided for @liveBasketInSync.
+  ///
+  /// In en, this message translates to:
+  /// **'in sync'**
+  String get liveBasketInSync;
+
+  /// No description provided for @liveBasketStillToFind.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} still to find'**
+  String liveBasketStillToFind(int count);
+
+  /// No description provided for @liveBasketStillToFindPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Still to find'**
+  String get liveBasketStillToFindPlain;
+
+  /// No description provided for @liveBasketGotSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Got'**
+  String get liveBasketGotSection;
+
+  /// No description provided for @liveBasketGotUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{got} got · {unavailable} unavailable'**
+  String liveBasketGotUnavailable(int got, int unavailable);
+
+  /// No description provided for @liveBasketLastCallTold.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} {count, plural, =1{has} other{have}} been told it\'s the last call.'**
+  String liveBasketLastCallTold(String names, int count);
+
+  /// No description provided for @liveBasketHowExtending.
+  ///
+  /// In en, this message translates to:
+  /// **'How extending works'**
+  String get liveBasketHowExtending;
+
+  /// No description provided for @liveBasketHowExtendingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'One extension per basket, five minutes, shopper only. The hatched part of the bar is the time you added, so everyone can see where it came from.'**
+  String get liveBasketHowExtendingNote;
+
+  /// No description provided for @liveBasketOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'original {minutes} min'**
+  String liveBasketOriginal(int minutes);
+
+  /// No description provided for @liveBasketExtensionLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'+5 min extension'**
+  String get liveBasketExtensionLegend;
+
+  /// No description provided for @liveBasketCancelThis.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this basket'**
+  String get liveBasketCancelThis;
+
+  /// No description provided for @itemHasIt.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has it'**
+  String itemHasIt(String name);
+
+  /// No description provided for @itemAddedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {time}'**
+  String itemAddedAt(String time);
+
+  /// No description provided for @itemNotPicked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not picked'**
+  String get itemNotPicked;
+
+  /// No description provided for @youTag.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get youTag;
+
+  /// No description provided for @liveBasketJoinedAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} opened one {ago}'**
+  String liveBasketJoinedAgo(String name, String ago);
+
+  /// No description provided for @liveBasketOpenOwnLater.
+  ///
+  /// In en, this message translates to:
+  /// **'You can open your own once this one closes at {time}.'**
+  String liveBasketOpenOwnLater(String time);
+
+  /// No description provided for @liveBasketBackOnlineOne.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is on everyone\'s list now. It kept the time you added it.'**
+  String liveBasketBackOnlineOne(String name);
+
+  /// No description provided for @liveBasketWhatYouAsked.
+  ///
+  /// In en, this message translates to:
+  /// **'What you asked for'**
+  String get liveBasketWhatYouAsked;
+
+  /// No description provided for @liveBasketAskedNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'You didn\'t add anything to this run.'**
+  String get liveBasketAskedNothing;
+
+  /// No description provided for @liveBasketNothingWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is waiting on you.'**
+  String get liveBasketNothingWaiting;
+
+  /// No description provided for @liveBasketStillAtTill.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is still at the till.'**
+  String liveBasketStillAtTill(String name);
+
+  /// No description provided for @liveBasketYouOwe.
+  ///
+  /// In en, this message translates to:
+  /// **'You owe {name}'**
+  String liveBasketYouOwe(String name);
+
+  /// No description provided for @liveBasketOwesYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} owes you'**
+  String liveBasketOwesYou(String name);
+
+  /// No description provided for @liveBasketLineParts.
+  ///
+  /// In en, this message translates to:
+  /// **'{items} items + {gap} gap'**
+  String liveBasketLineParts(String items, String gap);
+
+  /// No description provided for @liveBasketLineItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{items} items'**
+  String liveBasketLineItems(String items);
+
+  /// No description provided for @liveBasketNothingToPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing for you to pay on this one.'**
+  String get liveBasketNothingToPay;
+
+  /// No description provided for @liveBasketSeeWholeRun.
+  ///
+  /// In en, this message translates to:
+  /// **'See the whole run'**
+  String get liveBasketSeeWholeRun;
+
+  /// No description provided for @liveBasketSeeWholeBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'See the whole basket'**
+  String get liveBasketSeeWholeBasket;
+
+  /// No description provided for @liveBasketBackHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the household'**
+  String get liveBasketBackHome;
+
+  /// No description provided for @liveBasketYouFroze.
+  ///
+  /// In en, this message translates to:
+  /// **'You froze it at {time}'**
+  String liveBasketYouFroze(String time);
+
+  /// No description provided for @liveBasketYouFrozeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The list is final. Type in what the till charged.'**
+  String get liveBasketYouFrozeNote;
+
+  /// No description provided for @liveBasketWholeBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'The whole basket'**
+  String get liveBasketWholeBasket;
+
+  /// No description provided for @cancelSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this basket?'**
+  String get cancelSheetTitle;
+
+  /// No description provided for @cancelSheetNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The clock stops now and nobody can add anything. Nothing gets priced and nobody owes anybody.'**
+  String get cancelSheetNote;
+
+  /// No description provided for @cancelSheetTimeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Time left'**
+  String get cancelSheetTimeLeft;
+
+  /// No description provided for @cancelSheetDropped.
+  ///
+  /// In en, this message translates to:
+  /// **'Items that get dropped'**
+  String get cancelSheetDropped;
+
+  /// No description provided for @cancelSheetTold.
+  ///
+  /// In en, this message translates to:
+  /// **'People told'**
+  String get cancelSheetTold;
+
+  /// No description provided for @cancelSheetHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'It shows up in history as cancelled. You can open a new basket straight away.'**
+  String get cancelSheetHistory;
+
+  /// No description provided for @cancelSheetYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, cancel it'**
+  String get cancelSheetYes;
+
+  /// No description provided for @cancelSheetKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep shopping'**
+  String get cancelSheetKeep;
+
+  /// No description provided for @checkoutStoreItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{store} · {count, plural, =1{1 item} other{{count} items}}'**
+  String checkoutStoreItems(String store, int count);
+
+  /// No description provided for @settlementRunTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{store} run, {day}'**
+  String settlementRunTitle(String store, String day);
+
+  /// No description provided for @settlementRunTitlePlain.
+  ///
+  /// In en, this message translates to:
+  /// **'The run, {day}'**
+  String settlementRunTitlePlain(String day);
+
+  /// No description provided for @settlementEach.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} each'**
+  String settlementEach(String amount);
+
+  /// No description provided for @settlementShopperCarries.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} carries their own share of the gap and any remaining cent, so the lines above always add up to what they paid.'**
+  String settlementShopperCarries(String name);
+
+  /// No description provided for @settlementPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} paid'**
+  String settlementPaid(String name);
+
+  /// No description provided for @settlementShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share the summary'**
+  String get settlementShare;
+
+  /// No description provided for @settlementShareNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain text — no app needed on their end.'**
+  String get settlementShareNote;
+
+  /// No description provided for @settlementShareHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} · {total}'**
+  String settlementShareHeader(String title, String total);
+
+  /// No description provided for @historyEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No runs yet'**
+  String get historyEmptyTitle;
+
+  /// No description provided for @historyEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first basket will show up here with who asked for what.'**
+  String get historyEmptyBody;
+
+  /// No description provided for @commonOfflineRetryNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is lost. Try again when you have signal.'**
+  String get commonOfflineRetryNote;
+
+  /// No description provided for @historyStoppedAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'stopped after {minutes} min'**
+  String historyStoppedAfter(int minutes);
+
+  /// No description provided for @historyCancelledByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled by {name}'**
+  String historyCancelledByName(String name);
+
+  /// No description provided for @historyNothingToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to share'**
+  String get historyNothingToShare;
+
+  /// No description provided for @membersCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the code'**
+  String get membersCopy;
+
+  /// No description provided for @settingsBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get settingsBack;
+
+  /// No description provided for @currencySearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search {count} currencies'**
+  String currencySearch(int count);
+
+  /// No description provided for @currencyCommon.
+  ///
+  /// In en, this message translates to:
+  /// **'Common'**
+  String get currencyCommon;
+
+  /// No description provided for @currencyBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get currencyBack;
+
+  /// No description provided for @liveBasketDoneAdding.
+  ///
+  /// In en, this message translates to:
+  /// **'Done adding'**
+  String get liveBasketDoneAdding;
 }
 
 class _AppLocalizationsDelegate

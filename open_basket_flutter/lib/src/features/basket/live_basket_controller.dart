@@ -250,7 +250,10 @@ class LiveBasketController extends Notifier<LiveBasketState> {
       state = state.copyWith(connection: LiveConnection.over);
     }
 
-    state = state.copyWith(lastSyncedAt: DateTime.now());
+    state = state.copyWith(
+      lastSyncedAt: DateTime.now(),
+      viewers: event.viewerMemberIds,
+    );
     _refreshMembersIfSomeoneIsNew();
     if (event.type == BasketEventType.snapshot) unawaited(_flush());
 
@@ -258,7 +261,13 @@ class LiveBasketController extends Notifier<LiveBasketState> {
     // once. Without this it kept saying "a basket is open" after the stream
     // had reported the basket frozen — found by letting a basket close itself
     // in the background and then going back.
-    if (event.type != BasketEventType.itemAdded &&
+    // Someone opening or leaving the screen (ADR-049) changes nothing the
+    // home screen shows.
+    final presenceOnly =
+        event.type == BasketEventType.basketUpdated &&
+        event.viewerMemberIds != null;
+    if (!presenceOnly &&
+        event.type != BasketEventType.itemAdded &&
         event.type != BasketEventType.itemUpdated &&
         event.type != BasketEventType.itemRemoved) {
       ref.invalidate(activeBasketProvider);

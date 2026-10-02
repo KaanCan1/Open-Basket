@@ -83,6 +83,49 @@ abstract final class NotificationService {
     return sent;
   }
 
+  /// Screen 10's nudge: the members who are neither looking at the basket
+  /// nor have anything on it yet, if they want to hear about baskets opening
+  /// at all. Returns how many members that was.
+  static Future<int> nudge(
+    Session session,
+    Basket basket, {
+    required int fromMemberId,
+    required Set<int> lookingMemberIds,
+  }) async {
+    var count = 0;
+    await _guard(session, 'nudge', basket.id!, () async {
+      final members = await _activeMembers(session, basket.householdId);
+      final items = await BasketItem.db.find(
+        session,
+        where: (t) => t.basketId.equals(basket.id!),
+      );
+      final asked = {for (final item in items) item.requesterMemberId};
+      final targets = [
+        for (final m in members)
+          if (m.id != fromMemberId &&
+              m.id != basket.shopperMemberId &&
+              !lookingMemberIds.contains(m.id) &&
+              !asked.contains(m.id))
+            m,
+      ];
+      count = targets.length;
+      final message = NotificationCopy.nudge(
+        from: _byId(members, fromMemberId)?.displayName ?? '',
+        shopper: _byId(members, basket.shopperMemberId)?.displayName ?? '',
+        minutesLeft: basket.closesAt
+            .difference(ServerClock.now())
+            .inMinutes
+            .clamp(1, 1 << 30),
+        basketId: basket.id!,
+      );
+      await _deliver(session, {
+        for (final m in targets)
+          if (m.notifyBasketOpened) m: message,
+      });
+    });
+    return count;
+  }
+
   /// Each member who owes something, told how much and to whom.
   static Future<void> settlementReady(
     Session session,

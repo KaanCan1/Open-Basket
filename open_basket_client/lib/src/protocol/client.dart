@@ -325,6 +325,20 @@ class EndpointBasket extends _isc.EndpointRef {
         {'basketId': basketId},
       );
 
+  /// Any member, while the basket is `open`: a push to everyone in the house
+  /// who does not have it on screen right now and has not added anything
+  /// yet (screen 10's "Nudge the ones who aren't"). Never the caller.
+  ///
+  /// Once a minute per basket at most, so a household cannot be buzzed in a
+  /// loop; a second tap inside that answers `nudgeTooSoon`. Returns how many
+  /// people it went to, before their own notification switches, which the
+  /// sender still respects.
+  _ida.Future<int> nudge(int basketId) => caller.callServerEndpoint<int>(
+    'basket',
+    'nudge',
+    {'basketId': basketId},
+  );
+
   /// The household's open or frozen basket, or null. This is also what a
   /// client calls on cold start to discover that a basket closed while it was
   /// away.

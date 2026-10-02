@@ -40,37 +40,74 @@ abstract final class OpenBasketColors {
   static const glassBorderDark = Color(0x24F7F7F5);
 }
 
-/// Per-member tones. One per person, for life — a member's colour never
-/// changes, because people learn it.
+/// One member's tone: the fill of their avatar and the letter on it, or an
+/// outline when the house has more people than greys.
+class MemberTone {
+  const MemberTone(this.fill, this.onFill, {this.outlined = false});
+
+  final Color fill;
+  final Color onFill;
+  final bool outlined;
+}
+
+/// Per-member tones, from the design's person chip: greys from ink to chip,
+/// then an outline. One per person, for life — a member's tone never changes,
+/// because people learn it. Colour is kept for time (Signal); people are told
+/// apart by their initial and their grey.
+///
+/// The index is the member's place in the household, longest-standing first,
+/// former members included (`memberToneProvider`), so the first five people
+/// never share a tone and nobody's tone moves when someone leaves.
 abstract final class MemberTones {
-  static const light = <Color>[
-    Color(0xFF3A5A40),
-    Color(0xFF6B4E71),
-    Color(0xFF9C6644),
-    Color(0xFF335C81),
-    Color(0xFF7D4F50),
+  static const light = <MemberTone>[
+    MemberTone(Color(0xFF4A4A46), OpenBasketColors.paper),
+    MemberTone(OpenBasketColors.ink, OpenBasketColors.paper),
+    MemberTone(Color(0xFF8E8E88), OpenBasketColors.paper),
+    MemberTone(Color(0xFFC9C9C4), OpenBasketColors.ink),
+    MemberTone(
+      Colors.transparent,
+      OpenBasketColors.ink,
+      outlined: true,
+    ),
   ];
 
-  static const dark = <Color>[
-    Color(0xFF8FBF9F),
-    Color(0xFFC3A1C9),
-    Color(0xFFDBA97C),
-    Color(0xFF8FB8DE),
-    Color(0xFFD49FA0),
+  static const dark = <MemberTone>[
+    MemberTone(Color(0xFF9A9A94), OpenBasketColors.ink),
+    MemberTone(OpenBasketColors.paper, OpenBasketColors.ink),
+    MemberTone(Color(0xFF5F5F5A), OpenBasketColors.paper),
+    MemberTone(Color(0xFF3A3A36), OpenBasketColors.paper),
+    MemberTone(
+      Colors.transparent,
+      OpenBasketColors.paper,
+      outlined: true,
+    ),
   ];
 
-  /// Stable across sessions and devices: the same member id always lands on
-  /// the same tone, so two phones never disagree about who is green.
-  static Color forMember(int memberId, Brightness brightness) {
+  static MemberTone of(int index, Brightness brightness) {
     final palette = brightness == Brightness.dark ? dark : light;
-    return palette[memberId.abs() % palette.length];
+    return palette[index.abs() % palette.length];
   }
 }
 
-/// The type scale. Archivo carries everything except numbers you read under
-/// time pressure; those are mono so the digits do not jitter as they tick.
+/// The type scale. Archivo carries words; JetBrains Mono carries numbers you
+/// read under time pressure (so the digits do not jitter as they tick), money,
+/// codes and the small uppercase labels.
 abstract final class OpenBasketText {
-  static TextStyle countdown(Color color) => GoogleFonts.robotoMono(
+  static TextStyle mono({
+    required Color color,
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w700,
+    double? letterSpacing,
+    double? height,
+  }) => GoogleFonts.jetBrainsMono(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: letterSpacing,
+    height: height,
+    color: color,
+  );
+
+  static TextStyle countdown(Color color) => GoogleFonts.jetBrainsMono(
     fontSize: 60,
     height: 1.0,
     fontWeight: FontWeight.w700,
@@ -78,12 +115,24 @@ abstract final class OpenBasketText {
     color: color,
   );
 
+  /// Screen titles: "Kaya household", "Check your email". 32/700, tight.
   static TextStyle display(Color color) => GoogleFonts.archivo(
-    fontSize: 30,
+    fontSize: 32,
     height: 1.1,
     fontWeight: FontWeight.w700,
+    letterSpacing: -1.12,
     color: color,
   );
+
+  /// Card titles: "No basket open", "Ayşe owes Kaan". 17/700.
+  static TextStyle title(Color color, {double fontSize = 17}) =>
+      GoogleFonts.archivo(
+        fontSize: fontSize,
+        height: 1.2,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.02 * fontSize,
+        color: color,
+      );
 
   static TextStyle item(Color color) => GoogleFonts.archivo(
     fontSize: 16,
@@ -97,15 +146,17 @@ abstract final class OpenBasketText {
   static TextStyle meta(Color color) =>
       GoogleFonts.archivo(fontSize: 13, height: 1.35, color: color);
 
-  static TextStyle label(Color color) => GoogleFonts.archivo(
+  /// "IN THE HOUSE", "RECENT RUNS": mono, 11/500, tracked 0.12em. The
+  /// string is uppercased by the widget, not the copy.
+  static TextStyle label(Color color) => GoogleFonts.jetBrainsMono(
     fontSize: 11,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 1.1,
+    fontWeight: FontWeight.w500,
+    letterSpacing: 1.32,
     color: color,
   );
 
   /// Tabular so a column of prices lines up and does not reflow as it changes.
-  static TextStyle money(Color color) => GoogleFonts.robotoMono(
+  static TextStyle money(Color color) => GoogleFonts.jetBrainsMono(
     fontSize: 17,
     fontWeight: FontWeight.w700,
     color: color,
@@ -114,6 +165,10 @@ abstract final class OpenBasketText {
 
 /// Every control clears 44px. A 32px glyph sits in a 44px hit box.
 const double kMinTapTarget = 44;
+
+/// The big full-width button: 58px tall, 17px corners.
+const double kPrimaryButtonHeight = 58;
+const double kButtonRadius = 17;
 
 ThemeData buildOpenBasketTheme(Brightness brightness) {
   final isDark = brightness == Brightness.dark;
@@ -173,13 +228,25 @@ ThemeData buildOpenBasketTheme(Brightness brightness) {
       primaryColor: onGround,
       primaryContrastingColor: ground,
     ),
+    // The design is drawn iPhone-first on both platforms: no ink ripples,
+    // and pages slide in from the side rather than fading up.
+    splashFactory: NoSplash.splashFactory,
+    highlightColor: Colors.transparent,
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        for (final platform in TargetPlatform.values)
+          platform: const CupertinoPageTransitionsBuilder(),
+      },
+    ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: onGround,
-        minimumSize: const Size.fromHeight(52),
-        side: BorderSide(color: onGround),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        textStyle: OpenBasketText.item(onGround),
+        minimumSize: const Size.fromHeight(kPrimaryButtonHeight),
+        side: BorderSide(color: onGround, width: 1.5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kButtonRadius),
+        ),
+        textStyle: OpenBasketText.title(onGround),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -193,20 +260,69 @@ ThemeData buildOpenBasketTheme(Brightness brightness) {
       style: FilledButton.styleFrom(
         backgroundColor: OpenBasketColors.signal,
         foregroundColor: OpenBasketColors.ink,
-        minimumSize: const Size.fromHeight(52),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        textStyle: OpenBasketText.item(OpenBasketColors.ink),
+        disabledBackgroundColor: isDark
+            ? const Color(0xFF1C1C1A)
+            : OpenBasketColors.tonal,
+        disabledForegroundColor: const Color(0xFF8E8E88),
+        minimumSize: const Size.fromHeight(kPrimaryButtonHeight),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kButtonRadius),
+        ),
+        textStyle: OpenBasketText.title(OpenBasketColors.ink),
       ),
     ),
+    // Fields sit on frosted paper with an ink edge (screens 01, 07).
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: isDark ? const Color(0xFF1C1C1A) : OpenBasketColors.tonal,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      hintStyle: OpenBasketText.body(muted),
+      fillColor: isDark
+          ? OpenBasketColors.glassDark
+          : OpenBasketColors.glassLight,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 19),
+      hintStyle: OpenBasketText.body(muted).copyWith(fontSize: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(kButtonRadius),
+        borderSide: BorderSide(color: onGround, width: 1.5),
       ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(kButtonRadius),
+        borderSide: BorderSide(color: onGround, width: 1.5),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(kButtonRadius),
+        borderSide: BorderSide(color: onGround, width: 1.5),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(kButtonRadius),
+        borderSide: BorderSide(
+          color: isDark ? OpenBasketColors.ruleDark : OpenBasketColors.rule,
+          width: 1.5,
+        ),
+      ),
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: onGround,
+      selectionHandleColor: onGround,
+      selectionColor: OpenBasketColors.signal.withValues(alpha: 0.5),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? OpenBasketColors.signal
+            : OpenBasketColors.paper,
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? (isDark ? const Color(0xFF2C2C29) : OpenBasketColors.ink)
+            : (isDark ? const Color(0xFF3A3A36) : const Color(0xFFDCDCD8)),
+      ),
+      trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: isDark ? const Color(0xFF1C1C1A) : OpenBasketColors.ink,
+      contentTextStyle: OpenBasketText.body(OpenBasketColors.paper),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
   );
 }

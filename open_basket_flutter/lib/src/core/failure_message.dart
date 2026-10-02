@@ -51,4 +51,5 @@ String errorMessage(AppLocalizations l10n, BasketError error) =>
       BasketError.invalidSignInCode => l10n.codeEntryMismatch,
       BasketError.signInCodeExpired => l10n.codeEntryExpired,
       BasketError.tooManySignInAttempts => l10n.codeEntryBurned,
+      BasketError.nudgeTooSoon => l10n.errorNudgeTooSoon,
     };

@@ -61,6 +61,7 @@ class LiveBasketState {
     this.queued = const [],
     this.report,
     this.lastSyncedAt,
+    this.viewers = const [],
   });
 
   const LiveBasketState.connecting()
@@ -82,6 +83,10 @@ class LiveBasketState {
   /// while reconnecting.
   final DateTime? lastSyncedAt;
 
+  /// Member ids with this basket on screen right now, as the server last
+  /// said (ADR-049). Includes this phone's own member.
+  final List<int> viewers;
+
   bool get isOpen => basket?.status == BasketStatus.open;
 
   /// [report] is replaced rather than merged: pass [clearReport] to take the
@@ -94,6 +99,7 @@ class LiveBasketState {
     QueueReport? report,
     bool clearReport = false,
     DateTime? lastSyncedAt,
+    List<int>? viewers,
   }) {
     return LiveBasketState(
       connection: connection ?? this.connection,
@@ -102,6 +108,7 @@ class LiveBasketState {
       queued: queued ?? this.queued,
       report: clearReport ? null : report ?? this.report,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      viewers: viewers ?? this.viewers,
     );
   }
 

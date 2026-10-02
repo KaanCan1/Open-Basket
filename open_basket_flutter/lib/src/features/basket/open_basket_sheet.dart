@@ -1,13 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:open_basket_client/open_basket_client.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/eta.dart';
 import '../../core/location.dart';
 import '../../core/router.dart';
+import '../../core/server_clock.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import '../stores/stores_controller.dart';
 import 'basket_controller.dart';
 import '../../core/failure_message.dart';
@@ -24,10 +28,8 @@ class OpenBasketSheet extends ConsumerStatefulWidget {
 
   /// Returns the basket that was opened, or null if the sheet was dismissed.
   static Future<Basket?> show(BuildContext context) {
-    return showModalBottomSheet<Basket>(
+    return showGlassSheet<Basket>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (final _) => const OpenBasketSheet(),
     );
   }
@@ -165,27 +167,38 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
+    final chosen = _chosenMinutes;
+    final closes = chosen == null
+        ? null
+        : DateFormat.Hm().format(
+            ref
+                .read(serverClockProvider)
+                .now()
+                .add(Duration(minutes: chosen))
+                .toLocal(),
+          );
 
     // Scrollable: with the store row, the estimate and the custom field's
     // keyboard all on screen, a fixed column ran off the bottom of a phone.
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        24 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 10, 24, 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.openSheetTitle, style: theme.textTheme.displayLarge),
-          const SizedBox(height: 8),
-          Text(l10n.openSheetBlurb, style: theme.textTheme.bodyMedium),
-          const SizedBox(height: 24),
-          Text(l10n.openSheetStore, style: theme.textTheme.labelSmall),
-          const SizedBox(height: 8),
+          ScreenTitle(
+            l10n.openSheetTitle,
+            subtitle: l10n.openSheetBlurb,
+            fontSize: 27,
+          ),
+          const SizedBox(height: 22),
+          SectionLabel(
+            l10n.openSheetStore,
+            action: l10n.openSheetAddStore,
+            onAction: () => context.push(Routes.stores),
+          ),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -196,51 +209,42 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
                   selected: _store?.id == store.id,
                   onTap: () => _pickStore(store),
                 ),
-              _Pick(
-                label: l10n.openSheetAddStore,
-                selected: false,
-                onTap: () => context.push(Routes.stores),
-              ),
+              _AddPick(onTap: () => context.push(Routes.stores)),
             ],
           ),
-          if (_store != null) ...[
-            const SizedBox(height: 12),
-            _Estimate(
-              store: _store!,
-              estimating: _estimating,
-              minutes: _estimate,
-            ),
-          ],
-          const SizedBox(height: 20),
-          Text(l10n.openSheetHowLong, style: theme.textTheme.labelSmall),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          const SizedBox(height: 22),
+          SectionLabel(
+            l10n.openSheetHowLong,
+            action: l10n.openSheetCustom,
+            onAction: () {
+              setState(() => _custom = true);
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _customFocus.requestFocus(),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          Row(
             children: [
-              for (final minutes in OpenBasketSheet.quickPicks)
-                _Pick(
-                  label: l10n.openSheetMinutes(minutes),
-                  selected: !_custom && _minutes == minutes,
-                  onTap: () => setState(() {
-                    _custom = false;
-                    _minutes = minutes;
-                  }),
+              for (final minutes in OpenBasketSheet.quickPicks) ...[
+                if (minutes != OpenBasketSheet.quickPicks.first)
+                  const SizedBox(width: 8),
+                Expanded(
+                  child: _MinutesTile(
+                    minutes: minutes,
+                    selected: !_custom && _minutes == minutes,
+                    onTap: () => setState(() {
+                      _custom = false;
+                      _minutes = minutes;
+                      _customFocus.unfocus();
+                    }),
+                  ),
                 ),
-              _Pick(
-                label: l10n.openSheetCustom,
-                selected: _custom,
-                onTap: () {
-                  setState(() => _custom = true);
-                  WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => _customFocus.requestFocus(),
-                  );
-                },
-              ),
+              ],
             ],
           ),
           if (_custom) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             TextField(
               controller: _customMinutes,
               focusNode: _customFocus,
@@ -248,29 +252,46 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
               // button; a tap anywhere else is the way out.
               onTapOutside: (_) => _customFocus.unfocus(),
               keyboardType: TextInputType.number,
+              style: OpenBasketText.mono(color: ob.onGround, fontSize: 19),
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(hintText: '30'),
+              decoration: InputDecoration(
+                hintText: '30',
+                suffixText: l10n.openSheetMinUnit,
+              ),
+            ),
+          ],
+          if (_store != null) ...[
+            const SizedBox(height: 10),
+            _Estimate(
+              store: _store!,
+              estimating: _estimating,
+              minutes: _estimate,
             ),
           ],
           if (_error != null) ...[
             const SizedBox(height: 16),
-            Text(_error!, style: OpenBasketText.meta(theme.colorScheme.error)),
+            Text(
+              _error!,
+              style: OpenBasketText.meta(Theme.of(context).colorScheme.error),
+            ),
           ],
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _busy ? null : _open,
-            child: _busy
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(
-                    _chosenMinutes == null
-                        ? l10n.openSheetStart
-                        : l10n.openSheetOpenFor(_chosenMinutes!),
-                  ),
+          const SizedBox(height: 22),
+          PrimaryButton(
+            glow: true,
+            busy: _busy,
+            onPressed: chosen == null ? null : _open,
+            label: chosen == null
+                ? l10n.openSheetStart
+                : l10n.openSheetOpenFor(chosen),
           ),
+          if (closes != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              l10n.openSheetClosesAt(closes),
+              textAlign: TextAlign.center,
+              style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+            ),
+          ],
           const SizedBox(height: 8),
         ],
       ),
@@ -278,6 +299,7 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
   }
 }
 
+/// A store chip: tonal, ink when picked.
 class _Pick extends StatelessWidget {
   const _Pick({
     required this.label,
@@ -291,39 +313,107 @@ class _Pick extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final ink = theme.textTheme.bodyLarge!.color!;
-
+    final ob = Ob.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        // Vertical padding rather than a minHeight plus an alignment: a
-        // Container given an alignment expands to fill the constraints it is
-        // handed, and inside a stretched Column that made every pick the
-        // full width of the sheet instead of a chip. The padding keeps the
-        // 44pt tap target without asking for any width.
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        height: kMinTapTarget,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          // Selected is a fill, so Signal never has to carry text.
-          color: selected
-              ? OpenBasketColors.signal
-              : theme.colorScheme.surfaceContainerHighest,
-          border: Border.all(
-            color: selected ? OpenBasketColors.ink : theme.dividerColor,
-          ),
+          color: selected ? ob.onGround : ob.tonal,
+          borderRadius: BorderRadius.circular(14),
         ),
-        child: Text(
-          label,
-          style: OpenBasketText.item(selected ? OpenBasketColors.ink : ink),
+        child: Center(
+          widthFactor: 1,
+          child: Text(
+            label,
+            style: OpenBasketText.body(
+              selected ? ob.ground : ob.onGround,
+            ).copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
         ),
       ),
     );
   }
 }
 
-/// "Estimated 12 min — from your distance to Migros." A quiet panel, never an
+/// The dashed + after the stores.
+class _AddPick extends StatelessWidget {
+  const _AddPick({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ob = Ob.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: CustomPaint(
+        painter: DashedRectPainter(color: ob.faint, radius: 14),
+        child: SizedBox(
+          width: kMinTapTarget,
+          height: kMinTapTarget,
+          child: Icon(CupertinoIcons.add, size: 18, color: ob.onGround),
+        ),
+      ),
+    );
+  }
+}
+
+/// "15 / min" — one of the four quick picks, ink when chosen.
+class _MinutesTile extends StatelessWidget {
+  const _MinutesTile({
+    required this.minutes,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final int minutes;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final ob = Ob.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 64,
+        decoration: BoxDecoration(
+          color: selected ? ob.onGround : ob.tonal,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '$minutes',
+              style: OpenBasketText.mono(
+                color: selected ? ob.ground : ob.onGround,
+                fontSize: 19,
+              ),
+            ),
+            Text(
+              l10n.openSheetMinUnit,
+              style: OpenBasketText.meta(
+                selected
+                    ? (ob.dark
+                          ? OpenBasketColors.meta
+                          : OpenBasketColors.metaDark)
+                    : ob.meta,
+              ).copyWith(fontSize: 11),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Estimated 12 min from your distance to Migros." A quiet panel, never an
 /// error: without a pinned location or a position it says so and the picks
-/// below carry on as before.
+/// above carry on as before.
 class _Estimate extends StatelessWidget {
   const _Estimate({
     required this.store,
@@ -338,33 +428,47 @@ class _Estimate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
+    final style = OpenBasketText.meta(ob.meta).copyWith(height: 1.45);
 
-    final String title;
-    final String? note;
+    final Widget text;
     if (estimating) {
-      title = l10n.openSheetEstimating(store.name);
-      note = null;
+      text = Text(l10n.openSheetEstimating(store.name), style: style);
     } else if (minutes != null) {
-      title = l10n.openSheetEstimated(minutes!);
-      note = l10n.openSheetEstimatedNote(store.name);
+      final whole = l10n.openSheetEstimateLine(minutes!, store.name);
+      final bold = l10n.openSheetMinutes(minutes!);
+      final at = whole.indexOf(bold);
+      text = at < 0
+          ? Text(whole, style: style)
+          : Text.rich(
+              TextSpan(
+                style: style,
+                children: [
+                  TextSpan(text: whole.substring(0, at)),
+                  TextSpan(
+                    text: bold,
+                    style: TextStyle(
+                      color: ob.onGround,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  TextSpan(text: whole.substring(at + bold.length)),
+                ],
+              ),
+            );
     } else {
-      title = l10n.openSheetNoEstimate(store.name);
-      note = null;
+      text = Text(l10n.openSheetNoEstimate(store.name), style: style);
     }
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Column(
+    return TonalCard(
+      radius: 14,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: theme.textTheme.titleMedium),
-          if (note != null) ...[
-            const SizedBox(height: 2),
-            Text(note, style: theme.textTheme.bodySmall),
-          ],
+          Icon(CupertinoIcons.clock, size: 16, color: ob.onGround),
+          const SizedBox(width: 11),
+          Expanded(child: text),
         ],
       ),
     );

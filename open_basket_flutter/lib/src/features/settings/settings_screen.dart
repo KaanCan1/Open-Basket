@@ -10,6 +10,7 @@ import '../../core/client_provider.dart';
 import '../../core/formatters.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import '../household/household_controller.dart';
 import '../stores/stores_controller.dart';
 import 'currency_screen.dart';
@@ -150,7 +151,6 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final household = ref.watch(myHouseholdProvider).value;
     final me = ref.watch(myMembershipProvider).value;
     final members = ref.watch(activeMembersProvider).value ?? const [];
@@ -159,134 +159,118 @@ class SettingsScreen extends ConsumerWidget {
     final version = ref.watch(_versionProvider).value;
     final email = ref.watch(myEmailProvider).value;
 
-    if (household == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    if (household == null) return const SkeletonScreen(back: true);
 
     final currency = household.currencyCode;
+    final ob = Ob.of(context);
 
-    return Scaffold(
-      appBar: AppBar(),
+    return ObScaffold(
+      back: true,
+      backLabel: l10n.settingsBack,
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
-          Text(l10n.settingsTitle, style: theme.textTheme.displayLarge),
-          const SizedBox(height: 24),
-          if (me != null) ...[
-            Text(l10n.settingsYou, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 4),
-            _Row(
-              label: l10n.settingsYourName,
-              value: me.displayName,
-              note: l10n.settingsYourNameNote,
-              onTap: () => _nameMyself(context, ref, me),
-            ),
-            const SizedBox(height: 24),
-          ],
-          Text(l10n.settingsHousehold, style: theme.textTheme.labelSmall),
+          Text(l10n.settingsTitle, style: OpenBasketText.display(ob.onGround)),
+          const SizedBox(height: 18),
+          SectionLabel(l10n.settingsHousehold),
           const SizedBox(height: 4),
-          _Row(
-            label: l10n.settingsName,
+          ListRow(
+            title: l10n.settingsName,
             value: household.name,
+            chevron: isOwner,
             onTap: isOwner ? () => _rename(context, ref, household) : null,
           ),
-          _Row(
-            label: l10n.settingsCurrency,
-            value:
-                '${MoneyFormat.symbol(currency)} $currency · '
-                '${CurrencyScreen.nameOf(l10n, currency)}',
-            note: l10n.settingsCurrencyNote,
+          ListRow(
+            title: l10n.settingsCurrency,
+            subtitle:
+                '${CurrencyScreen.nameOf(l10n, currency)} · '
+                '${l10n.settingsCurrencyNote}',
+            value: '${MoneyFormat.symbol(currency)} $currency',
+            valueMono: true,
             onTap: () => context.push(Routes.currency),
           ),
-          _Row(
-            label: l10n.settingsStores,
-            value: stores.isEmpty
+          ListRow(
+            title: l10n.settingsStores,
+            subtitle: stores.isEmpty
                 ? l10n.homeStoresNone
                 : stores.map((s) => s.name).join(', '),
             onTap: () => context.push(Routes.stores),
           ),
-          _Row(
-            label: l10n.settingsMembers,
-            value: l10n.settingsMembersValue(members.length, household.code),
+          ListRow(
+            title: l10n.settingsMembers,
+            subtitle: l10n.settingsMembersValue(members.length, household.code),
             onTap: () => context.push(Routes.members),
           ),
+          if (me != null)
+            ListRow(
+              title: l10n.settingsYourName,
+              subtitle: l10n.settingsYourNameNote,
+              value: me.displayName,
+              onTap: () => _nameMyself(context, ref, me),
+            ),
           if (!isOwner) ...[
             const SizedBox(height: 8),
-            Text(l10n.settingsOwnerOnly, style: theme.textTheme.bodySmall),
+            Text(l10n.settingsOwnerOnly, style: OpenBasketText.meta(ob.meta)),
           ],
           if (me != null) ...[
-            const SizedBox(height: 32),
-            Text(l10n.settingsNotifications, style: theme.textTheme.labelSmall),
+            const SizedBox(height: 22),
+            SectionLabel(l10n.settingsNotifications),
             const SizedBox(height: 4),
-            _Switch(
-              label: l10n.settingsNotifyOpened,
-              value: me.notifyBasketOpened,
-              onChanged: (v) => _setNotifications(
-                context,
-                ref,
-                me,
-                basketOpened: v,
+            ListRow(
+              title: l10n.settingsNotifyOpened,
+              trailing: ObSwitch(
+                value: me.notifyBasketOpened,
+                onChanged: (v) =>
+                    _setNotifications(context, ref, me, basketOpened: v),
               ),
             ),
-            _Switch(
-              label: l10n.settingsNotifyClosingSoon,
-              value: me.notifyClosingSoon,
-              onChanged: (v) => _setNotifications(
-                context,
-                ref,
-                me,
-                closingSoon: v,
+            ListRow(
+              title: l10n.settingsNotifyClosingSoon,
+              trailing: ObSwitch(
+                value: me.notifyClosingSoon,
+                onChanged: (v) =>
+                    _setNotifications(context, ref, me, closingSoon: v),
               ),
             ),
-            _Switch(
-              label: l10n.settingsNotifySettled,
-              value: me.notifySettlementReady,
-              onChanged: (v) => _setNotifications(
-                context,
-                ref,
-                me,
-                settlementReady: v,
+            ListRow(
+              title: l10n.settingsNotifySettled,
+              trailing: ObSwitch(
+                value: me.notifySettlementReady,
+                onChanged: (v) =>
+                    _setNotifications(context, ref, me, settlementReady: v),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.settingsNotificationsNote,
-              style: theme.textTheme.bodySmall,
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                l10n.settingsNotificationsNote,
+                style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+              ),
             ),
           ],
-          const SizedBox(height: 32),
-          OutlinedButton(
-            onPressed: ref.watch(signOutProvider),
-            child: Text(l10n.settingsSignOut),
+          const SizedBox(height: 14),
+          ListRow(
+            title: l10n.settingsSignOut,
+            onTap: ref.watch(signOutProvider),
           ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => _leave(context, ref, household),
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
-            ),
-            child: Column(
-              children: [
-                Text(l10n.settingsLeave(household.name)),
-                Text(
-                  l10n.settingsLeaveNote,
-                  style: OpenBasketText.meta(theme.textTheme.bodySmall!.color!),
-                ),
-              ],
-            ),
+          ListRow(
+            title: l10n.settingsLeave(household.name),
+            subtitle: l10n.settingsLeaveNote,
+            destructive: true,
+            onTap: () => _leave(context, ref, household),
           ),
-          const SizedBox(height: 24),
-          Center(
-            child: Text(
-              switch ((version, email)) {
-                (final v?, final e?) => l10n.settingsFooterEmail(v, e),
-                (final v?, null) => l10n.settingsFooter(v),
-                _ => '',
-              },
-              style: theme.textTheme.bodySmall,
+          Divider(height: 1, color: ob.rule),
+          const SizedBox(height: 16),
+          Text(
+            switch ((version, email)) {
+              (final v?, final e?) => l10n.settingsFooterEmail(v, e),
+              (final v?, null) => l10n.settingsFooter(v),
+              _ => '',
+            },
+            style: OpenBasketText.mono(
+              color: ob.meta,
+              fontSize: 11,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ],
@@ -315,96 +299,5 @@ class SettingsScreen extends ConsumerWidget {
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     }
-  }
-}
-
-/// One notification type and its switch (screen 19).
-class _Switch extends StatelessWidget {
-  const _Switch({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      constraints: const BoxConstraints(minHeight: kMinTapTarget),
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: theme.dividerColor)),
-      ),
-      child: Row(
-        children: [
-          Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
-          CupertinoSwitch(
-            value: value,
-            // Ink on paper; in the dark, Signal — a white thumb on the light
-            // ink colour read as neither on nor off.
-            activeTrackColor: theme.brightness == Brightness.dark
-                ? OpenBasketColors.signal
-                : OpenBasketColors.ink,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Row extends StatelessWidget {
-  const _Row({
-    required this.label,
-    required this.value,
-    this.note,
-    this.onTap,
-  });
-
-  final String label;
-  final String value;
-  final String? note;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: kMinTapTarget),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: theme.dividerColor)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: theme.textTheme.bodySmall),
-                  const SizedBox(height: 2),
-                  Text(value, style: theme.textTheme.titleMedium),
-                  if (note != null)
-                    Text(note!, style: theme.textTheme.bodySmall),
-                ],
-              ),
-            ),
-            if (onTap != null)
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 18,
-                color: theme.textTheme.bodySmall!.color,
-              ),
-          ],
-        ),
-      ),
-    );
   }
 }

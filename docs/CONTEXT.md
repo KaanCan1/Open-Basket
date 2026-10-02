@@ -119,7 +119,10 @@ What works, walked on simulators and deployed:
 - Checked on an iPhone SE-sized frame in dark mode (ADR-039). Installed on Kaan's iPhone by
   cable; the free provisioning profile expires 2026-09-29 22:05 Turkey time.
 
-Tests: 214 server, 68 Flutter, CI on every PR to `main`.
+- **Design set v3 on every screen** (ADR-050) and **presence + nudge** on the live basket
+  (ADR-049), on `feat/design-v3`, 2026-10-02. Not deployed yet.
+
+Tests: 223 server, 72 Flutter, CI on every PR to `main`.
 
 Open:
 

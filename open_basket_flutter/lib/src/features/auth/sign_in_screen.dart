@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import 'sign_in_controller.dart';
 
 /// Screen 01. The user types an address; the code arrives by email.
@@ -52,66 +53,81 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall!.color!;
+    final ob = Ob.of(context);
 
-    return Scaffold(
-      body: SafeArea(
-        // Scrollable rather than balanced with flexible gaps: a raised
-        // keyboard takes a few hundred pixels away, and the code screen next
-        // door overflowed for exactly this reason.
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 96),
-              Text(l10n.signInHeadline, style: theme.textTheme.displayLarge),
-              const SizedBox(height: 12),
-              Text(l10n.signInBlurb, style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 40),
-              Text(l10n.signInEmailLabel, style: theme.textTheme.labelSmall),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _email,
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-                autofillHints: const [AutofillHints.email],
-                decoration: InputDecoration(hintText: l10n.signInEmailHint),
-                onSubmitted: (_) => _sending ? null : _send(),
-              ),
-              if (_error != null) ...[
+    return ObScaffold(
+      // Scrollable rather than balanced with flexible gaps: a raised keyboard
+      // takes a few hundred pixels away, and the code screen next door
+      // overflowed for exactly this reason.
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: constraints.maxHeight * 0.14),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: BrandMark(height: 58),
+                ),
+                const SizedBox(height: 30),
+                Text(
+                  l10n.signInHeadline,
+                  style: OpenBasketText.display(
+                    ob.onGround,
+                  ).copyWith(fontSize: 36, height: 1.02, letterSpacing: -1.26),
+                ),
                 const SizedBox(height: 12),
                 Text(
-                  _error!,
-                  style: OpenBasketText.meta(theme.colorScheme.error),
+                  l10n.signInBlurb,
+                  style: OpenBasketText.body(ob.meta).copyWith(fontSize: 16),
                 ),
+                const SizedBox(height: 38),
+                SectionLabel(l10n.signInEmailLabel),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: _email,
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  autofillHints: const [AutofillHints.email],
+                  style: OpenBasketText.body(
+                    ob.onGround,
+                  ).copyWith(fontSize: 16),
+                  decoration: InputDecoration(hintText: l10n.signInEmailHint),
+                  onSubmitted: (_) => _sending ? null : _send(),
+                ),
+                if (_error != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    _error!,
+                    style: OpenBasketText.meta(
+                      Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                PrimaryButton(
+                  label: l10n.signInSendCode,
+                  busy: _sending,
+                  onPressed: _send,
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  l10n.signInCodeNote,
+                  textAlign: TextAlign.center,
+                  style: OpenBasketText.meta(ob.meta),
+                ),
+                const SizedBox(height: 72),
+                Text(
+                  l10n.signInTerms,
+                  textAlign: TextAlign.center,
+                  style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+                ),
+                const SizedBox(height: 18),
               ],
-              const SizedBox(height: 20),
-              FilledButton(
-                onPressed: _sending ? null : _send,
-                child: _sending
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.signInSendCode),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.signInCodeNote,
-                textAlign: TextAlign.center,
-                style: OpenBasketText.meta(muted),
-              ),
-              const SizedBox(height: 72),
-              Text(
-                l10n.signInTerms,
-                textAlign: TextAlign.center,
-                style: OpenBasketText.meta(muted),
-              ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
       ),

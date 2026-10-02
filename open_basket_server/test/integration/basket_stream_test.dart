@@ -7,6 +7,7 @@ import 'package:open_basket_server/src/endpoints/basket_stream_endpoint.dart';
 import 'package:open_basket_server/src/future_calls/close_basket_future_call.dart';
 import 'package:open_basket_server/src/generated/protocol.dart';
 import 'package:open_basket_server/src/services/basket_channels.dart';
+import 'package:open_basket_server/src/services/basket_presence.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
@@ -17,6 +18,9 @@ Matcher _fails(BasketError error) =>
     throwsA(predicate((final e) => _errorOf(e) == error));
 
 final _noon = DateTime.utc(2030, 5, 1, 12);
+
+bool _isPresence(BasketEvent e) =>
+    e.type == BasketEventType.basketUpdated && e.viewerMemberIds != null;
 
 void main() {
   withServerpod('Given a live basket', (sessionBuilder, endpoints) {
@@ -45,14 +49,77 @@ void main() {
 
     /// Opens a watch and waits for the snapshot, so the caller knows the
     /// subscription is live before it changes anything.
+    ///
+    /// Presence announcements (ADR-049) are left out: every watcher that
+    /// comes or goes sends one, and these tests are about what a change to
+    /// the basket does. The presence tests below read the raw stream.
     Future<(StreamQueue<BasketEvent>, BasketEvent)> watch(
       TestSessionBuilder who,
       int basketId,
     ) async {
-      final queue = StreamQueue(endpoints.basketStream.watch(who, basketId));
+      final queue = StreamQueue(
+        endpoints.basketStream
+            .watch(who, basketId)
+            .where((final e) => !_isPresence(e)),
+      );
       final snapshot = await queue.next;
       return (queue, snapshot);
     }
+
+    group('who is looking (ADR-049)', () {
+      setUp(BasketPresence.reset);
+
+      Future<List<int>> nextViewers(StreamQueue<BasketEvent> queue) async {
+        while (true) {
+          final event = await queue.next;
+          if (_isPresence(event)) return event.viewerMemberIds!;
+        }
+      }
+
+      test('the snapshot says who is looking, including you', () async {
+        final (shopper, _, basket) = await aLiveBasket();
+        final queue = StreamQueue(
+          endpoints.basketStream.watch(shopper, basket.id!),
+        );
+        addTearDown(queue.cancel);
+        final snapshot = await queue.next;
+        expect(snapshot.viewerMemberIds, [basket.shopperMemberId]);
+      });
+
+      test('a second watcher is announced to the first', () async {
+        final (shopper, member, basket) = await aLiveBasket();
+        final his = StreamQueue(
+          endpoints.basketStream.watch(shopper, basket.id!),
+        );
+        addTearDown(his.cancel);
+        await his.next;
+        expect(await nextViewers(his), hasLength(1));
+
+        final hers = StreamQueue(
+          endpoints.basketStream.watch(member, basket.id!),
+        );
+        await hers.next;
+        expect(await nextViewers(his), hasLength(2));
+
+        // She closes the screen: he sees her go.
+        await hers.cancel();
+        expect(await nextViewers(his), [basket.shopperMemberId]);
+      });
+
+      test('an announcement is a basketUpdated with no basket, so builds '
+          'already on phones keep the basket they have', () async {
+        final (shopper, _, basket) = await aLiveBasket();
+        final queue = StreamQueue(
+          endpoints.basketStream.watch(shopper, basket.id!),
+        );
+        addTearDown(queue.cancel);
+        await queue.next;
+        final event = await queue.next;
+        expect(event.type, BasketEventType.basketUpdated);
+        expect(event.basket, isNull);
+        expect(event.viewerMemberIds, [basket.shopperMemberId]);
+      });
+    });
 
     test('the channel name is the one the publisher uses', () {
       // The endpoint and the service each spell it; if they ever disagree,
@@ -188,6 +255,7 @@ void main() {
       var ended = false;
       final sub = endpoints.basketStream
           .watch(member, basket.id!)
+          .where((final e) => !_isPresence(e))
           .listen(received.add, onDone: () => ended = true);
       addTearDown(sub.cancel);
       await _until(() => received.isNotEmpty);

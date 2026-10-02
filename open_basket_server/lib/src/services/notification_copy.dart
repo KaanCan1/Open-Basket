@@ -32,6 +32,21 @@ abstract final class NotificationCopy {
   static const basketOpenedType = 'basket_opened';
   static const closingSoonType = 'closing_soon';
   static const settlementReadyType = 'settlement_ready';
+  static const nudgeType = 'nudge';
+
+  /// "Ayşe is waiting on your list" / "Kaan's basket closes in 8 min. Add
+  /// what you need." Sent by the nudge on screen 10.
+  static PushMessage nudge({
+    required String from,
+    required String shopper,
+    required int minutesLeft,
+    required int basketId,
+  }) => PushMessage(
+    title: '$from is waiting on your list',
+    body: "$shopper's basket closes in $minutesLeft min. Add what you need.",
+    type: nudgeType,
+    basketId: basketId,
+  );
 
   /// "Kaan is heading to Migros" / "Add what you need in the next 10 min."
   static PushMessage basketOpened({

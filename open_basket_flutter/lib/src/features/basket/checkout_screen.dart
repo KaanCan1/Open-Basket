@@ -9,12 +9,14 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/formatters.dart';
 import '../../core/router.dart';
+import '../../core/quantity_format.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
+import '../stores/stores_controller.dart';
 import '../household/household_controller.dart';
 import 'basket_controller.dart';
 import 'live_basket_controller.dart';
 import '../../core/failure_message.dart';
-import '../../shared/widgets/item_name.dart';
 
 /// Screen 14. The shopper at the till: a price for everything they got, "not
 /// available" for everything they did not, the receipt total, and the button
@@ -98,12 +100,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final members = ref.watch(membersProvider).value ?? const [];
     final basket = state.basket;
 
-    if (basket == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    if (basket == null) return const SkeletonScreen();
 
     final currency = basket.currencyCode;
     final items = state.items;
@@ -132,15 +129,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
     groups.removeWhere((_, theirs) => theirs.isEmpty);
 
-    return Scaffold(
-      appBar: AppBar(),
+    final store = (ref.watch(storesProvider).value ?? const <Store>[])
+        .where((s) => s.id == basket.storeId)
+        .firstOrNull
+        ?.name;
+
+    return ObScaffold(
+      safeBottom: false,
       body: Column(
         children: [
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              padding: const EdgeInsets.fromLTRB(20, 2, 20, 24),
               children: [
-                _LockedCard(basket: basket, itemCount: items.length),
+                _LockedCard(
+                  basket: basket,
+                  itemCount: items.length,
+                  storeName: store,
+                ),
                 const SizedBox(height: 12),
                 if (items.isEmpty) ...[
                   Text(l10n.checkoutEmpty, style: theme.textTheme.titleMedium),
@@ -150,7 +156,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     style: theme.textTheme.bodySmall,
                   ),
                 ] else
-                  Text(l10n.checkoutHint, style: theme.textTheme.bodySmall),
+                  Text(
+                    l10n.checkoutHint,
+                    style: OpenBasketText.meta(Ob.of(context).meta),
+                  ),
                 const SizedBox(height: 8),
                 for (final entry in groups.entries) ...[
                   _PersonHeader(
@@ -184,6 +193,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             settling: _settling,
             onSettle: _settle,
             onError: _say,
+            keyboardUp: MediaQuery.viewInsetsOf(context).bottom > 0,
           ),
         ],
       ),
@@ -192,23 +202,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 }
 
 class _LockedCard extends StatelessWidget {
-  const _LockedCard({required this.basket, required this.itemCount});
+  const _LockedCard({
+    required this.basket,
+    required this.itemCount,
+    this.storeName,
+  });
 
   final Basket basket;
   final int itemCount;
+  final String? storeName;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final closed = basket.frozenAt ?? basket.closesAt;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(18, 15, 18, 15),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.dividerColor),
+        color: ob.tonal,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: ob.faint),
       ),
       child: Row(
         children: [
@@ -218,62 +233,39 @@ class _LockedCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      CupertinoIcons.lock,
-                      size: 13,
-                      color: theme.textTheme.bodySmall!.color,
-                    ),
+                    Icon(CupertinoIcons.lock, size: 13, color: ob.meta),
                     const SizedBox(width: 6),
                     Text(
                       l10n.checkoutLocked,
-                      style: theme.textTheme.labelSmall,
+                      style: OpenBasketText.label(
+                        ob.meta,
+                      ).copyWith(letterSpacing: 1.1),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.checkoutItems(itemCount),
-                  style: OpenBasketText.display(
-                    theme.textTheme.bodySmall!.color!,
-                  ).copyWith(fontSize: 22),
-                ),
                 const SizedBox(height: 2),
+                Text(
+                  storeName == null
+                      ? l10n.checkoutItems(itemCount)
+                      : l10n.checkoutStoreItems(storeName!, itemCount),
+                  style: OpenBasketText.title(ob.meta, fontSize: 20),
+                ),
                 Text(
                   l10n.checkoutClosedAt(
                     DateFormat.Hm().format(closed.toLocal()),
                   ),
-                  style: OpenBasketText.money(
-                    theme.textTheme.bodySmall!.color!,
-                  ).copyWith(fontSize: 13, fontWeight: FontWeight.w400),
+                  style: OpenBasketText.mono(
+                    color: ob.meta,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
           ),
-          _Badge(label: l10n.checkoutFrozen),
+          Tag(l10n.checkoutFrozen),
         ],
       ),
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final ink = theme.textTheme.bodyLarge!.color!;
-    final ground = theme.scaffoldBackgroundColor;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: ink,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(label, style: OpenBasketText.label(ground)),
     );
   }
 }
@@ -292,11 +284,10 @@ class _PersonHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall!.color!;
+    final ob = Ob.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 4),
+      padding: const EdgeInsets.only(top: 14, bottom: 4),
       child: Row(
         children: [
           if (member != null) ...[
@@ -305,18 +296,16 @@ class _PersonHeader extends StatelessWidget {
           ],
           Text(
             member?.displayName ?? AppLocalizations.of(context).checkoutSomeone,
-            style: OpenBasketText.item(
-              theme.textTheme.bodyLarge!.color!,
-            ).copyWith(fontSize: 14),
+            style: OpenBasketText.body(
+              ob.onGround,
+            ).copyWith(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(width: 8),
-          Expanded(child: Divider(color: theme.dividerColor)),
+          Expanded(child: Divider(color: ob.rule)),
           const SizedBox(width: 8),
           Text(
             MoneyFormat.format(subtotal, currency),
-            style: OpenBasketText.money(
-              muted,
-            ).copyWith(fontSize: 13, fontWeight: FontWeight.w400),
+            style: OpenBasketText.mono(color: ob.meta, fontSize: 13),
           ),
         ],
       ),
@@ -324,8 +313,8 @@ class _PersonHeader extends StatelessWidget {
   }
 }
 
-/// The member's initial in their tone, for life (the same tone as their chip
-/// on the live basket).
+/// The member's square in their tone, for life — the same as on the live
+/// basket. Kept as a name the other screens already use.
 class MemberInitial extends StatelessWidget {
   const MemberInitial({required this.member, this.size = 22, super.key});
 
@@ -333,29 +322,11 @@ class MemberInitial extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final tone = MemberTones.forMember(member.id!, theme.brightness);
-    final initial = member.displayName.isEmpty
-        ? '?'
-        : member.displayName.characters.first.toUpperCase();
-
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: tone,
-        borderRadius: BorderRadius.circular(size / 4),
-      ),
-      child: Text(
-        initial,
-        style: OpenBasketText.label(
-          theme.scaffoldBackgroundColor,
-        ).copyWith(fontSize: size * 0.5, letterSpacing: 0),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => PersonAvatar(
+    memberId: member.id!,
+    name: member.displayName,
+    size: size,
+  );
 }
 
 /// One item: its name on the left, its price field (or "Undo" when it was not
@@ -486,10 +457,13 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ItemName.of(
-                      item,
-                      style: OpenBasketText.item(gone ? muted : ink),
-                      struck: gone,
+                    Text(
+                      '${item.name} ${QuantityFormat.label(item.quantity, item.unit)}',
+                      style: OpenBasketText.item(gone ? muted : ink).copyWith(
+                        fontSize: 15,
+                        decoration: gone ? TextDecoration.lineThrough : null,
+                        decorationColor: muted,
+                      ),
                     ),
                     if (gone)
                       Text(
@@ -499,7 +473,12 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
                         ).copyWith(fontWeight: FontWeight.w600),
                       )
                     else if (item.note != null)
-                      Text(item.note!, style: OpenBasketText.meta(muted)),
+                      Text(
+                        item.note!,
+                        style: OpenBasketText.meta(
+                          muted,
+                        ).copyWith(fontSize: 12),
+                      ),
                   ],
                 ),
               ),
@@ -510,15 +489,22 @@ class _PriceRowState extends ConsumerState<_PriceRow> {
             width: 104,
             height: 44,
             child: gone
-                ? OutlinedButton(
-                    onPressed: () => _mark(ItemStatus.requested),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(104, 44),
-                      side: BorderSide(color: theme.dividerColor),
-                      textStyle: OpenBasketText.body(muted),
-                      foregroundColor: muted,
+                ? GestureDetector(
+                    onTap: () => _mark(ItemStatus.requested),
+                    child: CustomPaint(
+                      painter: DashedRectPainter(
+                        color: Ob.of(context).faint,
+                        radius: 13,
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.checkoutUndo,
+                          style: OpenBasketText.body(
+                            muted,
+                          ).copyWith(fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
+                      ),
                     ),
-                    child: Text(l10n.checkoutUndo),
                   )
                 : _MoneyField(
                     controller: _text,
@@ -553,7 +539,6 @@ class _MoneyField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ink = theme.textTheme.bodyLarge!.color!;
-    final muted = theme.textTheme.bodySmall!.color!;
     final zeroDecimal = MoneyFormat.minorUnitDigits(currency) == 0;
 
     // A field sized for "54.50" clipped "8990.00" to "8990.0" — and a price
@@ -564,8 +549,8 @@ class _MoneyField extends StatelessWidget {
       builder: (context, constraints) => ValueListenableBuilder(
         valueListenable: controller,
         builder: (context, value, _) {
-          final base = OpenBasketText.money(ink);
-          final symbol = OpenBasketText.money(muted);
+          final base = OpenBasketText.money(ink).copyWith(fontSize: 15);
+          final symbol = OpenBasketText.money(ink).copyWith(fontSize: 15);
           final painter = TextPainter(
             text: TextSpan(
               children: [
@@ -577,7 +562,9 @@ class _MoneyField extends StatelessWidget {
             textScaler: MediaQuery.textScalerOf(context),
           )..layout();
           // Content padding either side, and a little for the cursor.
-          final room = constraints.maxWidth - 2 * _padding - 6;
+          // The prefix's own gap and the cursor take a little more than the
+          // text itself; measured short, "8990.00" lost its last digit.
+          final room = constraints.maxWidth - 2 * _padding - 14;
           final scale = painter.width <= room
               ? 1.0
               : (room / painter.width).clamp(0.5, 1.0);
@@ -623,18 +610,32 @@ class _MoneyField extends StatelessWidget {
         isDense: true,
         prefixText: MoneyFormat.symbol(currency),
         prefixStyle: symbolStyle,
+        // Priced fields sit on the tonal fill; the one being typed in, and
+        // the receipt total, are paper with an ink edge (screen 14).
+        fillColor: emphasised || focusNode.hasFocus || controller.text.isEmpty
+            ? (theme.brightness == Brightness.dark
+                  ? OpenBasketColors.ink
+                  : OpenBasketColors.paper)
+            : (theme.brightness == Brightness.dark
+                  ? const Color(0xFF1C1C1A)
+                  : OpenBasketColors.tonal),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: _padding,
           vertical: 12,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: emphasised
+          borderRadius: BorderRadius.circular(13),
+          borderSide: emphasised || controller.text.isEmpty
               ? BorderSide(color: ink, width: 1.5)
-              : BorderSide(color: theme.dividerColor),
+              : BorderSide(
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF3A3A36)
+                      : const Color(0xFFC9C9C4),
+                  width: 1.5,
+                ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide(color: ink, width: 1.5),
         ),
       ),
@@ -653,7 +654,13 @@ class _TotalsPanel extends ConsumerStatefulWidget {
     required this.settling,
     required this.onSettle,
     required this.onError,
+    required this.keyboardUp,
   });
+
+  /// Measured by the screen, above the Scaffold: the Scaffold takes the
+  /// keyboard out of the MediaQuery its body sees, so the panel itself
+  /// would always read zero.
+  final bool keyboardUp;
 
   final Basket basket;
   final int itemSum;
@@ -740,7 +747,7 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
     // and crush the list to a row or two — found on a phone, where the next
     // item to price was hidden behind the totals. It steps aside instead, and
     // stays when the keyboard is up for its own receipt field.
-    if (MediaQuery.viewInsetsOf(context).bottom > 0 && !_focus.hasFocus) {
+    if (widget.keyboardUp && !_focus.hasFocus) {
       return const SizedBox.shrink();
     }
 
@@ -748,15 +755,14 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
     // the same truncating division, so the two agree on the members' share.
     final each = count == 0 ? 0 : gap ~/ count;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        border: Border(top: BorderSide(color: theme.dividerColor)),
-      ),
+    final ob = Ob.of(context);
+    return Glass(
+      shadow: true,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -766,12 +772,12 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
                   Expanded(
                     child: Text(
                       l10n.checkoutItemsAddUp,
-                      style: theme.textTheme.bodySmall,
+                      style: OpenBasketText.meta(ob.meta),
                     ),
                   ),
                   Text(
                     MoneyFormat.format(widget.itemSum, currency),
-                    style: OpenBasketText.money(ink),
+                    style: OpenBasketText.money(ink).copyWith(fontSize: 16),
                   ),
                 ],
               ),
@@ -781,12 +787,12 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
                   Expanded(
                     child: Text(
                       l10n.checkoutReceiptTotal,
-                      style: theme.textTheme.bodySmall,
+                      style: OpenBasketText.meta(ob.meta),
                     ),
                   ),
                   SizedBox(
-                    width: 140,
-                    height: 48,
+                    width: 128,
+                    height: 44,
                     child: _MoneyField(
                       controller: _text,
                       focusNode: _focus,
@@ -800,24 +806,44 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
               if (gap != 0 && count > 0) ...[
                 const SizedBox(height: 10),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.fromLTRB(13, 11, 13, 11),
                   decoration: BoxDecoration(
-                    color: ink,
-                    borderRadius: BorderRadius.circular(12),
+                    color: ob.dark
+                        ? const Color(0xFF2C2C29)
+                        : OpenBasketColors.ink,
+                    borderRadius: BorderRadius.circular(13),
                   ),
-                  child: Text(
-                    gap > 0
-                        ? l10n.checkoutGapMore(
-                            MoneyFormat.format(gap, currency),
-                            count,
-                            MoneyFormat.format(each, currency),
-                          )
-                        : l10n.checkoutGapLess(
-                            MoneyFormat.format(-gap, currency),
-                            count,
-                            MoneyFormat.format(-each, currency),
-                          ),
-                    style: OpenBasketText.meta(theme.scaffoldBackgroundColor),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 1),
+                        child: Icon(
+                          CupertinoIcons.exclamationmark_circle,
+                          size: 16,
+                          color: OpenBasketColors.signal,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          gap > 0
+                              ? l10n.checkoutGapMore(
+                                  MoneyFormat.format(gap, currency),
+                                  count,
+                                  MoneyFormat.format(each, currency),
+                                )
+                              : l10n.checkoutGapLess(
+                                  MoneyFormat.format(-gap, currency),
+                                  count,
+                                  MoneyFormat.format(-each, currency),
+                                ),
+                          style: OpenBasketText.meta(
+                            OpenBasketColors.paper,
+                          ).copyWith(fontSize: 12.5, height: 1.4),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -831,6 +857,9 @@ class _TotalsPanelState extends ConsumerState<_TotalsPanel> {
                 const SizedBox(height: 8),
               ],
               FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                ),
                 // Rule 6 and ADR-029: nothing counts as free by accident. The
                 // server refuses too; this keeps the refusal from being the
                 // way the shopper finds out.

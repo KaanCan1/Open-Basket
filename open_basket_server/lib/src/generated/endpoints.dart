@@ -404,6 +404,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['basketId'],
                   ),
         ),
+        'nudge': _is.MethodConnector(
+          name: 'nudge',
+          params: {
+            'basketId': _is.ParameterDescription(
+              name: 'basketId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['basket'] as _iq57g1s3.BasketEndpoint).nudge(
+                    session,
+                    params['basketId'],
+                  ),
+        ),
         'getActive': _is.MethodConnector(
           name: 'getActive',
           params: {},

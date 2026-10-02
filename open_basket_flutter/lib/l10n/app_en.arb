@@ -45,10 +45,8 @@
   "commonSomethingWentWrong": "Something went wrong",
   "commonOffline": "Can't reach the basket",
   "commonOfflineNote": "Your items are saved on this phone and will sync the moment you're back.",
-  "householdChoiceHeadline": "Who are you\nshopping with?",
-  "@householdChoiceHeadline": {},
-  "householdChoiceBlurb": "Start a household, or join one with the six characters someone already in it can read out.",
-  "@householdChoiceBlurb": {},
+  "householdChoiceHeadline": "Find your people",
+  "householdChoiceBlurb": "A household is the group you shop for. You can be in one at a time.",
   "householdChoiceCreate": "Start a household",
   "@householdChoiceCreate": {},
   "householdChoiceJoin": "I have a code",
@@ -65,10 +63,8 @@
   "@createHouseholdAction": {},
   "createHouseholdEmpty": "Give it a name first.",
   "@createHouseholdEmpty": {},
-  "joinHouseholdTitle": "Enter the code",
-  "@joinHouseholdTitle": {},
-  "joinHouseholdBlurb": "Six characters from someone already in the household. Case does not matter.",
-  "@joinHouseholdBlurb": {},
+  "joinHouseholdTitle": "Join with a code",
+  "joinHouseholdBlurb": "Six characters, from whoever set up the household.",
   "joinHouseholdLabel": "CODE",
   "@joinHouseholdLabel": {},
   "joinHouseholdHint": "K7Q2M4",
@@ -90,7 +86,6 @@
   "homeCodeLabel": "HOUSEHOLD CODE",
   "@homeCodeLabel": {},
   "homeCodeCopied": "Code copied",
-  "@homeCodeCopied": {},
   "homeCodeNote": "Anyone with these six characters can join.",
   "@homeCodeNote": {},
   "homeOpenBasket": "Open a basket",
@@ -109,8 +104,7 @@
   "@homeNoBasket": {},
   "homeNoBasketNote": "Open one when you are heading out, and the house has until it closes to add things.",
   "@homeNoBasketNote": {},
-  "homeMembersTitle": "IN THIS HOUSEHOLD",
-  "@homeMembersTitle": {},
+  "homeMembersTitle": "In the house",
   "homeOwnerTag": "OWNER",
   "@homeOwnerTag": {},
   "homeYouTag": "YOU",
@@ -135,12 +129,9 @@
       }
     }
   },
-  "homeBasketSee": "Open it",
-  "@homeBasketSee": {},
-  "openSheetTitle": "How long?",
-  "@openSheetTitle": {},
-  "openSheetBlurb": "The basket closes itself when the time runs out. Everyone can add until then.",
-  "@openSheetBlurb": {},
+  "homeBasketSee": "See the basket",
+  "openSheetTitle": "Open a basket",
+  "openSheetBlurb": "The house gets a notification the second you do.",
   "openSheetMinutes": "{count} min",
   "@openSheetMinutes": {
     "placeholders": {
@@ -163,14 +154,12 @@
       }
     }
   },
-  "liveBasketAddHint": "Add an item",
-  "@liveBasketAddHint": {},
+  "liveBasketAddHint": "Add an item…",
   "liveBasketNoteHint": "Brand, size, \"only if fresh\"",
   "@liveBasketNoteHint": {},
   "liveBasketAdd": "Add",
   "@liveBasketAdd": {},
-  "liveBasketEmpty": "Nothing in the basket yet.",
-  "@liveBasketEmpty": {},
+  "liveBasketEmpty": "Nothing in the basket yet",
   "liveBasketEmptyNote": "Type what you need. Everyone sees it the moment you add it.",
   "@liveBasketEmptyNote": {},
   "liveBasketExtendUsed": "Extend used",
@@ -450,8 +439,7 @@
       }
     }
   },
-  "liveBasketOfflineHint": "Offline — anything you add is kept here and sent the moment you're back.",
-  "@liveBasketOfflineHint": {},
+  "liveBasketOfflineHint": "Offline — anything you add is kept here and sent the moment you are back.",
   "liveBasketBackOnline": "{count, plural, =1{Back online · 1 item sent} other{Back online · {count} items sent}}",
   "@liveBasketBackOnline": {
     "placeholders": {
@@ -811,8 +799,7 @@
   "@settingsName": {},
   "settingsCurrency": "Currency",
   "@settingsCurrency": {},
-  "settingsCurrencyNote": "Every price and settlement uses it.",
-  "@settingsCurrencyNote": {},
+  "settingsCurrencyNote": "every price and settlement",
   "settingsStores": "Stores",
   "@settingsStores": {},
   "settingsMembers": "Members and code",
@@ -1199,8 +1186,7 @@
   "@unitMillilitres": {},
   "unitPacks": "Packs",
   "@unitPacks": {},
-  "liveBasketAddNote": "Add a note",
-  "@liveBasketAddNote": {},
+  "liveBasketAddNote": "Add a note — brand, size, \"only if fresh\"",
   "noteAnyBrand": "any brand",
   "@noteAnyBrand": {},
   "noteOnlyIfFresh": "only if fresh",
@@ -1260,5 +1246,480 @@
     }
   },
   "liveBasketExtendPlus": "Extend +5",
-  "@liveBasketExtendPlus": {}
+  "@liveBasketExtendPlus": {},
+  "codeEntryMismatchTries": "Codes expire after 10 minutes. {count, plural, =1{One try left} =2{Two tries left} other{{count} tries left}}, then we'll send a fresh one.",
+  "@codeEntryMismatchTries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "householdChoiceCreateNote": "You'll get a permanent six-character code to send to the others.",
+  "householdChoiceOr": "or",
+  "householdChoiceJoinTitle": "Join with a code",
+  "homeHouseholdLabel": "Household",
+  "homeNoBasketTitle": "No basket open",
+  "homeLastRunLine": "Last run {day} · {amount}",
+  "@homeLastRunLine": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "homeNoRunsYet": "No runs yet",
+  "homeOpenBasketNote": "Heading to the shop? Give the house a few minutes to chip in.",
+  "homeRecentRuns": "Recent runs",
+  "homeAllRuns": "All",
+  "homeRecentRunTitle": "{store} · {day}",
+  "@homeRecentRunTitle": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "homeRecentRunMeta": "{count, plural, =1{1 item} other{{count} items}} · {status}",
+  "@homeRecentRunMeta": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "dayToday": "today",
+  "dayYesterday": "yesterday",
+  "runSettledLower": "settled",
+  "runCancelledLower": "cancelled",
+  "openSheetEstimateLine": "Estimated {minutes} min from your distance to {store}. Pick your own if you know better.",
+  "@openSheetEstimateLine": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "openSheetClosesAt": "Closes at {time} · one extension of +5 min available",
+  "@openSheetClosesAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "openSheetMinUnit": "min",
+  "openSheetCustomHint": "Minutes",
+  "storesSaved": "Saved stores",
+  "storesLocating": "Reading your location once…",
+  "errorNudgeTooSoon": "The house was nudged a moment ago. Give them a minute.",
+  "countdownServerTime": "Server time · only {name} can change the clock",
+  "@countdownServerTime": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownStillCounting": "Server time · still counting without your phone",
+  "countdownStoreCloses": "{store} · closes {time}",
+  "@countdownStoreCloses": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownRunAt": "{name}'s {store} run",
+  "@countdownRunAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownRunLine": "{run} · ran {minutes} min · closed {time}",
+  "@countdownRunLine": {
+    "placeholders": {
+      "run": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownCancelledLine": "{run} · cancelled {time}",
+  "@countdownCancelledLine": {
+    "placeholders": {
+      "run": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketEmptyTold": "{names} just got the notification. Add something so they know it's real.",
+  "@liveBasketEmptyTold": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketEmptyNoOne": "Add the first thing, and everyone sees it the moment you do.",
+  "liveBasketUsuallyFrom": "From your last runs at {store}.",
+  "@liveBasketUsuallyFrom": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketUsuallyFromAny": "From your last runs.",
+  "liveBasketLookingNow": "{names} {count, plural, =1{is} other{are}} looking now",
+  "@liveBasketLookingNow": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketNobodyLooking": "Nobody else has it open yet",
+  "liveBasketNudge": "Nudge the ones who aren't",
+  "liveBasketNudged": "{count, plural, =0{Everyone is already here.} =1{Nudged 1 person.} other{Nudged {count} people.}}",
+  "@liveBasketNudged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketAddedAgo": "{name} added {ago}",
+  "@liveBasketAddedAgo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "agoSeconds": "{count}s ago",
+  "@agoSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "agoMinutes": "{count} min ago",
+  "@agoMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketItemsHeader": "{count, plural, =1{1 item} other{{count} items}}",
+  "@liveBasketItemsHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketItemsSoFar": "{count, plural, =1{1 item so far} other{{count} items so far}}",
+  "@liveBasketItemsSoFar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketNothingYours": "nothing of yours yet",
+  "liveBasketInSync": "in sync",
+  "liveBasketStillToFind": "{count} still to find",
+  "@liveBasketStillToFind": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketStillToFindPlain": "Still to find",
+  "liveBasketGotSection": "Got",
+  "liveBasketGotUnavailable": "{got} got · {unavailable} unavailable",
+  "@liveBasketGotUnavailable": {
+    "placeholders": {
+      "got": {
+        "type": "int"
+      },
+      "unavailable": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketLastCallTold": "{names} {count, plural, =1{has} other{have}} been told it's the last call.",
+  "@liveBasketLastCallTold": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketHowExtending": "How extending works",
+  "liveBasketHowExtendingNote": "One extension per basket, five minutes, shopper only. The hatched part of the bar is the time you added, so everyone can see where it came from.",
+  "liveBasketOriginal": "original {minutes} min",
+  "@liveBasketOriginal": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "liveBasketExtensionLegend": "+5 min extension",
+  "liveBasketCancelThis": "Cancel this basket",
+  "itemHasIt": "{name} has it",
+  "@itemHasIt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemAddedAt": "Added {time}",
+  "@itemAddedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "itemNotPicked": "Not picked",
+  "youTag": "You",
+  "liveBasketJoinedAgo": "{name} opened one {ago}",
+  "@liveBasketJoinedAgo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketOpenOwnLater": "You can open your own once this one closes at {time}.",
+  "@liveBasketOpenOwnLater": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketBackOnlineOne": "{name} is on everyone's list now. It kept the time you added it.",
+  "@liveBasketBackOnlineOne": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketWhatYouAsked": "What you asked for",
+  "liveBasketAskedNothing": "You didn't add anything to this run.",
+  "liveBasketNothingWaiting": "Nothing is waiting on you.",
+  "liveBasketStillAtTill": "{name} is still at the till.",
+  "@liveBasketStillAtTill": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketYouOwe": "You owe {name}",
+  "@liveBasketYouOwe": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketOwesYou": "{name} owes you",
+  "@liveBasketOwesYou": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketLineParts": "{items} items + {gap} gap",
+  "@liveBasketLineParts": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      },
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketLineItems": "{items} items",
+  "@liveBasketLineItems": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketNothingToPay": "Nothing for you to pay on this one.",
+  "liveBasketSeeWholeRun": "See the whole run",
+  "liveBasketSeeWholeBasket": "See the whole basket",
+  "liveBasketBackHome": "Back to the household",
+  "liveBasketYouFroze": "You froze it at {time}",
+  "@liveBasketYouFroze": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "liveBasketYouFrozeNote": "The list is final. Type in what the till charged.",
+  "liveBasketWholeBasket": "The whole basket",
+  "cancelSheetTitle": "Cancel this basket?",
+  "cancelSheetNote": "The clock stops now and nobody can add anything. Nothing gets priced and nobody owes anybody.",
+  "cancelSheetTimeLeft": "Time left",
+  "cancelSheetDropped": "Items that get dropped",
+  "cancelSheetTold": "People told",
+  "cancelSheetHistory": "It shows up in history as cancelled. You can open a new basket straight away.",
+  "cancelSheetYes": "Yes, cancel it",
+  "cancelSheetKeep": "Keep shopping",
+  "checkoutStoreItems": "{store} · {count, plural, =1{1 item} other{{count} items}}",
+  "@checkoutStoreItems": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settlementRunTitle": "{store} run, {day}",
+  "@settlementRunTitle": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementRunTitlePlain": "The run, {day}",
+  "@settlementRunTitlePlain": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementEach": "{amount} each",
+  "@settlementEach": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementShopperCarries": "{name} carries their own share of the gap and any remaining cent, so the lines above always add up to what they paid.",
+  "@settlementShopperCarries": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementPaid": "{name} paid",
+  "@settlementPaid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settlementShare": "Share the summary",
+  "settlementShareNote": "Plain text — no app needed on their end.",
+  "settlementShareHeader": "{title} · {total}",
+  "@settlementShareHeader": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "historyEmptyTitle": "No runs yet",
+  "historyEmptyBody": "Your first basket will show up here with who asked for what.",
+  "commonOfflineRetryNote": "Nothing is lost. Try again when you have signal.",
+  "historyStoppedAfter": "stopped after {minutes} min",
+  "@historyStoppedAfter": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "historyCancelledByName": "Cancelled by {name}",
+  "@historyCancelledByName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "historyNothingToShare": "Nothing to share",
+  "membersCopy": "Copy the code",
+  "settingsBack": "Home",
+  "currencySearch": "Search {count} currencies",
+  "@currencySearch": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currencyCommon": "Common",
+  "currencyBack": "Settings",
+  "liveBasketDoneAdding": "Done adding"
 }

@@ -1,10 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/failure_message.dart';
+import '../../core/formatters.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import 'household_controller.dart';
 import 'members_screen.dart';
 
@@ -15,14 +17,28 @@ import 'members_screen.dart';
 /// The server picks the new code, so it is shown after rotating rather than
 /// before, and the share sheet opens with it straight away: rotating is
 /// almost always followed by sending the new one to someone.
-class RotateCodeScreen extends ConsumerStatefulWidget {
+class RotateCodeScreen extends StatelessWidget {
   const RotateCodeScreen({super.key});
 
+  /// As screen 18 draws it: a sheet over the members screen.
+  static Future<void> show(BuildContext context) => showGlassSheet<void>(
+    context: context,
+    builder: (_) => const RotateCodeBody(),
+  );
+
   @override
-  ConsumerState<RotateCodeScreen> createState() => _RotateCodeScreenState();
+  Widget build(BuildContext context) =>
+      const ObScaffold(back: true, body: RotateCodeBody());
 }
 
-class _RotateCodeScreenState extends ConsumerState<RotateCodeScreen> {
+class RotateCodeBody extends ConsumerStatefulWidget {
+  const RotateCodeBody({super.key});
+
+  @override
+  ConsumerState<RotateCodeBody> createState() => _RotateCodeBodyState();
+}
+
+class _RotateCodeBodyState extends ConsumerState<RotateCodeBody> {
   bool _rotating = false;
   String? _newCode;
 
@@ -46,7 +62,7 @@ class _RotateCodeScreenState extends ConsumerState<RotateCodeScreen> {
       if (buttonContext.mounted) {
         await shareHouseholdCode(buttonContext, household.name, household.code);
       }
-      if (mounted) context.pop();
+      if (mounted) Navigator.of(context).pop();
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(failureMessage(l10n, e))));
     } finally {
@@ -54,91 +70,114 @@ class _RotateCodeScreenState extends ConsumerState<RotateCodeScreen> {
     }
   }
 
-  /// "Kaan, Ayşe, Deniz and Mert".
-  static String _names(AppLocalizations l10n, List<String> names) {
-    if (names.length == 1) return names.single;
-    return l10n.namesAnd(
-      names.sublist(0, names.length - 1).join(', '),
-      names.last,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final household = ref.watch(myHouseholdProvider).value;
     final members = ref.watch(activeMembersProvider).value ?? const [];
-    if (household == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    if (household == null) return const SkeletonList();
     final old = _oldCode ?? household.code;
-    final muted = theme.textTheme.bodySmall!.color!;
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+    Widget bullet(String text) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.rotateTitle, style: theme.textTheme.displayLarge),
-          const SizedBox(height: 8),
-          Text(l10n.rotateBlurb, style: theme.textTheme.bodyMedium),
-          const SizedBox(height: 28),
-          _CodeLine(
-            label: l10n.rotateOld,
-            note: l10n.rotateOldNote,
-            child: Text(
-              old,
-              style: OpenBasketText.money(muted).copyWith(
-                decoration: _newCode == null
-                    ? null
-                    : TextDecoration.lineThrough,
-              ),
+          Container(
+            width: 6,
+            height: 6,
+            margin: const EdgeInsets.only(top: 7, right: 12),
+            decoration: BoxDecoration(
+              color: ob.onGround,
+              shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(height: 16),
-          _CodeLine(
-            label: l10n.rotateNew,
-            note: _newCode == null ? l10n.rotateNewNote : l10n.rotateNewDone,
-            child: _newCode == null
-                ? Text('– – – – – –', style: OpenBasketText.money(muted))
-                : CodeBoxes(code: _newCode!),
+          Expanded(
+            child: Text(
+              text,
+              style: OpenBasketText.body(ob.onGround).copyWith(fontSize: 14),
+            ),
           ),
-          const SizedBox(height: 24),
-          Text(l10n.rotateWarning, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 8),
-          Text(
-            members.length <= 1
-                ? l10n.rotateKeepPlaceOne
-                : l10n.rotateKeepPlace(
-                    _names(l10n, [for (final m in members) m.displayName]),
-                  ),
-            style: theme.textTheme.bodySmall,
+        ],
+      ),
+    );
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ScreenTitle(
+            l10n.rotateTitle,
+            subtitle: l10n.rotateBlurb,
+            fontSize: 27,
           ),
-          const SizedBox(height: 8),
-          Text(l10n.rotateOwnerOnly, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 32),
+          const SizedBox(height: 22),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: _CodeLine(
+                  label: l10n.rotateOld,
+                  note: l10n.rotateOldNote,
+                  code: old,
+                  struck: true,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 26, right: 12),
+                child: Icon(
+                  CupertinoIcons.arrow_right,
+                  size: 18,
+                  color: ob.onGround,
+                ),
+              ),
+              Expanded(
+                child: _CodeLine(
+                  label: l10n.rotateNew,
+                  note: _newCode == null
+                      ? l10n.rotateNewNote
+                      : l10n.rotateNewDone,
+                  code: _newCode ?? '– – – – – –',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          TonalCard(
+            child: Column(
+              children: [
+                bullet(l10n.rotateWarning),
+                bullet(
+                  members.length <= 1
+                      ? l10n.rotateKeepPlaceOne
+                      : l10n.rotateKeepPlace(
+                          joinNames(l10n, [
+                            for (final m in members) m.displayName,
+                          ]),
+                        ),
+                ),
+                bullet(l10n.rotateOwnerOnly),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
           Builder(
-            builder: (final buttonContext) => FilledButton(
+            builder: (final buttonContext) => InkButton(
+              label: l10n.rotateAction,
               onPressed: _rotating || _newCode != null
                   ? null
                   : () => _rotate(buttonContext),
-              child: _rotating
-                  ? const SizedBox.square(
-                      dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l10n.rotateAction),
             ),
           ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: _rotating ? null : () => context.pop(),
-            child: Text(l10n.rotateKeep(old)),
+          const SizedBox(height: 10),
+          OutlineButton(
+            label: l10n.rotateKeep(old),
+            quiet: true,
+            onPressed: _rotating ? null : () => Navigator.of(context).pop(),
           ),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -149,33 +188,42 @@ class _CodeLine extends StatelessWidget {
   const _CodeLine({
     required this.label,
     required this.note,
-    required this.child,
+    required this.code,
+    this.struck = false,
   });
 
   final String label;
   final String note;
-  final Widget child;
+  final String code;
+  final bool struck;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(label, style: theme.textTheme.labelSmall),
-              const Spacer(),
-              Text(note, style: theme.textTheme.bodySmall),
-            ],
+    final ob = Ob.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: OpenBasketText.label(ob.meta)),
+        const SizedBox(height: 4),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            code,
+            style:
+                OpenBasketText.mono(
+                  color: struck ? ob.meta : ob.onGround,
+                  fontSize: 22,
+                  letterSpacing: 1.5,
+                ).copyWith(
+                  decoration: struck ? TextDecoration.lineThrough : null,
+                  decorationColor: ob.meta,
+                ),
           ),
-          const SizedBox(height: 10),
-          child,
-        ],
-      ),
+        ),
+        const SizedBox(height: 4),
+        Text(note, style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12)),
+      ],
     );
   }
 }
