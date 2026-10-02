@@ -1410,7 +1410,7 @@
       }
     }
   },
-  "liveBasketNobodyLooking": "Nobody else has it open yet",
+  "liveBasketNobodyLooking": "Nobody at home has it open yet",
   "liveBasketNudge": "Nudge the ones who aren't",
   "liveBasketNudged": "{count, plural, =0{Everyone is already here.} =1{Nudged 1 person.} other{Nudged {count} people.}}",
   "@liveBasketNudged": {
@@ -1546,7 +1546,7 @@
       }
     }
   },
-  "liveBasketBackOnlineOne": "{name} is on everyone's list now. It kept the time you added it.",
+  "liveBasketBackOnlineOne": "{name} is on everyone's list now.",
   "@liveBasketBackOnlineOne": {
     "placeholders": {
       "name": {
@@ -1721,5 +1721,6 @@
   },
   "currencyCommon": "Common",
   "currencyBack": "Settings",
-  "liveBasketDoneAdding": "Done adding"
+  "liveBasketDoneAdding": "Done adding",
+  "runNoTotal": "—"
 }

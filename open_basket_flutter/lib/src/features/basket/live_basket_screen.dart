@@ -161,6 +161,7 @@ class _LiveBasketScreenState extends ConsumerState<LiveBasketScreen> {
                 child: empty
                     ? _EmptyOpen(
                         basketId: basketId,
+                        joined: widget.joined && !isShopper,
                         basket: basket,
                         state: state,
                         storeName: storeName,
@@ -327,7 +328,7 @@ class _OpenList extends ConsumerWidget {
       headerText = urgent
           ? l10n.liveBasketStillToFind(toFind.length)
           : l10n.liveBasketStillToFindPlain;
-      headerTrailing = urgent
+      headerTrailing = urgent && got + unavailable > 0
           ? Text(l10n.liveBasketGotUnavailable(got, unavailable), style: quiet)
           : null;
     } else if (isShopper) {
@@ -685,6 +686,7 @@ class _QueuedRow extends StatelessWidget {
 class _EmptyOpen extends ConsumerStatefulWidget {
   const _EmptyOpen({
     required this.basketId,
+    required this.joined,
     required this.basket,
     required this.state,
     required this.storeName,
@@ -696,6 +698,9 @@ class _EmptyOpen extends ConsumerStatefulWidget {
   final LiveBasketState state;
   final String? storeName;
   final bool isShopper;
+
+  /// Arrived from a lost race (screen 24): say when their own can open.
+  final bool joined;
 
   @override
   ConsumerState<_EmptyOpen> createState() => _EmptyOpenState();
@@ -821,6 +826,15 @@ class _EmptyOpenState extends ConsumerState<_EmptyOpen> {
                   ),
                 ],
               ],
+            ),
+          ),
+        ],
+        if (widget.joined) ...[
+          const SizedBox(height: 18),
+          IconNote(
+            icon: CupertinoIcons.clock,
+            text: l10n.liveBasketOpenOwnLater(
+              DateFormat.Hm().format(basket.closesAt.toLocal()),
             ),
           ),
         ],

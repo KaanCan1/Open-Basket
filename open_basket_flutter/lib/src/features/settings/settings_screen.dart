@@ -199,7 +199,10 @@ class SettingsScreen extends ConsumerWidget {
           ListRow(
             title: l10n.settingsMembers,
             subtitle: l10n.settingsMembersValue(members.length, household.code),
-            onTap: () => context.push(Routes.members),
+            onTap: () {
+              ref.invalidate(myHouseholdProvider);
+              context.push(Routes.members);
+            },
           ),
           if (me != null)
             ListRow(

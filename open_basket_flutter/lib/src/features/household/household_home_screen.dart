@@ -85,6 +85,14 @@ class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
   }
 }
 
+/// Opens a screen that shows the household's code or members, refetching
+/// them first: the owner may have rotated the code on another phone since
+/// this one last asked, and settings showed the dead code until a restart.
+void _pushFresh(BuildContext context, WidgetRef ref, String route) {
+  ref.invalidate(myHouseholdProvider);
+  context.push(route);
+}
+
 class _Home extends ConsumerWidget {
   const _Home({required this.household});
 
@@ -118,7 +126,7 @@ class _Home extends ConsumerWidget {
                 GlassIconButton(
                   icon: CupertinoIcons.gear,
                   tooltip: l10n.settingsTitle,
-                  onTap: () => context.push(Routes.settings),
+                  onTap: () => _pushFresh(context, ref, Routes.settings),
                 ),
               ],
             ),
@@ -134,7 +142,7 @@ class _Home extends ConsumerWidget {
             SectionLabel(
               l10n.homeMembersTitle,
               action: l10n.homeInvite,
-              onAction: () => context.push(Routes.members),
+              onAction: () => _pushFresh(context, ref, Routes.members),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -145,7 +153,7 @@ class _Home extends ConsumerWidget {
                   PersonChip(
                     memberId: member.id ?? 0,
                     name: member.displayName,
-                    onTap: () => context.push(Routes.members),
+                    onTap: () => _pushFresh(context, ref, Routes.members),
                   ),
               ],
             ),
@@ -289,7 +297,10 @@ class _IdleCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final ob = Ob.of(context);
     final runs = ref.watch(historyProvider).value ?? const <PastRun>[];
-    final last = runs.firstOrNull;
+    // A cancelled run cost nothing and says nothing about the last shop.
+    final last = runs
+        .where((r) => r.basket.status == BasketStatus.settled)
+        .firstOrNull;
     final lastSettled = ref.watch(lastSettledRunProvider).value;
     final me = ref.watch(myMembershipProvider).value;
     final members = ref.watch(membersProvider).value ?? const [];
@@ -469,13 +480,18 @@ class _RecentRuns extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  // A cancelled run was never priced: a dash, not ₺0.00.
                   Text(
-                    MoneyFormat.format(
-                      run.totalMinor,
-                      run.basket.currencyCode,
-                    ),
+                    run.basket.status == BasketStatus.cancelled
+                        ? l10n.runNoTotal
+                        : MoneyFormat.format(
+                            run.totalMinor,
+                            run.basket.currencyCode,
+                          ),
                     style: OpenBasketText.money(
-                      ob.onGround,
+                      run.basket.status == BasketStatus.cancelled
+                          ? ob.meta
+                          : ob.onGround,
                     ).copyWith(fontSize: 16),
                   ),
                 ],

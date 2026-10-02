@@ -2401,7 +2401,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketNobodyLooking.
   ///
   /// In en, this message translates to:
-  /// **'Nobody else has it open yet'**
+  /// **'Nobody at home has it open yet'**
   String get liveBasketNobodyLooking;
 
   /// No description provided for @liveBasketNudge.
@@ -2557,7 +2557,7 @@ abstract class AppLocalizations {
   /// No description provided for @liveBasketBackOnlineOne.
   ///
   /// In en, this message translates to:
-  /// **'{name} is on everyone\'s list now. It kept the time you added it.'**
+  /// **'{name} is on everyone\'s list now.'**
   String liveBasketBackOnlineOne(String name);
 
   /// No description provided for @liveBasketWhatYouAsked.
@@ -2823,6 +2823,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done adding'**
   String get liveBasketDoneAdding;
+
+  /// No description provided for @runNoTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get runNoTotal;
 }
 
 class _AppLocalizationsDelegate

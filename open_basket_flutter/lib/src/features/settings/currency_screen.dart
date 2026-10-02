@@ -319,10 +319,13 @@ class _CurrencyRow extends StatelessWidget {
                 ],
               ),
             ),
-            TickBox(
-              state: selected ? TickState.got : TickState.empty,
-              onTap: onTap,
-            ),
+            // Only the owner chooses; anyone else sees the list without boxes
+            // that look tappable and do nothing.
+            if (onTap != null)
+              TickBox(
+                state: selected ? TickState.got : TickState.empty,
+                onTap: onTap,
+              ),
           ],
         ),
       ),
