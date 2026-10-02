@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_basket_client/open_basket_client.dart';
@@ -8,10 +7,13 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../core/formatters.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import '../basket/basket_controller.dart';
+import '../basket/countdown_banner.dart';
 import '../basket/open_basket_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import '../history/history_controller.dart';
+import '../history/history_screen.dart';
 import '../stores/stores_controller.dart';
 import 'create_or_join_screen.dart';
 import 'household_controller.dart';
@@ -63,13 +65,18 @@ class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
     final household = ref.watch(myHouseholdProvider);
 
     return household.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (final error, final _) => Scaffold(
-        body: _Retry(
-          message: l10n.commonOffline,
-          onRetry: () => ref.invalidate(myHouseholdProvider),
+      loading: () => const SkeletonScreen(),
+      error: (final error, final _) => ObScaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: ErrorCard(
+              title: l10n.commonOffline,
+              body: l10n.commonOfflineRetryNote,
+              retryLabel: l10n.commonRetry,
+              onRetry: () => ref.invalidate(myHouseholdProvider),
+            ),
+          ),
         ),
       ),
       data: (final it) =>
@@ -86,210 +93,64 @@ class _Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final members = ref.watch(activeMembersProvider);
-    final me = ref.watch(myMembershipProvider).value;
+    final ob = Ob.of(context);
+    final members = ref.watch(activeMembersProvider).value ?? const [];
 
-    return Scaffold(
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(myHouseholdProvider);
-            // The basket too: pulling down is what someone does when a
-            // basket they were told about is not on the screen.
-            ref.invalidate(activeBasketProvider);
-            ref.invalidate(lastSettledRunProvider);
-            ref.invalidate(historyProvider);
-            await ref.read(membersProvider.future);
-          },
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            children: [
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  onPressed: () => context.push(Routes.settings),
-                  tooltip: l10n.settingsTitle,
-                  icon: const Icon(CupertinoIcons.gear),
-                ),
-              ),
-              Text(household.name, style: theme.textTheme.displayLarge),
-              const SizedBox(height: 4),
-              Text(
-                l10n.homeMembersOne(members.value?.length ?? 0),
-                style: OpenBasketText.meta(theme.textTheme.bodySmall!.color!),
-              ),
-              const SizedBox(height: 28),
-              const _BasketSection(),
-              const SizedBox(height: 32),
-              const _StoresRow(),
-              const _HistoryRow(),
-              const SizedBox(height: 24),
-              _CodeCard(code: household.code),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.homeMembersTitle,
-                      style: theme.textTheme.labelSmall,
-                    ),
-                  ),
-                  // The theme's buttons are full width; in a row this one
-                  // must size to its label or the layout has no width.
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(kMinTapTarget, kMinTapTarget),
-                    ),
-                    onPressed: () => context.push(Routes.members),
-                    child: Text(l10n.homeInvite),
-                  ),
-                ],
-              ),
-              ...?members.value?.map(
-                (final member) => _MemberRow(
-                  member: member,
-                  isYou: member.id == me?.id,
-                ),
-              ),
-              // Sign out and leaving live in settings (screen 19).
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The join code, big enough to read out across a room, and copyable.
-class _CodeCard extends StatelessWidget {
-  const _CodeCard({required this.code});
-
-  final String code;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall!.color!;
-
-    // Tap for the members screen (17), where the code can be shared or
-    // rotated; long-press still copies it, for the person who only wants that.
-    return GestureDetector(
-      onTap: () => context.push(Routes.members),
-      onLongPress: () async {
-        await Clipboard.setData(ClipboardData(text: code));
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.homeCodeCopied)),
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        color: theme.colorScheme.surfaceContainerHighest,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return ObScaffold(
+      body: RefreshIndicator(
+        color: ob.onGround,
+        onRefresh: () async {
+          ref.invalidate(myHouseholdProvider);
+          // The basket too: pulling down is what someone does when a basket
+          // they were told about is not on the screen.
+          ref.invalidate(activeBasketProvider);
+          ref.invalidate(lastSettledRunProvider);
+          ref.invalidate(historyProvider);
+          await ref.read(membersProvider.future);
+        },
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           children: [
-            Text(l10n.homeCodeLabel, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Wordmark(),
+                const Spacer(),
+                GlassIconButton(
+                  icon: CupertinoIcons.gear,
+                  tooltip: l10n.settingsTitle,
+                  onTap: () => context.push(Routes.settings),
+                ),
+              ],
+            ),
+            const SizedBox(height: 26),
+            SectionLabel(l10n.homeHouseholdLabel),
             Text(
-              code,
-              style: OpenBasketText.countdown(
-                theme.textTheme.bodyLarge!.color!,
-              ).copyWith(fontSize: 34, letterSpacing: 8),
+              household.name,
+              style: OpenBasketText.display(ob.onGround),
+            ),
+            const SizedBox(height: 26),
+            const _BasketSection(),
+            const SizedBox(height: 26),
+            SectionLabel(
+              l10n.homeMembersTitle,
+              action: l10n.homeInvite,
+              onAction: () => context.push(Routes.members),
             ),
             const SizedBox(height: 8),
-            Text(l10n.homeCodeNote, style: OpenBasketText.meta(muted)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MemberRow extends StatelessWidget {
-  const _MemberRow({required this.member, required this.isYou});
-
-  final HouseholdMember member;
-  final bool isYou;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final tone = MemberTones.forMember(
-      member.id ?? 0,
-      theme.brightness,
-    );
-
-    return Container(
-      constraints: const BoxConstraints(minHeight: kMinTapTarget),
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: theme.dividerColor)),
-      ),
-      child: Row(
-        children: [
-          Container(width: 10, height: 10, color: tone),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              member.displayName,
-              style: OpenBasketText.item(theme.textTheme.bodyLarge!.color!),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final member in members)
+                  PersonChip(
+                    memberId: member.id ?? 0,
+                    name: member.displayName,
+                    onTap: () => context.push(Routes.members),
+                  ),
+              ],
             ),
-          ),
-          if (isYou) _Tag(text: l10n.homeYouTag),
-          if (member.role == MemberRole.owner) ...[
-            const SizedBox(width: 6),
-            _Tag(text: l10n.homeOwnerTag),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _Tag extends StatelessWidget {
-  const _Tag({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.dividerColor),
-      ),
-      child: Text(text, style: theme.textTheme.labelSmall),
-    );
-  }
-}
-
-class _Retry extends StatelessWidget {
-  const _Retry({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, style: theme.textTheme.displayLarge),
-            const SizedBox(height: 20),
-            OutlinedButton(onPressed: onRetry, child: Text(l10n.commonRetry)),
+            const SizedBox(height: 26),
+            const _RecentRuns(),
           ],
         ),
       ),
@@ -305,11 +166,15 @@ class _BasketSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final active = ref.watch(activeBasketProvider);
     final members = ref.watch(membersProvider).value ?? const [];
+    final me = ref.watch(myMembershipProvider).value;
 
-    final openButton = FilledButton(
+    final openButton = PrimaryButton(
+      label: l10n.homeOpenBasket,
+      icon: CupertinoIcons.add,
+      glow: true,
       onPressed: () async {
         final opened = await OpenBasketSheet.show(context);
         if (opened == null || !context.mounted) return;
@@ -321,24 +186,22 @@ class _BasketSection extends ConsumerWidget {
           '${Routes.basket}/${opened.id}${joined ? '?joined=1' : ''}',
         );
       },
-      child: Text(l10n.homeOpenBasket),
     );
 
     final basket = active.value;
     if (basket == null) {
-      final lastRun = ref.watch(lastSettledRunProvider).value;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (lastRun != null) ...[
-            _LastRunCard(basket: lastRun.basket, lines: lastRun.lines),
-            const SizedBox(height: 28),
-          ],
-          Text(l10n.homeNoBasket, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(l10n.homeNoBasketNote, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 16),
+          const _IdleCard(),
+          const SizedBox(height: 14),
           openButton,
+          const SizedBox(height: 14),
+          Text(
+            l10n.homeOpenBasketNote,
+            textAlign: TextAlign.center,
+            style: OpenBasketText.meta(ob.meta),
+          ),
         ],
       );
     }
@@ -347,110 +210,193 @@ class _BasketSection extends ConsumerWidget {
         .where((final m) => m.id == basket.shopperMemberId)
         .map((final m) => m.displayName)
         .firstOrNull;
-    final open = basket.status == BasketStatus.open;
     final store = (ref.watch(storesProvider).value ?? const <Store>[])
         .where((s) => s.id == basket.storeId)
         .firstOrNull
         ?.name;
+    void see() => context.push('${Routes.basket}/${basket.id}');
 
-    final card = Container(
-      padding: const EdgeInsets.all(20),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Column(
+    if (basket.status == BasketStatus.open) {
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            open ? l10n.homeBasketOpenTitle : l10n.homeBasketFrozenTitle,
-            style: theme.textTheme.titleMedium,
+          GestureDetector(
+            onTap: see,
+            child: CountdownBanner(
+              basket: basket,
+              margin: EdgeInsets.zero,
+              shopperName: shopper ?? '',
+              storeName: store,
+              isShopper: me != null && basket.shopperMemberId == me.id,
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            open
-                ? (store == null
-                      ? l10n.homeBasketOpenNote(shopper ?? '')
-                      : l10n.homeBasketOpenAt(shopper ?? '', store))
-                : l10n.homeBasketFrozenNote(shopper ?? ''),
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => context.push('${Routes.basket}/${basket.id}'),
-            child: Text(l10n.homeBasketSee),
-          ),
+          const SizedBox(height: 14),
+          PrimaryButton(label: l10n.homeBasketSee, onPressed: see),
         ],
-      ),
-    );
+      );
+    }
 
     // A frozen basket is waiting for prices, not blocking the next run.
     // Rule 4 is one *open* basket, so the way to start another stays on
     // screen underneath it.
-    if (open) return card;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [card, const SizedBox(height: 16), openButton],
+      children: [
+        GestureDetector(
+          onTap: see,
+          child: Glass(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Icon(CupertinoIcons.lock, size: 24, color: ob.onGround),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.homeBasketFrozenTitle,
+                        style: OpenBasketText.title(ob.onGround),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.homeBasketFrozenNote(shopper ?? ''),
+                        style: OpenBasketText.meta(ob.meta),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(CupertinoIcons.chevron_right, size: 16, color: ob.meta),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        openButton,
+      ],
     );
   }
 }
 
-/// The last run, settled: what this member owes or is owed, and the way to
-/// the full settlement. Without it a member who was not watching the live
-/// basket had no way to find out (ADR-031).
-class _LastRunCard extends ConsumerWidget {
-  const _LastRunCard({required this.basket, required this.lines});
-
-  final Basket basket;
-  final List<SettlementLine> lines;
+/// "No basket open · Last run today · ₺250.80", and — until the next run —
+/// what this member owes or is owed from it. Without that line a member who
+/// was not watching the live basket had no way to find out (ADR-031).
+class _IdleCard extends ConsumerWidget {
+  const _IdleCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
+    final runs = ref.watch(historyProvider).value ?? const <PastRun>[];
+    final last = runs.firstOrNull;
+    final lastSettled = ref.watch(lastSettledRunProvider).value;
     final me = ref.watch(myMembershipProvider).value;
     final members = ref.watch(membersProvider).value ?? const [];
     String name(int id) =>
         members.where((m) => m.id == id).firstOrNull?.displayName ?? '';
-    String money(int minor) => MoneyFormat.format(minor, basket.currencyCode);
 
-    final iOwe = lines.where((l) => l.fromMemberId == me?.id).toList();
-    final owedToMe = lines.where((l) => l.toMemberId == me?.id).toList();
-    final String summary;
-    if (iOwe.isNotEmpty) {
-      summary = iOwe
-          .map(
-            (l) => l10n.homeLastRunYouOwe(
-              name(l.toMemberId),
-              money(l.amountMinor),
-            ),
-          )
-          .join('\n');
-    } else if (owedToMe.length == 1) {
-      summary = l10n.homeLastRunOwesYou(
-        name(owedToMe.single.fromMemberId),
-        money(owedToMe.single.amountMinor),
-      );
-    } else if (owedToMe.length > 1) {
-      summary = l10n.homeLastRunManyOweYou(
-        owedToMe.length,
-        money(owedToMe.fold(0, (sum, l) => sum + l.amountMinor)),
-      );
-    } else {
-      summary = l10n.homeLastRunClear;
+    String? owes;
+    if (lastSettled != null && me != null) {
+      String money(int minor) =>
+          MoneyFormat.format(minor, lastSettled.basket.currencyCode);
+      final lines = lastSettled.lines;
+      final iOwe = lines.where((l) => l.fromMemberId == me.id).toList();
+      final owedToMe = lines.where((l) => l.toMemberId == me.id).toList();
+      if (iOwe.isNotEmpty) {
+        owes = iOwe
+            .map(
+              (l) => l10n.homeLastRunYouOwe(
+                name(l.toMemberId),
+                money(l.amountMinor),
+              ),
+            )
+            .join('\n');
+      } else if (owedToMe.length == 1) {
+        owes = l10n.homeLastRunOwesYou(
+          name(owedToMe.single.fromMemberId),
+          money(owedToMe.single.amountMinor),
+        );
+      } else if (owedToMe.length > 1) {
+        owes = l10n.homeLastRunManyOweYou(
+          owedToMe.length,
+          money(owedToMe.fold(0, (sum, l) => sum + l.amountMinor)),
+        );
+      }
     }
 
-    return Container(
+    final card = Glass(
       padding: const EdgeInsets.all(20),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
         children: [
-          Text(l10n.homeLastRunTitle, style: theme.textTheme.labelSmall),
-          const SizedBox(height: 8),
-          Text(summary, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 16),
-          OutlinedButton(
-            onPressed: () =>
-                context.push('${Routes.basket}/${basket.id}/settlement'),
-            child: Text(l10n.liveBasketSeeSettlement),
+          const BrandMark(height: 30, opacity: 0.85),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.homeNoBasketTitle,
+                  style: OpenBasketText.title(ob.onGround),
+                ),
+                const SizedBox(height: 2),
+                if (last == null)
+                  Text(
+                    l10n.homeNoRunsYet,
+                    style: OpenBasketText.meta(ob.meta),
+                  )
+                else
+                  _LastRunLine(run: last),
+                if (owes != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    owes,
+                    style: OpenBasketText.meta(
+                      ob.onGround,
+                    ).copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (lastSettled != null)
+            Icon(CupertinoIcons.chevron_right, size: 16, color: ob.meta),
+        ],
+      ),
+    );
+    if (lastSettled == null) return card;
+    return GestureDetector(
+      onTap: () => context.push(
+        '${Routes.basket}/${lastSettled.basket.id}/settlement',
+      ),
+      child: card,
+    );
+  }
+}
+
+class _LastRunLine extends StatelessWidget {
+  const _LastRunLine({required this.run});
+
+  final PastRun run;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final ob = Ob.of(context);
+    final day = describeDay(l10n, run.basket.openedAt, DateTime.now());
+    final amount = MoneyFormat.format(run.totalMinor, run.basket.currencyCode);
+    final whole = l10n.homeLastRunLine(day, amount);
+    final at = whole.lastIndexOf(amount);
+    final style = OpenBasketText.meta(ob.meta);
+    if (at < 0) return Text(whole, style: style);
+    return Text.rich(
+      TextSpan(
+        style: style,
+        children: [
+          TextSpan(text: whole.substring(0, at)),
+          TextSpan(
+            text: amount,
+            style: OpenBasketText.mono(color: ob.meta, fontSize: 13),
           ),
         ],
       ),
@@ -458,97 +404,85 @@ class _LastRunCard extends ConsumerWidget {
   }
 }
 
-/// Where the stores live until there is a settings screen (screen 19 has a
-/// "Stores" row; this is that row, on the home screen for now).
-class _StoresRow extends ConsumerWidget {
-  const _StoresRow();
+/// Screen 05's last two runs, and the way to all of them.
+class _RecentRuns extends ConsumerWidget {
+  const _RecentRuns();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final stores = ref.watch(storesProvider).value ?? const <Store>[];
-    return _NavRow(
-      label: l10n.homeStoresLabel,
-      value: stores.isEmpty
-          ? l10n.homeStoresNone
-          : stores.map((s) => s.name).join(', '),
-      onTap: () => context.push(Routes.stores),
-    );
-  }
-}
-
-/// The way to screen 16.
-class _HistoryRow extends ConsumerWidget {
-  const _HistoryRow();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final ob = Ob.of(context);
     final runs = ref.watch(historyProvider).value ?? const <PastRun>[];
-    return _NavRow(
-      label: l10n.homeHistoryLabel,
-      value: runs.isEmpty
-          ? l10n.homeHistoryNone
-          : l10n.historySummary(
-              runs.length,
-              MoneyFormat.format(
-                runs.fold(0, (sum, r) => sum + r.totalMinor),
-                runs.first.basket.currencyCode,
-              ),
-            ),
-      onTap: () => context.push(Routes.history),
-    );
-  }
-}
+    if (runs.isEmpty) return const SizedBox.shrink();
+    final stores = ref.watch(storesProvider).value ?? const <Store>[];
 
-class _NavRow extends StatelessWidget {
-  const _NavRow({
-    required this.label,
-    required this.value,
-    required this.onTap,
-  });
-
-  final String label;
-  final String value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: kMinTapTarget),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: theme.dividerColor)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionLabel(
+          l10n.homeRecentRuns,
+          action: l10n.homeAllRuns,
+          onAction: () => context.push(Routes.history),
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        const SizedBox(height: 6),
+        for (final run in runs.take(2))
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => context.push('${Routes.history}/${run.basket.id}'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: ob.rule)),
+              ),
+              child: Row(
                 children: [
-                  Text(label, style: theme.textTheme.labelSmall),
-                  const SizedBox(height: 4),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.homeRecentRunTitle(
+                            stores
+                                    .where((s) => s.id == run.basket.storeId)
+                                    .firstOrNull
+                                    ?.name ??
+                                l10n.historyNoStore,
+                            describeDay(
+                              l10n,
+                              run.basket.openedAt,
+                              DateTime.now(),
+                            ),
+                          ),
+                          style: OpenBasketText.body(
+                            ob.onGround,
+                          ).copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          l10n.homeRecentRunMeta(
+                            run.itemCount,
+                            run.basket.status == BasketStatus.cancelled
+                                ? l10n.runCancelledLower
+                                : l10n.runSettledLower,
+                          ),
+                          style: OpenBasketText.meta(ob.meta),
+                        ),
+                      ],
+                    ),
+                  ),
                   Text(
-                    value,
-                    style: theme.textTheme.titleMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    MoneyFormat.format(
+                      run.totalMinor,
+                      run.basket.currencyCode,
+                    ),
+                    style: OpenBasketText.money(
+                      ob.onGround,
+                    ).copyWith(fontSize: 16),
                   ),
                 ],
               ),
             ),
-            Icon(
-              CupertinoIcons.chevron_right,
-              size: 18,
-              color: theme.textTheme.bodySmall!.color,
-            ),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
 }

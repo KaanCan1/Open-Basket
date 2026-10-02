@@ -4,6 +4,7 @@ import '../generated/protocol.dart';
 import '../services/analytics_service.dart';
 import '../services/authz.dart';
 import '../services/basket_channels.dart';
+import '../services/basket_presence.dart';
 import '../services/basket_service.dart';
 import '../services/notification_service.dart';
 import '../util/clock.dart';
@@ -207,6 +208,40 @@ class BasketEndpoint extends Endpoint {
     );
     return cancelled;
   }
+
+  /// Any member, while the basket is `open`: a push to everyone in the house
+  /// who does not have it on screen right now and has not added anything
+  /// yet (screen 10's "Nudge the ones who aren't"). Never the caller.
+  ///
+  /// Once a minute per basket at most, so a household cannot be buzzed in a
+  /// loop; a second tap inside that answers `nudgeTooSoon`. Returns how many
+  /// people it went to, before their own notification switches, which the
+  /// sender still respects.
+  Future<int> nudge(Session session, int basketId) async {
+    final member = await Authz.requireMember(session);
+    final basket = await _requireOpen(session, basketId, shopperOnly: false);
+    final now = ServerClock.now();
+    final last = _lastNudge[basketId];
+    if (last != null && now.difference(last) < _nudgeGap) {
+      throw OpenBasketException(
+        error: BasketError.nudgeTooSoon,
+        message: 'The house was nudged a moment ago.',
+      );
+    }
+    _lastNudge[basketId] = now;
+    return NotificationService.nudge(
+      session,
+      basket,
+      fromMemberId: member.id!,
+      lookingMemberIds: BasketPresence.viewers(basketId).toSet(),
+    );
+  }
+
+  static const _nudgeGap = Duration(minutes: 1);
+
+  /// In memory, like presence: losing it on a restart only means one more
+  /// nudge is allowed.
+  static final _lastNudge = <int, DateTime>{};
 
   /// The household's open or frozen basket, or null. This is also what a
   /// client calls on cold start to discover that a basket closed while it was

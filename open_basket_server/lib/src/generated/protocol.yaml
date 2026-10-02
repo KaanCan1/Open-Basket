@@ -15,6 +15,7 @@ basket:
   - extend:
   - freeze:
   - cancel:
+  - nudge:
   - getActive:
   - addItem:
   - updateItem:

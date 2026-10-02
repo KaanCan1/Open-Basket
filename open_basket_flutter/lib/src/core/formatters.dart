@@ -1,3 +1,4 @@
+import '../../l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 /// Money on screen. Amounts arrive as `int` minor units (rule 5) and leave as
@@ -78,4 +79,22 @@ abstract final class MoneyFormat {
     }
     return minor / divisor;
   }
+}
+
+/// "Ayşe", "Ayşe and Deniz", "Ayşe, Deniz and Mert".
+String joinNames(AppLocalizations l10n, List<String> names) {
+  if (names.isEmpty) return '';
+  if (names.length == 1) return names.single;
+  return l10n.namesAnd(
+    names.sublist(0, names.length - 1).join(', '),
+    names.last,
+  );
+}
+
+/// "12s ago", "3 min ago".
+String describeAgo(AppLocalizations l10n, Duration ago) {
+  if (ago.inSeconds < 60) {
+    return l10n.agoSeconds(ago.inSeconds < 1 ? 1 : ago.inSeconds);
+  }
+  return l10n.agoMinutes(ago.inMinutes);
 }

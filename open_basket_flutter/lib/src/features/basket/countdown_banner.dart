@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/server_clock.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 
 /// The time left, rendered from the server's clock.
 ///
@@ -25,8 +27,27 @@ class CountdownBanner extends ConsumerStatefulWidget {
     this.storeName,
     this.isShopper = false,
     this.onExtend,
+    this.margin = const EdgeInsets.fromLTRB(16, 2, 16, 4),
+    this.viewers = const [],
+    this.reconnecting = false,
+    this.quiet = false,
     super.key,
   });
+
+  /// Who else is looking right now (ADR-049), as (memberId, name): the
+  /// squares on the shopper's card (screen 08).
+  final List<(int, String)> viewers;
+
+  /// The stream dropped: a member's line says the clock carries on without
+  /// this phone (screen 25). The card itself never changes for this.
+  final bool reconnecting;
+
+  /// Nothing on the list yet: a member's line is just where and until when
+  /// (screen 10).
+  final bool quiet;
+
+  /// Around the card; the home screen sits it on its own 24px gutter.
+  final EdgeInsetsGeometry margin;
 
   /// Whose card this is: the shopper sees where they are and the Extend
   /// button; everyone else sees whose run it is (screens 08-09).
@@ -125,7 +146,14 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
     // that on screen as a number that keeps moving reads as "still counting"
     // when the list is already final.
     if (basket.status != BasketStatus.open) {
-      return _Closed(basket: basket, shopperName: widget.shopperName);
+      return Padding(
+        padding: widget.margin,
+        child: _Closed(
+          basket: basket,
+          shopperName: widget.shopperName,
+          storeName: widget.storeName,
+        ),
+      );
     }
 
     final left = basket.closesAt.difference(
@@ -188,12 +216,19 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
           : widget.storeName == null
           ? l10n.countdownCloses(closes)
           : l10n.countdownYoureAt(widget.storeName!, closes);
+    } else if (widget.reconnecting) {
+      caption = l10n.countdownStillCounting;
+    } else if (widget.quiet) {
+      caption = widget.storeName == null
+          ? l10n.countdownCloses(closes)
+          : l10n.countdownStoreCloses(widget.storeName!, closes);
     } else {
-      caption = l10n.countdownMemberLine(closes, widget.shopperName);
+      caption = l10n.countdownServerTime(widget.shopperName);
     }
+    final locked = !widget.isShopper && !widget.quiet;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
+      padding: widget.margin,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -249,7 +284,15 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
                   ),
                 ),
                 if (!widget.isShopper && widget.shopperName.isNotEmpty)
-                  _RunOf(name: widget.shopperName),
+                  _RunOf(name: widget.shopperName)
+                else if (widget.isShopper && widget.viewers.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: AvatarStack(
+                      people: widget.viewers,
+                      onDark: true,
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 16),
@@ -261,14 +304,22 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
             const SizedBox(height: 16),
             Row(
               children: [
+                if (locked) ...[
+                  const Icon(CupertinoIcons.lock, size: 12, color: meta),
+                  const SizedBox(width: 6),
+                ],
                 Expanded(
                   child: Text(
                     caption,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: urgent ? paper : meta,
-                      fontWeight: urgent ? FontWeight.w600 : FontWeight.w400,
-                    ),
+                    style:
+                        OpenBasketText.meta(
+                          urgent ? paper : meta,
+                        ).copyWith(
+                          fontSize: 12,
+                          fontWeight: urgent
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
                   ),
                 ),
                 if (widget.isShopper) ...[
@@ -306,65 +357,112 @@ class _CountdownBannerState extends ConsumerState<CountdownBanner> {
   }
 }
 
-/// Screens 22-23: arriving at a basket that is no longer open. It says how it
-/// ended and when — the question someone opening the app after a run is
-/// actually asking — instead of a bare "frozen".
+/// The countdown once the basket is no longer open (screens 14, 22, 23, and
+/// the frozen state of the set's foundations): the same geometry, flat and
+/// grey, the bar spent, and a tag for how it stands. A `closesAt` that kept
+/// moving would read as "still counting" when the list is already final.
 class _Closed extends StatelessWidget {
-  const _Closed({required this.basket, required this.shopperName});
+  const _Closed({
+    required this.basket,
+    required this.shopperName,
+    this.storeName,
+  });
 
   final Basket basket;
   final String shopperName;
+  final String? storeName;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final ended = (basket.frozenAt ?? basket.closesAt).toLocal();
     final at = DateFormat.Hm().format(ended);
     final ran = (basket.frozenAt ?? basket.closesAt)
         .difference(basket.openedAt)
         .inMinutes;
+    final run = storeName == null
+        ? l10n.countdownRunOf(shopperName)
+        : l10n.countdownRunAt(shopperName, storeName!);
+    final cancelled = basket.status == BasketStatus.cancelled;
 
-    final String label;
-    final String title;
-    final String? note;
-    switch (basket.status) {
-      case BasketStatus.cancelled:
-        label = l10n.countdownCancelled;
-        title = l10n.countdownCancelledBy(shopperName);
-        note = l10n.countdownCancelledNote;
-      case BasketStatus.settled:
-        label = l10n.countdownSettled;
-        title = basket.closedAutomatically
-            ? l10n.countdownClosedItself(at)
-            : l10n.countdownClosedBy(shopperName, at);
-        note = null;
-      case BasketStatus.frozen:
-      case BasketStatus.open:
-        label = basket.closedAutomatically
-            ? l10n.countdownClosedOnTime
-            : l10n.countdownFrozen;
-        title = basket.closedAutomatically
-            ? l10n.countdownClosedItself(at)
-            : l10n.countdownClosedBy(shopperName, at);
-        note = basket.closedAutomatically
-            ? l10n.countdownClosedItselfNote(ran < 1 ? 1 : ran)
-            : l10n.countdownListFinal;
-    }
+    final label = cancelled
+        ? l10n.countdownCancelled
+        : basket.closedAutomatically
+        ? l10n.countdownClosedOnTime
+        : l10n.countdownLocked;
+    final tag = switch (basket.status) {
+      BasketStatus.settled => Tag(l10n.countdownSettled),
+      BasketStatus.cancelled => Tag(l10n.countdownCancelled, outlined: true),
+      _ => Tag(l10n.countdownFrozen),
+    };
+    final grey = ob.dark ? const Color(0xFF6F6F69) : OpenBasketColors.meta;
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: ob.dark ? const Color(0xFF1C1C1A) : OpenBasketColors.tonal,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: ob.faint),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(label, style: theme.textTheme.labelSmall),
-          const SizedBox(height: 4),
-          Text(title, style: theme.textTheme.titleMedium),
-          if (note != null) ...[
-            const SizedBox(height: 2),
-            Text(note, style: theme.textTheme.bodySmall),
-          ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          cancelled
+                              ? CupertinoIcons.xmark
+                              : CupertinoIcons.lock,
+                          size: 13,
+                          color: ob.meta,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          label,
+                          style: OpenBasketText.label(
+                            ob.meta,
+                          ).copyWith(letterSpacing: 1.1),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '0:00',
+                      style: OpenBasketText.countdown(grey).copyWith(
+                        fontSize: 54,
+                        height: 0.95,
+                        letterSpacing: -2.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(padding: const EdgeInsets.only(bottom: 4), child: tag),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            height: 10,
+            decoration: BoxDecoration(
+              color: ob.faint,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            cancelled
+                ? l10n.countdownCancelledLine(run, at)
+                : l10n.countdownRunLine(run, ran < 1 ? 1 : ran, at),
+            style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+          ),
         ],
       ),
     );
@@ -518,10 +616,10 @@ class _GlassButton extends StatelessWidget {
     const paper = OpenBasketColors.paper;
     final enabled = onPressed != null;
     return Material(
-      color: paper.withValues(alpha: 0.12),
+      color: paper.withValues(alpha: enabled ? 0.12 : 0.06),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: paper.withValues(alpha: 0.24)),
+        side: BorderSide(color: paper.withValues(alpha: enabled ? 0.24 : 0.12)),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -530,13 +628,24 @@ class _GlassButton extends StatelessWidget {
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: enabled ? paper : OpenBasketColors.metaDark,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!enabled) ...[
+                const Icon(
+                  CupertinoIcons.lock,
+                  size: 13,
+                  color: OpenBasketColors.metaDark,
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: OpenBasketText.body(
+                  enabled ? paper : OpenBasketColors.metaDark,
+                ).copyWith(fontSize: 13, fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
         ),
       ),

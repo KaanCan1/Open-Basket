@@ -61,8 +61,11 @@ final routerProvider = Provider<GoRouter>((final ref) {
           ),
           GoRoute(
             path: 'household/join',
-            builder: (final context, final state) =>
-                const JoinHouseholdScreen(),
+            builder: (final context, final state) => JoinHouseholdScreen(
+              attempt: state.extra is RefusedJoin
+                  ? state.extra! as RefusedJoin
+                  : null,
+            ),
           ),
           GoRoute(
             path: 'settings',

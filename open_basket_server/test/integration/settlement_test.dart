@@ -342,6 +342,12 @@ void main() {
       var ended = false;
       final sub = endpoints.basketStream
           .watch(run.ayse, run.basket.id!)
+          // Presence announcements (ADR-049) are not what this is about.
+          .where(
+            (e) =>
+                !(e.type == BasketEventType.basketUpdated &&
+                    e.viewerMemberIds != null),
+          )
           .listen(received.add, onDone: () => ended = true);
       addTearDown(sub.cancel);
       await _until(() => received.isNotEmpty);

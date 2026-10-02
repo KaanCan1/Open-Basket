@@ -7,6 +7,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/formatters.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import '../household/household_controller.dart';
 import '../../core/failure_message.dart';
 
@@ -37,6 +38,7 @@ class CurrencyScreen extends ConsumerStatefulWidget {
 class _CurrencyScreenState extends ConsumerState<CurrencyScreen> {
   String? _picked;
   bool _saving = false;
+  String _query = '';
 
   Future<void> _save(String code) async {
     final l10n = AppLocalizations.of(context);
@@ -58,57 +60,186 @@ class _CurrencyScreenState extends ConsumerState<CurrencyScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final household = ref.watch(myHouseholdProvider).value;
     final me = ref.watch(myMembershipProvider).value;
     final isOwner = me?.role == MemberRole.owner;
     final current = household?.currencyCode ?? 'TRY';
     final picked = _picked ?? current;
-    final codes = [
-      current,
+    final q = _query.trim().toLowerCase();
+    final others = [
       for (final code in CurrencyScreen.common)
-        if (code != current) code,
+        if (code != current &&
+            (q.isEmpty ||
+                code.toLowerCase().contains(q) ||
+                CurrencyScreen.nameOf(l10n, code).toLowerCase().contains(q)))
+          code,
     ];
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+    return ObScaffold(
+      back: true,
+      backLabel: l10n.currencyBack,
+      bottomBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.currencyTitle, style: theme.textTheme.displayLarge),
-          const SizedBox(height: 4),
-          Text(l10n.currencyBlurb, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 20),
-          for (final code in codes)
-            _CurrencyRow(
-              code: code,
-              name: CurrencyScreen.nameOf(l10n, code),
-              inUse: code == current,
-              selected: code == picked,
-              onTap: isOwner ? () => setState(() => _picked = code) : null,
-            ),
-          const SizedBox(height: 16),
-          Text(l10n.currencyNote, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 24),
+          IconNote(text: l10n.currencyNote, boxed: true),
+          const SizedBox(height: 10),
           if (isOwner)
-            FilledButton(
-              onPressed: _saving || picked == current
-                  ? null
-                  : () => _save(picked),
-              child: _saving
-                  ? const SizedBox.square(
-                      dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l10n.currencySave),
+            PrimaryButton(
+              label: l10n.currencySave,
+              busy: _saving,
+              onPressed: picked == current ? null : () => _save(picked),
             )
           else
             Text(
               l10n.settingsOwnerOnly,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall,
+              style: OpenBasketText.meta(ob.meta),
             ),
         ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        children: [
+          ScreenTitle(l10n.currencyTitle, subtitle: l10n.currencyBlurb),
+          const SizedBox(height: 18),
+          _InUseCard(
+            code: current,
+            name: CurrencyScreen.nameOf(l10n, current),
+            selected: picked == current,
+            onTap: isOwner ? () => setState(() => _picked = current) : null,
+          ),
+          const SizedBox(height: 14),
+          Glass(
+            radius: 16,
+            shadow: false,
+            child: TextField(
+              onChanged: (v) => setState(() => _query = v),
+              style: OpenBasketText.body(ob.onGround),
+              decoration: InputDecoration(
+                hintText: l10n.currencySearch(CurrencyScreen.common.length),
+                prefixIcon: Icon(
+                  CupertinoIcons.search,
+                  size: 18,
+                  color: ob.meta,
+                ),
+                filled: false,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          SectionLabel(l10n.currencyCommon),
+          const SizedBox(height: 4),
+          for (final code in others)
+            _CurrencyRow(
+              code: code,
+              name: CurrencyScreen.nameOf(l10n, code),
+              selected: code == picked,
+              onTap: isOwner ? () => setState(() => _picked = code) : null,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+String _sample(String code) {
+  final digits = MoneyFormat.minorUnitDigits(code);
+  // 1,234.50 in whatever minor units this currency has.
+  var sampleMinor = 1234;
+  for (var i = 0; i < digits; i++) {
+    sampleMinor *= 10;
+  }
+  if (digits > 0) sampleMinor += 50 * (digits >= 2 ? 1 : 0);
+  return MoneyFormat.format(sampleMinor, code);
+}
+
+/// The currency in use, on ink with its symbol on Signal (screen 20).
+class _InUseCard extends StatelessWidget {
+  const _InUseCard({
+    required this.code,
+    required this.name,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String code;
+  final String name;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    const paper = OpenBasketColors.paper;
+    return GestureDetector(
+      onTap: onTap,
+      child: InkCard(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: OpenBasketColors.signal,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: FittedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Text(
+                    MoneyFormat.symbol(code),
+                    style: OpenBasketText.mono(
+                      color: OpenBasketColors.ink,
+                      fontSize: 22,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: OpenBasketText.title(paper)),
+                  Text(
+                    MoneyFormat.minorUnitDigits(code) == 0
+                        ? l10n.currencyNoCents(code, _sample(code))
+                        : l10n.currencySample(code, _sample(code)),
+                    style: OpenBasketText.mono(
+                      color: OpenBasketColors.metaDark,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: paper.withValues(alpha: 0.5)),
+              ),
+              child: Text(
+                l10n.currencyInUse.toUpperCase(),
+                style: OpenBasketText.mono(
+                  color: paper,
+                  fontSize: 10.5,
+                  letterSpacing: 1.05,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -118,83 +249,79 @@ class _CurrencyRow extends StatelessWidget {
   const _CurrencyRow({
     required this.code,
     required this.name,
-    required this.inUse,
     required this.selected,
     required this.onTap,
   });
 
   final String code;
   final String name;
-  final bool inUse;
   final bool selected;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final ink = theme.textTheme.bodyLarge!.color!;
+    final ob = Ob.of(context);
+    final sample = _sample(code);
     final digits = MoneyFormat.minorUnitDigits(code);
-    // 1,234.50 in whatever minor units this currency has.
-    var sampleMinor = 1234;
-    for (var i = 0; i < digits; i++) {
-      sampleMinor *= 10;
-    }
-    if (digits > 0) sampleMinor += 50 * (digits >= 2 ? 1 : 0);
-    final sample = MoneyFormat.format(sampleMinor, code);
 
-    return InkWell(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 56),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        constraints: const BoxConstraints(minHeight: 60),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: theme.dividerColor)),
+          border: Border(top: BorderSide(color: ob.rule)),
         ),
         child: Row(
           children: [
             // Some symbols are the code itself ("CHF"): scaled down to fit
-            // the column rather than wrapping onto a second line.
-            SizedBox(
-              width: 40,
+            // the square rather than wrapping onto a second line.
+            Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: ob.tonal,
+                borderRadius: BorderRadius.circular(11),
+              ),
               child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  MoneyFormat.symbol(code),
-                  maxLines: 1,
-                  style: OpenBasketText.money(ink).copyWith(fontSize: 20),
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Text(
+                    MoneyFormat.symbol(code),
+                    maxLines: 1,
+                    style: OpenBasketText.mono(
+                      color: ob.onGround,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: theme.textTheme.titleMedium),
+                  Text(name, style: OpenBasketText.item(ob.onGround)),
                   Text(
                     digits == 0
                         ? l10n.currencyNoCents(code, sample)
                         : l10n.currencySample(code, sample),
-                    style: theme.textTheme.bodySmall,
+                    style: OpenBasketText.mono(
+                      color: ob.meta,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ],
               ),
             ),
-            if (inUse)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Text(
-                  l10n.currencyInUse,
-                  style: theme.textTheme.labelSmall,
-                ),
-              ),
-            SizedBox.square(
-              dimension: kMinTapTarget,
-              child: selected
-                  ? Icon(CupertinoIcons.checkmark_alt, color: ink)
-                  : null,
+            TickBox(
+              state: selected ? TickState.got : TickState.empty,
+              onTap: onTap,
             ),
           ],
         ),

@@ -104,7 +104,11 @@ enum BasketError implements _is.SerializableModel {
   invalidEmailAddress,
   invalidSignInCode,
   signInCodeExpired,
-  tooManySignInAttempts;
+  tooManySignInAttempts,
+
+  /// A nudge for this basket went out less than a minute ago. Everyone
+  /// who was going to hear it already has.
+  nudgeTooSoon;
 
   static BasketError fromJson(String name) {
     switch (name) {
@@ -170,6 +174,8 @@ enum BasketError implements _is.SerializableModel {
         return BasketError.signInCodeExpired;
       case 'tooManySignInAttempts':
         return BasketError.tooManySignInAttempts;
+      case 'nudgeTooSoon':
+        return BasketError.nudgeTooSoon;
       default:
         throw ArgumentError(
           'Value "$name" cannot be converted to "BasketError"',

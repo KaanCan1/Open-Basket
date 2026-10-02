@@ -27,6 +27,7 @@ abstract class BasketEvent
     this.basket,
     this.items,
     this.item,
+    this.viewerMemberIds,
     required this.serverTime,
   });
 
@@ -35,6 +36,7 @@ abstract class BasketEvent
     _incyaby3.Basket? basket,
     List<_iqfe96ip.BasketItem>? items,
     _iqfe96ip.BasketItem? item,
+    List<int>? viewerMemberIds,
     required DateTime serverTime,
   }) = _BasketEventImpl;
 
@@ -58,6 +60,11 @@ abstract class BasketEvent
           : _ix10ipnp.Protocol().deserialize<_iqfe96ip.BasketItem>(
               jsonSerialization['item'],
             ),
+      viewerMemberIds: jsonSerialization['viewerMemberIds'] == null
+          ? null
+          : _ix10ipnp.Protocol().deserialize<List<int>>(
+              jsonSerialization['viewerMemberIds'],
+            ),
       serverTime: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['serverTime'],
       ),
@@ -74,6 +81,11 @@ abstract class BasketEvent
   /// Set on the single-item events.
   _iqfe96ip.BasketItem? item;
 
+  /// Who has this basket on screen right now, by member id (ADR-049). Set on
+  /// `snapshot`, and on the `basketUpdated` that announces a change in who
+  /// is looking. Null on every other event, which means "unchanged".
+  List<int>? viewerMemberIds;
+
   /// Sent on every event so the client can keep correcting for clock drift.
   DateTime serverTime;
 
@@ -85,6 +97,7 @@ abstract class BasketEvent
     _incyaby3.Basket? basket,
     List<_iqfe96ip.BasketItem>? items,
     _iqfe96ip.BasketItem? item,
+    List<int>? viewerMemberIds,
     DateTime? serverTime,
   });
   @override
@@ -95,6 +108,7 @@ abstract class BasketEvent
       if (basket != null) 'basket': basket?.toJson(),
       if (items != null) 'items': items?.toJson(valueToJson: (v) => v.toJson()),
       if (item != null) 'item': item?.toJson(),
+      if (viewerMemberIds != null) 'viewerMemberIds': viewerMemberIds?.toJson(),
       'serverTime': serverTime.toJson(),
     };
   }
@@ -108,6 +122,7 @@ abstract class BasketEvent
       if (items != null)
         'items': items?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       if (item != null) 'item': item?.toJsonForProtocol(),
+      if (viewerMemberIds != null) 'viewerMemberIds': viewerMemberIds?.toJson(),
       'serverTime': serverTime.toJson(),
     };
   }
@@ -126,12 +141,14 @@ class _BasketEventImpl extends BasketEvent {
     _incyaby3.Basket? basket,
     List<_iqfe96ip.BasketItem>? items,
     _iqfe96ip.BasketItem? item,
+    List<int>? viewerMemberIds,
     required DateTime serverTime,
   }) : super._(
          type: type,
          basket: basket,
          items: items,
          item: item,
+         viewerMemberIds: viewerMemberIds,
          serverTime: serverTime,
        );
 
@@ -144,6 +161,7 @@ class _BasketEventImpl extends BasketEvent {
     Object? basket = _Undefined,
     Object? items = _Undefined,
     Object? item = _Undefined,
+    Object? viewerMemberIds = _Undefined,
     DateTime? serverTime,
   }) {
     return BasketEvent(
@@ -153,6 +171,9 @@ class _BasketEventImpl extends BasketEvent {
           ? items
           : this.items?.map((e0) => e0.copyWith()).toList(),
       item: item is _iqfe96ip.BasketItem? ? item : this.item?.copyWith(),
+      viewerMemberIds: viewerMemberIds is List<int>?
+          ? viewerMemberIds
+          : this.viewerMemberIds?.map((e0) => e0).toList(),
       serverTime: serverTime ?? this.serverTime,
     );
   }

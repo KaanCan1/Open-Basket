@@ -1,18 +1,20 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_basket_client/open_basket_client.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../core/formatters.dart';
+import '../../core/quantity_format.dart';
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import '../basket/checkout_screen.dart';
 import '../household/household_controller.dart';
 import '../stores/stores_controller.dart';
 import 'history_controller.dart';
 import 'history_screen.dart';
-import '../../shared/widgets/item_name.dart';
 
 /// Screens 29 and 30. One finished run, read-only: settled with its prices
 /// and who paid whom, or cancelled with what was dropped.
@@ -27,19 +29,25 @@ class PastRunScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     final data = ref.watch(pastRunProvider(basketId));
     final members = ref.watch(membersProvider).value ?? const [];
     final stores = ref.watch(storesProvider).value ?? const <Store>[];
 
     final value = data.value;
     if (value == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: data.hasError
-              ? Text(l10n.commonOffline, style: theme.textTheme.bodySmall)
-              : const CircularProgressIndicator(),
+      if (!data.hasError) return const SkeletonScreen(back: true);
+      return ObScaffold(
+        back: true,
+        backLabel: l10n.historyTitle,
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: ErrorCard(
+            title: l10n.commonOffline,
+            body: l10n.commonOfflineRetryNote,
+            retryLabel: l10n.commonRetry,
+            onRetry: () => ref.invalidate(pastRunProvider(basketId)),
+          ),
         ),
       );
     }
@@ -71,7 +79,10 @@ class PastRunScreen extends ConsumerWidget {
         describeWhen(l10n, basket.openedAt, DateTime.now()),
         shopper,
       ),
-      if (settled && ranMinutes != null) l10n.historyRan(ranMinutes),
+      if (ranMinutes != null)
+        settled
+            ? l10n.historyRan(ranMinutes)
+            : l10n.historyStoppedAfter(ranMinutes < 1 ? 1 : ranMinutes),
     ].join(' · ');
 
     // Grouped by who asked, members in their household order.
@@ -94,35 +105,75 @@ class PastRunScreen extends ConsumerWidget {
     final gap = receipt - priced;
     final share = lines.isEmpty ? 0 : lines.first.receiptGapMinor;
 
-    return Scaffold(
-      appBar: AppBar(),
+    return ObScaffold(
+      back: true,
+      backLabel: l10n.historyTitle,
+      bottomBar: settled && lines.isNotEmpty
+          ? Builder(
+              builder: (buttonContext) => OutlineButton(
+                label: l10n.settlementShare,
+                icon: CupertinoIcons.share,
+                onPressed: () {
+                  final box = buttonContext.findRenderObject() as RenderBox?;
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text: summary,
+                      sharePositionOrigin: box == null
+                          ? null
+                          : box.localToGlobal(Offset.zero) & box.size,
+                    ),
+                  );
+                },
+              ),
+            )
+          : FilledButton(
+              onPressed: null,
+              child: Text(l10n.historyNothingToShare),
+            ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
         children: [
-          Text(
-            settled ? l10n.historySettled : l10n.historyCancelled,
-            style: theme.textTheme.labelSmall,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: settled
+                ? Tag(l10n.historySettled, icon: CupertinoIcons.checkmark_alt)
+                : Tag(
+                    l10n.historyCancelled,
+                    icon: CupertinoIcons.xmark,
+                    outlined: true,
+                  ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 12),
           Text(
             store?.name ?? l10n.historyNoStore,
-            style: theme.textTheme.displayLarge,
+            style: OpenBasketText.display(settled ? ob.onGround : ob.meta),
           ),
           const SizedBox(height: 4),
-          Text(subtitle, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 24),
+          Text(
+            subtitle,
+            style: OpenBasketText.body(ob.meta).copyWith(
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 18),
           if (settled) ...[
             Row(
               children: [
                 _Stat(value: '${items.length}', label: l10n.historyStatItems),
+                const SizedBox(width: 8),
                 _Stat(
                   value: '$unavailable',
                   label: l10n.historyStatUnavailable,
                 ),
-                _Stat(value: money(receipt), label: l10n.historyStatReceipt),
+                const SizedBox(width: 8),
+                _Stat(
+                  value: money(receipt),
+                  label: l10n.historyStatReceipt,
+                  ink: true,
+                ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             for (final entry in groups.entries) ...[
               _Person(
                 member: member(entry.key),
@@ -144,88 +195,134 @@ class PastRunScreen extends ConsumerWidget {
                       : money(item.priceMinor ?? 0),
                 ),
             ],
-            const SizedBox(height: 24),
-            Text(l10n.historyHowSettled, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 8),
-            if (lines.isEmpty)
-              Text(l10n.settlementNobody, style: theme.textTheme.titleMedium)
-            else
-              for (final line in lines)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          l10n.historyLine(
-                            name(line.fromMemberId),
-                            name(line.toMemberId),
-                          ),
-                          style: theme.textTheme.titleMedium,
+            const SizedBox(height: 18),
+            TonalCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionLabel(l10n.historyHowSettled),
+                  const SizedBox(height: 4),
+                  if (lines.isEmpty)
+                    Text(
+                      l10n.settlementNobody,
+                      style: OpenBasketText.body(ob.onGround),
+                    )
+                  else
+                    for (final line in lines)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.historyLine(
+                                  name(line.fromMemberId),
+                                  name(line.toMemberId),
+                                ),
+                                style: OpenBasketText.body(
+                                  ob.onGround,
+                                ).copyWith(fontSize: 14),
+                              ),
+                            ),
+                            Text(
+                              money(line.amountMinor),
+                              style: OpenBasketText.mono(
+                                color: ob.onGround,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        money(line.amountMinor),
-                        style: OpenBasketText.money(
-                          theme.textTheme.bodyLarge!.color!,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            if (gap != 0 && share != 0) ...[
-              const SizedBox(height: 4),
-              Text(
-                l10n.historyGapNote(money(share.abs()), money(gap.abs())),
-                style: theme.textTheme.bodySmall,
+                  if (gap != 0 && share != 0) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.historyGapNote(money(share.abs()), money(gap.abs())),
+                      style: OpenBasketText.meta(
+                        ob.meta,
+                      ).copyWith(fontSize: 12),
+                    ),
+                  ],
+                ],
               ),
-            ],
-            if (lines.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(text: summary));
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.settlementCopied)),
-                  );
-                },
-                child: Text(l10n.settlementCopy),
-              ),
-            ],
+            ),
           ] else ...[
             // Screen 30.
             Container(
               padding: const EdgeInsets.all(16),
-              color: theme.colorScheme.surfaceContainerHighest,
+              decoration: BoxDecoration(
+                color: ob.tonal,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: ob.faint),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.historyNobody, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(CupertinoIcons.lock, size: 16, color: ob.meta),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.historyNobody,
+                        style: OpenBasketText.title(ob.meta, fontSize: 15.5),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
                   Text(
                     l10n.historyCancelledNote(shopper),
-                    style: theme.textTheme.bodySmall,
+                    style: OpenBasketText.meta(ob.meta).copyWith(height: 1.5),
                   ),
                 ],
               ),
             ),
             if (items.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              Text(l10n.historyWhatWasInIt, style: theme.textTheme.labelSmall),
-              const SizedBox(height: 8),
+              const SizedBox(height: 20),
+              SectionLabel(l10n.historyWhatWasInIt),
+              const SizedBox(height: 6),
               for (final item in items)
-                _ItemLine(
-                  item: item,
-                  subtitle: l10n.historyAskedDropped(
-                    name(item.requesterMemberId),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: ob.rule)),
                   ),
-                  dropped: true,
+                  child: Row(
+                    children: [
+                      PersonAvatar(
+                        memberId: item.requesterMemberId,
+                        name: name(item.requesterMemberId),
+                        size: 28,
+                        faded: true,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${item.name} ${QuantityFormat.label(item.quantity, item.unit)}',
+                              style: OpenBasketText.item(
+                                ob.meta,
+                              ).copyWith(fontSize: 15),
+                            ),
+                            Text(
+                              l10n.historyAskedDropped(
+                                name(item.requesterMemberId),
+                              ),
+                              style: OpenBasketText.meta(
+                                ob.meta,
+                              ).copyWith(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             ],
-            const SizedBox(height: 24),
-            Text(l10n.historyHowItRan, style: theme.textTheme.labelSmall),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
+            SectionLabel(l10n.historyHowItRan),
+            const SizedBox(height: 6),
             _Fact(
               label: l10n.historyOpened,
               value: l10n.historyOpenedFor(
@@ -233,6 +330,11 @@ class PastRunScreen extends ConsumerWidget {
                 basket.closesAt.difference(basket.openedAt).inMinutes,
               ),
             ),
+            if (ended != null)
+              _Fact(
+                label: l10n.historyCancelledByName(shopper),
+                value: DateFormat.Hm().format(ended.toLocal()),
+              ),
             _Fact(label: l10n.historyPriced, value: l10n.historyNothing),
           ],
         ],
@@ -242,24 +344,45 @@ class PastRunScreen extends ConsumerWidget {
 }
 
 class _Stat extends StatelessWidget {
-  const _Stat({required this.value, required this.label});
+  const _Stat({required this.value, required this.label, this.ink = false});
 
   final String value;
   final String label;
 
+  /// The receipt: the one number that is the run, on ink.
+  final bool ink;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
+    final fg = ink ? OpenBasketColors.paper : ob.onGround;
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: OpenBasketText.money(theme.textTheme.bodyLarge!.color!),
-          ),
-          Text(label, style: theme.textTheme.bodySmall),
-        ],
+      flex: ink ? 5 : 4,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+        decoration: BoxDecoration(
+          color: ink ? ob.inkCard : ob.tonal,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: OpenBasketText.mono(color: fg, fontSize: ink ? 18 : 20),
+              ),
+            ),
+            Text(
+              label,
+              style: OpenBasketText.meta(
+                ink ? OpenBasketColors.metaDark : ob.meta,
+              ).copyWith(fontSize: 11),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -273,7 +396,7 @@ class _Person extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 14, bottom: 4),
       child: Row(
@@ -282,17 +405,22 @@ class _Person extends StatelessWidget {
             MemberInitial(member: member!),
             const SizedBox(width: 8),
           ],
-          Expanded(
-            child: Text(
-              member?.displayName ?? '',
-              style: theme.textTheme.titleMedium,
-            ),
+          Text(
+            member?.displayName ?? '',
+            style: OpenBasketText.body(
+              ob.onGround,
+            ).copyWith(fontSize: 13, fontWeight: FontWeight.w700),
           ),
+          const SizedBox(width: 8),
+          Expanded(child: Divider(color: ob.rule)),
+          const SizedBox(width: 8),
           Text(
             total,
-            style: OpenBasketText.money(
-              theme.textTheme.bodySmall!.color!,
-            ).copyWith(fontSize: 13, fontWeight: FontWeight.w400),
+            style: OpenBasketText.mono(
+              color: ob.meta,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),
@@ -301,23 +429,16 @@ class _Person extends StatelessWidget {
 }
 
 class _ItemLine extends StatelessWidget {
-  const _ItemLine({
-    required this.item,
-    this.trailing,
-    this.subtitle,
-    this.dropped = false,
-  });
+  const _ItemLine({required this.item, this.trailing});
 
   final BasketItem item;
   final String? trailing;
-  final String? subtitle;
-  final bool dropped;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final muted = theme.textTheme.bodySmall!.color!;
-    final gone = dropped || item.status == ItemStatus.unavailable;
+    final gone = item.status == ItemStatus.unavailable;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -327,15 +448,17 @@ class _ItemLine extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ItemName.of(
-                  item,
-                  style: OpenBasketText.item(
-                    gone ? muted : theme.textTheme.bodyLarge!.color!,
-                  ),
-                  struck: gone,
+                Text(
+                  '${item.name} ${QuantityFormat.label(item.quantity, item.unit)}',
+                  style:
+                      OpenBasketText.item(
+                        gone ? muted : theme.textTheme.bodyLarge!.color!,
+                      ).copyWith(
+                        fontSize: 15,
+                        decoration: gone ? TextDecoration.lineThrough : null,
+                        decorationColor: muted,
+                      ),
                 ),
-                if (subtitle != null)
-                  Text(subtitle!, style: OpenBasketText.meta(muted)),
               ],
             ),
           ),
@@ -343,8 +466,13 @@ class _ItemLine extends StatelessWidget {
             Text(
               trailing!,
               style: gone
-                  ? OpenBasketText.meta(muted)
-                  : OpenBasketText.money(theme.textTheme.bodyLarge!.color!),
+                  ? OpenBasketText.meta(muted).copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    )
+                  : OpenBasketText.money(
+                      theme.textTheme.bodyLarge!.color!,
+                    ).copyWith(fontSize: 15),
             ),
         ],
       ),
@@ -360,13 +488,21 @@ class _Fact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
-          Text(value, style: theme.textTheme.bodyMedium),
+          Expanded(
+            child: Text(
+              label,
+              style: OpenBasketText.body(ob.meta).copyWith(fontSize: 14),
+            ),
+          ),
+          Text(
+            value,
+            style: OpenBasketText.mono(color: ob.onGround, fontSize: 14),
+          ),
         ],
       ),
     );

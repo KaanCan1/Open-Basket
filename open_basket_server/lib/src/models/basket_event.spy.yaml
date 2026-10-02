@@ -10,5 +10,9 @@ fields:
   items: List<BasketItem>?
   ### Set on the single-item events.
   item: BasketItem?
+  ### Who has this basket on screen right now, by member id (ADR-049). Set on
+  ### `snapshot`, and on the `basketUpdated` that announces a change in who
+  ### is looking. Null on every other event, which means "unchanged".
+  viewerMemberIds: List<int>?
   ### Sent on every event so the client can keep correcting for clock drift.
   serverTime: DateTime

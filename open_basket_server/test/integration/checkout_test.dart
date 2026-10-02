@@ -245,6 +245,12 @@ void main() {
         final received = <BasketEvent>[];
         final sub = endpoints.basketStream
             .watch(member, basket.id!)
+            // Presence announcements (ADR-049) are not what this is about.
+            .where(
+              (e) =>
+                  !(e.type == BasketEventType.basketUpdated &&
+                      e.viewerMemberIds != null),
+            )
             .listen(received.add);
         addTearDown(sub.cancel);
         await _until(() => received.isNotEmpty);
@@ -265,6 +271,12 @@ void main() {
         final received = <BasketEvent>[];
         final sub = endpoints.basketStream
             .watch(member, basket.id!)
+            // Presence announcements (ADR-049) are not what this is about.
+            .where(
+              (e) =>
+                  !(e.type == BasketEventType.basketUpdated &&
+                      e.viewerMemberIds != null),
+            )
             .listen(received.add);
         addTearDown(sub.cancel);
         await _until(() => received.isNotEmpty);

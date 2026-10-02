@@ -737,6 +737,37 @@ class _BasketEndpoint {
     });
   }
 
+  _ida.Future<int> nudge(
+    _ist.TestSessionBuilder sessionBuilder,
+    int basketId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'basket',
+            method: 'nudge',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'basket',
+          methodName: 'nudge',
+          parameters: _ist.testObjectToJson({'basketId': basketId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<int>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<_i4kvfuua.Basket?> getActive(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {

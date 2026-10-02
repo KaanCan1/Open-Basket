@@ -71,20 +71,35 @@ void main() {
 
   group('member tones', () {
     test('a member keeps the same tone every time', () {
-      for (var id = 0; id < 50; id++) {
+      for (var i = 0; i < 50; i++) {
         expect(
-          MemberTones.forMember(id, Brightness.light),
-          MemberTones.forMember(id, Brightness.light),
+          MemberTones.of(i, Brightness.light),
+          same(MemberTones.of(i, Brightness.light)),
         );
       }
     });
 
-    test('neighbouring members do not collide', () {
-      final tones = [
-        for (var id = 0; id < MemberTones.light.length; id++)
-          MemberTones.forMember(id, Brightness.light),
-      ];
-      expect(tones.toSet(), hasLength(MemberTones.light.length));
+    test('the first five members never share a tone', () {
+      for (final brightness in Brightness.values) {
+        final tones = [
+          for (var i = 0; i < MemberTones.light.length; i++)
+            MemberTones.of(i, brightness),
+        ];
+        expect(tones.toSet(), hasLength(MemberTones.light.length));
+      }
+    });
+
+    test('every initial is readable on its tone', () {
+      for (final brightness in Brightness.values) {
+        final ground = brightness == Brightness.dark
+            ? OpenBasketColors.ink
+            : OpenBasketColors.paper;
+        for (var i = 0; i < MemberTones.light.length; i++) {
+          final tone = MemberTones.of(i, brightness);
+          final fill = tone.outlined ? ground : tone.fill;
+          expect(_contrast(tone.onFill, fill), greaterThanOrEqualTo(3));
+        }
+      }
     });
   });
 

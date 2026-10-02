@@ -68,3 +68,6 @@ values:
   - invalidSignInCode
   - signInCodeExpired
   - tooManySignInAttempts
+  ### A nudge for this basket went out less than a minute ago. Everyone
+  ### who was going to hear it already has.
+  - nudgeTooSoon

@@ -61,6 +61,10 @@ class BasketController {
 
   Future<void> removeItem(int itemId) => _client.basket.removeItem(itemId);
 
+  /// Screen 10: a push to whoever is neither looking nor on the list yet.
+  /// Returns how many people that was.
+  Future<int> nudge(int basketId) => _client.basket.nudge(basketId);
+
   /// Shopper only. Like extend and freeze, the result reaches this screen
   /// through the stream, so nothing is invalidated here.
   Future<BasketItem> markItem(

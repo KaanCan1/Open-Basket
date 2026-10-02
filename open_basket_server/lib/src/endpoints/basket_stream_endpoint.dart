@@ -3,6 +3,7 @@ import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 import '../services/authz.dart';
 import '../services/basket_channels.dart';
+import '../services/basket_presence.dart';
 import '../util/clock.dart';
 
 /// The live basket.
@@ -53,24 +54,63 @@ class BasketStreamEndpoint extends Endpoint {
       channelFor(basketId),
     );
 
-    yield BasketEvent(
-      type: BasketEventType.snapshot,
-      basket: basket,
-      items: await BasketItem.db.find(
-        session,
-        where: (final t) => t.basketId.equals(basketId),
-        orderBy: (final t) => t.addedAt,
-      ),
-      serverTime: ServerClock.now(),
-    );
+    final over = _isOver(basket.status);
+    var ended = false;
+    final memberId = member.id!;
+    if (!over) BasketPresence.enter(basketId, memberId);
+    try {
+      yield BasketEvent(
+        type: BasketEventType.snapshot,
+        basket: basket,
+        items: await BasketItem.db.find(
+          session,
+          where: (final t) => t.basketId.equals(basketId),
+          orderBy: (final t) => t.addedAt,
+        ),
+        viewerMemberIds: BasketPresence.viewers(basketId),
+        serverTime: ServerClock.now(),
+      );
 
-    if (_isOver(basket.status)) return;
+      if (over) return;
+      await _announceViewers(session, basketId);
 
-    await for (final event in events) {
-      yield event;
-      if (event.basket != null && _isOver(event.basket!.status)) return;
+      await for (final event in events) {
+        yield event;
+        if (event.basket != null && _isOver(event.basket!.status)) {
+          ended = true;
+          return;
+        }
+      }
+    } finally {
+      // Runs when the client goes away too: cancelling an async* stream
+      // resumes it at the pending yield and unwinds through here.
+      if (!over) {
+        BasketPresence.leave(basketId, memberId);
+        // Nobody needs telling who left a basket that is over.
+        if (!ended) await _announceViewers(session, basketId);
+      }
     }
   }
+
+  /// Tells everyone watching who is looking now.
+  ///
+  /// A `basketUpdated` with no basket rather than an event type of its own:
+  /// builds already installed on phones decode only the event types they
+  /// know, and an unknown one would break their stream. They apply a
+  /// `basketUpdated` as "keep the basket you have unless this one carries
+  /// a new one", so to them this is nothing; newer clients read
+  /// `viewerMemberIds`.
+  ///
+  /// No database read, on purpose: this also runs while a client is hanging
+  /// up, and a basket loaded here could be older than one already on its
+  /// way, which would wind a phone's countdown back.
+  static Future<void> _announceViewers(Session session, int basketId) =>
+      BasketChannels.publish(
+        session,
+        basketId,
+        BasketEventType.basketUpdated,
+        viewerMemberIds: BasketPresence.viewers(basketId),
+      );
 
   /// `frozen` is not over: the shopper is still marking items and entering
   /// prices, and every member watching wants to see that happen.

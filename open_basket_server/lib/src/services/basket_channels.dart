@@ -32,6 +32,7 @@ abstract final class BasketChannels {
     Basket? basket,
     BasketItem? item,
     List<BasketItem>? items,
+    List<int>? viewerMemberIds,
   }) async {
     try {
       await session.messages.postMessage(
@@ -41,6 +42,7 @@ abstract final class BasketChannels {
           basket: basket,
           item: item,
           items: items,
+          viewerMemberIds: viewerMemberIds,
           serverTime: ServerClock.now(),
         ),
       );

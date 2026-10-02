@@ -111,11 +111,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your items are saved on this phone and will sync the moment you\'re back.';
 
   @override
-  String get householdChoiceHeadline => 'Who are you\nshopping with?';
+  String get householdChoiceHeadline => 'Find your people';
 
   @override
   String get householdChoiceBlurb =>
-      'Start a household, or join one with the six characters someone already in it can read out.';
+      'A household is the group you shop for. You can be in one at a time.';
 
   @override
   String get householdChoiceCreate => 'Start a household';
@@ -143,11 +143,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createHouseholdEmpty => 'Give it a name first.';
 
   @override
-  String get joinHouseholdTitle => 'Enter the code';
+  String get joinHouseholdTitle => 'Join with a code';
 
   @override
   String get joinHouseholdBlurb =>
-      'Six characters from someone already in the household. Case does not matter.';
+      'Six characters, from whoever set up the household.';
 
   @override
   String get joinHouseholdLabel => 'CODE';
@@ -203,7 +203,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open one when you are heading out, and the house has until it closes to add things.';
 
   @override
-  String get homeMembersTitle => 'IN THIS HOUSEHOLD';
+  String get homeMembersTitle => 'In the house';
 
   @override
   String get homeOwnerTag => 'OWNER';
@@ -228,14 +228,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeBasketSee => 'Open it';
+  String get homeBasketSee => 'See the basket';
 
   @override
-  String get openSheetTitle => 'How long?';
+  String get openSheetTitle => 'Open a basket';
 
   @override
   String get openSheetBlurb =>
-      'The basket closes itself when the time runs out. Everyone can add until then.';
+      'The house gets a notification the second you do.';
 
   @override
   String openSheetMinutes(int count) {
@@ -265,7 +265,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get liveBasketAddHint => 'Add an item';
+  String get liveBasketAddHint => 'Add an item…';
 
   @override
   String get liveBasketNoteHint => 'Brand, size, \"only if fresh\"';
@@ -274,7 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveBasketAdd => 'Add';
 
   @override
-  String get liveBasketEmpty => 'Nothing in the basket yet.';
+  String get liveBasketEmpty => 'Nothing in the basket yet';
 
   @override
   String get liveBasketEmptyNote =>
@@ -545,7 +545,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketOfflineHint =>
-      'Offline — anything you add is kept here and sent the moment you\'re back.';
+      'Offline — anything you add is kept here and sent the moment you are back.';
 
   @override
   String liveBasketBackOnline(int count) {
@@ -863,7 +863,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCurrency => 'Currency';
 
   @override
-  String get settingsCurrencyNote => 'Every price and settlement uses it.';
+  String get settingsCurrencyNote => 'every price and settlement';
 
   @override
   String get settingsStores => 'Stores';
@@ -1327,7 +1327,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unitPacks => 'Packs';
 
   @override
-  String get liveBasketAddNote => 'Add a note';
+  String get liveBasketAddNote => 'Add a note — brand, size, \"only if fresh\"';
 
   @override
   String get noteAnyBrand => 'any brand';
@@ -1374,4 +1374,470 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketExtendPlus => 'Extend +5';
+
+  @override
+  String codeEntryMismatchTries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tries left',
+      two: 'Two tries left',
+      one: 'One try left',
+    );
+    return 'Codes expire after 10 minutes. $_temp0, then we\'ll send a fresh one.';
+  }
+
+  @override
+  String get householdChoiceCreateNote =>
+      'You\'ll get a permanent six-character code to send to the others.';
+
+  @override
+  String get householdChoiceOr => 'or';
+
+  @override
+  String get householdChoiceJoinTitle => 'Join with a code';
+
+  @override
+  String get homeHouseholdLabel => 'Household';
+
+  @override
+  String get homeNoBasketTitle => 'No basket open';
+
+  @override
+  String homeLastRunLine(String day, String amount) {
+    return 'Last run $day · $amount';
+  }
+
+  @override
+  String get homeNoRunsYet => 'No runs yet';
+
+  @override
+  String get homeOpenBasketNote =>
+      'Heading to the shop? Give the house a few minutes to chip in.';
+
+  @override
+  String get homeRecentRuns => 'Recent runs';
+
+  @override
+  String get homeAllRuns => 'All';
+
+  @override
+  String homeRecentRunTitle(String store, String day) {
+    return '$store · $day';
+  }
+
+  @override
+  String homeRecentRunMeta(int count, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0 · $status';
+  }
+
+  @override
+  String get dayToday => 'today';
+
+  @override
+  String get dayYesterday => 'yesterday';
+
+  @override
+  String get runSettledLower => 'settled';
+
+  @override
+  String get runCancelledLower => 'cancelled';
+
+  @override
+  String openSheetEstimateLine(int minutes, String store) {
+    return 'Estimated $minutes min from your distance to $store. Pick your own if you know better.';
+  }
+
+  @override
+  String openSheetClosesAt(String time) {
+    return 'Closes at $time · one extension of +5 min available';
+  }
+
+  @override
+  String get openSheetMinUnit => 'min';
+
+  @override
+  String get openSheetCustomHint => 'Minutes';
+
+  @override
+  String get storesSaved => 'Saved stores';
+
+  @override
+  String get storesLocating => 'Reading your location once…';
+
+  @override
+  String get errorNudgeTooSoon =>
+      'The house was nudged a moment ago. Give them a minute.';
+
+  @override
+  String countdownServerTime(String name) {
+    return 'Server time · only $name can change the clock';
+  }
+
+  @override
+  String get countdownStillCounting =>
+      'Server time · still counting without your phone';
+
+  @override
+  String countdownStoreCloses(String store, String time) {
+    return '$store · closes $time';
+  }
+
+  @override
+  String countdownRunAt(String name, String store) {
+    return '$name\'s $store run';
+  }
+
+  @override
+  String countdownRunLine(String run, int minutes, String time) {
+    return '$run · ran $minutes min · closed $time';
+  }
+
+  @override
+  String countdownCancelledLine(String run, String time) {
+    return '$run · cancelled $time';
+  }
+
+  @override
+  String liveBasketEmptyTold(String names) {
+    return '$names just got the notification. Add something so they know it\'s real.';
+  }
+
+  @override
+  String get liveBasketEmptyNoOne =>
+      'Add the first thing, and everyone sees it the moment you do.';
+
+  @override
+  String liveBasketUsuallyFrom(String store) {
+    return 'From your last runs at $store.';
+  }
+
+  @override
+  String get liveBasketUsuallyFromAny => 'From your last runs.';
+
+  @override
+  String liveBasketLookingNow(String names, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'are',
+      one: 'is',
+    );
+    return '$names $_temp0 looking now';
+  }
+
+  @override
+  String get liveBasketNobodyLooking => 'Nobody else has it open yet';
+
+  @override
+  String get liveBasketNudge => 'Nudge the ones who aren\'t';
+
+  @override
+  String liveBasketNudged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nudged $count people.',
+      one: 'Nudged 1 person.',
+      zero: 'Everyone is already here.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String liveBasketAddedAgo(String name, String ago) {
+    return '$name added $ago';
+  }
+
+  @override
+  String agoSeconds(int count) {
+    return '${count}s ago';
+  }
+
+  @override
+  String agoMinutes(int count) {
+    return '$count min ago';
+  }
+
+  @override
+  String liveBasketItemsHeader(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String liveBasketItemsSoFar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items so far',
+      one: '1 item so far',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get liveBasketNothingYours => 'nothing of yours yet';
+
+  @override
+  String get liveBasketInSync => 'in sync';
+
+  @override
+  String liveBasketStillToFind(int count) {
+    return '$count still to find';
+  }
+
+  @override
+  String get liveBasketStillToFindPlain => 'Still to find';
+
+  @override
+  String get liveBasketGotSection => 'Got';
+
+  @override
+  String liveBasketGotUnavailable(int got, int unavailable) {
+    return '$got got · $unavailable unavailable';
+  }
+
+  @override
+  String liveBasketLastCallTold(String names, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'have',
+      one: 'has',
+    );
+    return '$names $_temp0 been told it\'s the last call.';
+  }
+
+  @override
+  String get liveBasketHowExtending => 'How extending works';
+
+  @override
+  String get liveBasketHowExtendingNote =>
+      'One extension per basket, five minutes, shopper only. The hatched part of the bar is the time you added, so everyone can see where it came from.';
+
+  @override
+  String liveBasketOriginal(int minutes) {
+    return 'original $minutes min';
+  }
+
+  @override
+  String get liveBasketExtensionLegend => '+5 min extension';
+
+  @override
+  String get liveBasketCancelThis => 'Cancel this basket';
+
+  @override
+  String itemHasIt(String name) {
+    return '$name has it';
+  }
+
+  @override
+  String itemAddedAt(String time) {
+    return 'Added $time';
+  }
+
+  @override
+  String get itemNotPicked => 'Not picked';
+
+  @override
+  String get youTag => 'You';
+
+  @override
+  String liveBasketJoinedAgo(String name, String ago) {
+    return '$name opened one $ago';
+  }
+
+  @override
+  String liveBasketOpenOwnLater(String time) {
+    return 'You can open your own once this one closes at $time.';
+  }
+
+  @override
+  String liveBasketBackOnlineOne(String name) {
+    return '$name is on everyone\'s list now. It kept the time you added it.';
+  }
+
+  @override
+  String get liveBasketWhatYouAsked => 'What you asked for';
+
+  @override
+  String get liveBasketAskedNothing => 'You didn\'t add anything to this run.';
+
+  @override
+  String get liveBasketNothingWaiting => 'Nothing is waiting on you.';
+
+  @override
+  String liveBasketStillAtTill(String name) {
+    return '$name is still at the till.';
+  }
+
+  @override
+  String liveBasketYouOwe(String name) {
+    return 'You owe $name';
+  }
+
+  @override
+  String liveBasketOwesYou(String name) {
+    return '$name owes you';
+  }
+
+  @override
+  String liveBasketLineParts(String items, String gap) {
+    return '$items items + $gap gap';
+  }
+
+  @override
+  String liveBasketLineItems(String items) {
+    return '$items items';
+  }
+
+  @override
+  String get liveBasketNothingToPay => 'Nothing for you to pay on this one.';
+
+  @override
+  String get liveBasketSeeWholeRun => 'See the whole run';
+
+  @override
+  String get liveBasketSeeWholeBasket => 'See the whole basket';
+
+  @override
+  String get liveBasketBackHome => 'Back to the household';
+
+  @override
+  String liveBasketYouFroze(String time) {
+    return 'You froze it at $time';
+  }
+
+  @override
+  String get liveBasketYouFrozeNote =>
+      'The list is final. Type in what the till charged.';
+
+  @override
+  String get liveBasketWholeBasket => 'The whole basket';
+
+  @override
+  String get cancelSheetTitle => 'Cancel this basket?';
+
+  @override
+  String get cancelSheetNote =>
+      'The clock stops now and nobody can add anything. Nothing gets priced and nobody owes anybody.';
+
+  @override
+  String get cancelSheetTimeLeft => 'Time left';
+
+  @override
+  String get cancelSheetDropped => 'Items that get dropped';
+
+  @override
+  String get cancelSheetTold => 'People told';
+
+  @override
+  String get cancelSheetHistory =>
+      'It shows up in history as cancelled. You can open a new basket straight away.';
+
+  @override
+  String get cancelSheetYes => 'Yes, cancel it';
+
+  @override
+  String get cancelSheetKeep => 'Keep shopping';
+
+  @override
+  String checkoutStoreItems(String store, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$store · $_temp0';
+  }
+
+  @override
+  String settlementRunTitle(String store, String day) {
+    return '$store run, $day';
+  }
+
+  @override
+  String settlementRunTitlePlain(String day) {
+    return 'The run, $day';
+  }
+
+  @override
+  String settlementEach(String amount) {
+    return '$amount each';
+  }
+
+  @override
+  String settlementShopperCarries(String name) {
+    return '$name carries their own share of the gap and any remaining cent, so the lines above always add up to what they paid.';
+  }
+
+  @override
+  String settlementPaid(String name) {
+    return '$name paid';
+  }
+
+  @override
+  String get settlementShare => 'Share the summary';
+
+  @override
+  String get settlementShareNote => 'Plain text — no app needed on their end.';
+
+  @override
+  String settlementShareHeader(String title, String total) {
+    return '$title · $total';
+  }
+
+  @override
+  String get historyEmptyTitle => 'No runs yet';
+
+  @override
+  String get historyEmptyBody =>
+      'Your first basket will show up here with who asked for what.';
+
+  @override
+  String get commonOfflineRetryNote =>
+      'Nothing is lost. Try again when you have signal.';
+
+  @override
+  String historyStoppedAfter(int minutes) {
+    return 'stopped after $minutes min';
+  }
+
+  @override
+  String historyCancelledByName(String name) {
+    return 'Cancelled by $name';
+  }
+
+  @override
+  String get historyNothingToShare => 'Nothing to share';
+
+  @override
+  String get membersCopy => 'Copy the code';
+
+  @override
+  String get settingsBack => 'Home';
+
+  @override
+  String currencySearch(int count) {
+    return 'Search $count currencies';
+  }
+
+  @override
+  String get currencyCommon => 'Common';
+
+  @override
+  String get currencyBack => 'Settings';
 }

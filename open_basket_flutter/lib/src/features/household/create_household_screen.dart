@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme.dart';
+import '../../shared/widgets/design.dart';
 import '../../../l10n/app_localizations.dart';
 import 'household_controller.dart';
 import '../../core/failure_message.dart';
@@ -57,60 +58,44 @@ class _CreateHouseholdScreenState extends ConsumerState<CreateHouseholdScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final ob = Ob.of(context);
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 24),
-              Text(
-                l10n.createHouseholdTitle,
-                style: theme.textTheme.displayLarge,
-              ),
+    return ObScaffold(
+      back: true,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(26, 14, 26, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ScreenTitle(
+              l10n.createHouseholdTitle,
+              subtitle: l10n.createHouseholdBlurb,
+            ),
+            const SizedBox(height: 28),
+            SectionLabel(l10n.createHouseholdLabel),
+            const SizedBox(height: 4),
+            TextField(
+              controller: _name,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              style: OpenBasketText.body(ob.onGround).copyWith(fontSize: 16),
+              decoration: InputDecoration(hintText: l10n.createHouseholdHint),
+              onSubmitted: (_) => _busy ? null : _create(),
+            ),
+            if (_error != null) ...[
               const SizedBox(height: 12),
               Text(
-                l10n.createHouseholdBlurb,
-                style: theme.textTheme.bodyMedium,
+                _error!,
+                style: OpenBasketText.meta(Theme.of(context).colorScheme.error),
               ),
-              const SizedBox(height: 32),
-              Text(
-                l10n.createHouseholdLabel,
-                style: theme.textTheme.labelSmall,
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _name,
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(hintText: l10n.createHouseholdHint),
-                onSubmitted: (_) => _busy ? null : _create(),
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  _error!,
-                  style: OpenBasketText.meta(theme.colorScheme.error),
-                ),
-              ],
-              const SizedBox(height: 20),
-              FilledButton(
-                onPressed: _busy ? null : _create,
-                child: _busy
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.createHouseholdAction),
-              ),
-              const SizedBox(height: 24),
             ],
-          ),
+            const SizedBox(height: 16),
+            PrimaryButton(
+              label: l10n.createHouseholdAction,
+              busy: _busy,
+              onPressed: _create,
+            ),
+          ],
         ),
       ),
     );
