@@ -1533,7 +1533,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get liveBasketNobodyLooking => 'Nobody else has it open yet';
+  String get liveBasketNobodyLooking => 'Nobody at home has it open yet';
 
   @override
   String get liveBasketNudge => 'Nudge the ones who aren\'t';
@@ -1666,7 +1666,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String liveBasketBackOnlineOne(String name) {
-    return '$name is on everyone\'s list now. It kept the time you added it.';
+    return '$name is on everyone\'s list now.';
   }
 
   @override
@@ -1843,4 +1843,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveBasketDoneAdding => 'Done adding';
+
+  @override
+  String get runNoTotal => '—';
 }

@@ -175,7 +175,9 @@ class _RunRow extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  MoneyFormat.format(run.totalMinor, basket.currencyCode),
+                  settled
+                      ? MoneyFormat.format(run.totalMinor, basket.currencyCode)
+                      : l10n.runNoTotal,
                   style: OpenBasketText.money(strong).copyWith(fontSize: 16),
                 ),
                 Text(

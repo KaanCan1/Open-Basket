@@ -117,6 +117,7 @@ class _StoresScreenState extends ConsumerState<StoresScreen> {
 
     return ObScaffold(
       back: true,
+      backLabel: l10n.settingsBack,
       bottomBar: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

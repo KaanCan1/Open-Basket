@@ -113,7 +113,9 @@ class _JoinHouseholdScreenState extends ConsumerState<JoinHouseholdScreen> {
       _failure = null;
       _triesLeft = null;
     });
-    _focus.requestFocus();
+    // After the rebuild: on screen 28 the field is disabled, and focus asked
+    // for in the same frame is refused, leaving empty boxes and no keyboard.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _focus.requestFocus());
   }
 
   /// The code usually arrives in a message; pasting the whole message works,
