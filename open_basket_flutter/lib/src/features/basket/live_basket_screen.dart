@@ -8,6 +8,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/failure_message.dart';
 import '../../core/formatters.dart';
+import '../../core/push_status.dart';
 import '../../core/quantity_format.dart';
 import '../../core/router.dart';
 import '../../core/server_clock.dart';
@@ -739,7 +740,8 @@ class _EmptyOpenState extends ConsumerState<_EmptyOpen> {
     // has it switched on — the same rule the server sends by (ADR-043).
     final told = [
       for (final m in members)
-        if (m.id != basket.shopperMemberId &&
+        if (kPushOnPhones &&
+            m.id != basket.shopperMemberId &&
             m.id != me?.id &&
             m.notifyBasketOpened)
           m.displayName,
@@ -817,7 +819,9 @@ class _EmptyOpenState extends ConsumerState<_EmptyOpen> {
                     ),
                   ],
                 ),
-                if (someoneMissing) ...[
+                // A nudge is a push; without push on phones it would reach
+                // nobody while saying it reached someone.
+                if (kPushOnPhones && someoneMissing) ...[
                   const SizedBox(height: 12),
                   InkButton(
                     label: l10n.liveBasketNudge,

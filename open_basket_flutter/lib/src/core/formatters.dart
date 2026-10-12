@@ -15,6 +15,14 @@ abstract final class MoneyFormat {
   static const _zeroDecimal = {'JPY', 'KRW', 'VND', 'CLP', 'ISK', 'XAF', 'XOF'};
   static const _threeDecimal = {'BHD', 'IQD', 'JOD', 'KWD', 'OMR', 'TND'};
 
+  /// Currencies written with a decimal comma and a grouping point, whatever
+  /// the phone: the design set prints the euro as `€1.234,50`.
+  static const _decimalComma = {'EUR'};
+
+  /// The decimal mark this currency is written with.
+  static String decimalMark(String currencyCode) =>
+      _decimalComma.contains(currencyCode.toUpperCase()) ? ',' : '.';
+
   static int minorUnitDigits(String currencyCode) {
     final code = currencyCode.toUpperCase();
     if (_zeroDecimal.contains(code)) return 0;
@@ -22,7 +30,7 @@ abstract final class MoneyFormat {
     return 2;
   }
 
-  /// `₺84.50`, `$1,204.00`, `¥1,003`.
+  /// `₺84.50`, `$1,204.00`, `¥1,003`, `€1.234,50`.
   static String format(int minor, String currencyCode) {
     final digits = minorUnitDigits(currencyCode);
     final format = NumberFormat.simpleCurrency(
@@ -30,8 +38,15 @@ abstract final class MoneyFormat {
       name: currencyCode.toUpperCase(),
       decimalDigits: digits,
     );
-    return format.format(_toMajor(minor, digits));
+    final text = format.format(_toMajor(minor, digits));
+    return decimalMark(currencyCode) == ',' ? _swapMarks(text) : text;
   }
+
+  // `1,234.50` → `1.234,50`, in one pass so neither mark is swapped twice.
+  static String _swapMarks(String text) => text.replaceAllMapped(
+    RegExp('[.,]'),
+    (m) => m[0] == '.' ? ',' : '.',
+  );
 
   /// The currency's symbol on its own, for the prefix of a price field.
   static String symbol(String currencyCode) => NumberFormat.simpleCurrency(
@@ -40,14 +55,16 @@ abstract final class MoneyFormat {
   ).currencySymbol;
 
   /// The amount as it sits in a price field: no symbol, no grouping, so what
-  /// the shopper sees is what they can edit. `84.50`, `1003`.
+  /// the shopper sees is what they can edit. `84.50`, `1003`, `84,50` for a
+  /// currency written with a decimal comma.
   static String plain(int minor, String currencyCode) {
     final digits = minorUnitDigits(currencyCode);
     if (digits == 0) return '$minor';
     final sign = minor < 0 ? '-' : '';
     final abs = minor.abs().toString().padLeft(digits + 1, '0');
     final cut = abs.length - digits;
-    return '$sign${abs.substring(0, cut)}.${abs.substring(cut)}';
+    final mark = decimalMark(currencyCode);
+    return '$sign${abs.substring(0, cut)}$mark${abs.substring(cut)}';
   }
 
   /// What the shopper typed, in minor units, or null when it is not a price.

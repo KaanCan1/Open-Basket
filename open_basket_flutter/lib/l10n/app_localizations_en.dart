@@ -238,6 +238,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The house gets a notification the second you do.';
 
   @override
+  String get openSheetBlurbNoPush =>
+      'Everyone at home sees it the moment they open the app.';
+
+  @override
   String openSheetMinutes(int count) {
     return '$count min';
   }

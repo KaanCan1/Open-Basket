@@ -132,6 +132,7 @@
   "homeBasketSee": "See the basket",
   "openSheetTitle": "Open a basket",
   "openSheetBlurb": "The house gets a notification the second you do.",
+  "openSheetBlurbNoPush": "Everyone at home sees it the moment they open the app.",
   "openSheetMinutes": "{count} min",
   "@openSheetMinutes": {
     "placeholders": {

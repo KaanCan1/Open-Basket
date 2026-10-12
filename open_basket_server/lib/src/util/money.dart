@@ -12,6 +12,11 @@ abstract final class Money {
   static const _zeroDecimal = {'JPY', 'KRW', 'VND', 'CLP', 'ISK', 'XAF', 'XOF'};
   static const _threeDecimal = {'BHD', 'IQD', 'JOD', 'KWD', 'OMR', 'TND'};
 
+  /// Currencies written with a decimal comma and a grouping point, whatever
+  /// the phone: the design set prints the euro as `€1.234,50`. The app's
+  /// `MoneyFormat` has the same set.
+  static const _decimalComma = {'EUR'};
+
   static int minorUnitDigits(String currencyCode) {
     final code = currencyCode.toUpperCase();
     if (_zeroDecimal.contains(code)) return 0;
@@ -19,19 +24,26 @@ abstract final class Money {
     return 2;
   }
 
-  /// `₺84.50`, `$1,204.00`, `¥1,003` — the app's `MoneyFormat.format`, so a
-  /// push and the screen it opens print the same amount the same way.
+  /// `₺84.50`, `$1,204.00`, `¥1,003`, `€1.234,50` — the app's
+  /// `MoneyFormat.format`, so a push and the screen it opens print the same
+  /// amount the same way.
   static String format(int minor, String currencyCode) {
     final digits = minorUnitDigits(currencyCode);
     var divisor = 1;
     for (var i = 0; i < digits; i++) {
       divisor *= 10;
     }
-    return NumberFormat.simpleCurrency(
+    final text = NumberFormat.simpleCurrency(
       locale: 'en',
       name: currencyCode.toUpperCase(),
       decimalDigits: digits,
     ).format(minor / divisor);
+    if (!_decimalComma.contains(currencyCode.toUpperCase())) return text;
+    // `1,234.50` → `1.234,50`, in one pass so neither mark is swapped twice.
+    return text.replaceAllMapped(
+      RegExp('[.,]'),
+      (m) => m[0] == '.' ? ',' : '.',
+    );
   }
 
   /// Splits [totalMinor] evenly across [shareCount] people, giving the whole

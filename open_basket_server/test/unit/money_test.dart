@@ -24,6 +24,19 @@ void main() {
     });
   });
 
+  group('format', () {
+    test('matches the app, symbol first and two decimals', () {
+      expect(Money.format(8450, 'TRY'), '₺84.50');
+      expect(Money.format(120400, 'USD'), r'$1,204.00');
+      expect(Money.format(1003, 'JPY'), '¥1,003');
+    });
+
+    test('writes the euro with a decimal comma, as the design set has it', () {
+      expect(Money.format(8450, 'EUR'), '€84,50');
+      expect(Money.format(123450, 'EUR'), '€1.234,50');
+    });
+  });
+
   group('splitEvenly', () {
     test('divides a gap that comes out exact', () {
       // The design's own example: ₺2.00 over four members is ₺0.50 each.

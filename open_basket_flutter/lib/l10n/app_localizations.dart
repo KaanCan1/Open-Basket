@@ -496,6 +496,12 @@ abstract class AppLocalizations {
   /// **'The house gets a notification the second you do.'**
   String get openSheetBlurb;
 
+  /// No description provided for @openSheetBlurbNoPush.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone at home sees it the moment they open the app.'**
+  String get openSheetBlurbNoPush;
+
   /// No description provided for @openSheetMinutes.
   ///
   /// In en, this message translates to:

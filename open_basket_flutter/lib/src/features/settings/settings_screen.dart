@@ -10,6 +10,7 @@ import '../../core/client_provider.dart';
 import '../../core/formatters.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
+import '../../core/push_status.dart';
 import '../../shared/widgets/design.dart';
 import '../household/household_controller.dart';
 import '../stores/stores_controller.dart';
@@ -243,13 +244,14 @@ class SettingsScreen extends ConsumerWidget {
                     _setNotifications(context, ref, me, settlementReady: v),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(
-                l10n.settingsNotificationsNote,
-                style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+            if (!kPushOnPhones)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  l10n.settingsNotificationsNote,
+                  style: OpenBasketText.meta(ob.meta).copyWith(fontSize: 12),
+                ),
               ),
-            ),
           ],
           const SizedBox(height: 14),
           ListRow(

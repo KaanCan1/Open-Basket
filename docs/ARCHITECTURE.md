@@ -1065,3 +1065,23 @@ was the flat, square first pass. On 2026-10-02 every screen was rebuilt on one d
 - **Left on purpose**: notification actions (21) wait for the app half of push; "Typical run from
   home" (07) per ADR-046; currencies keep one number format (`€1,234.50`) where the set shows
   `€1.234,50`, because the server's push copy formats money too and both would have to change.
+  (The euro was changed in ADR-051.)
+
+## ADR-051: The last sweep before submission, 2026-10-12
+
+- **The euro takes a decimal comma.** `€1.234,50`, `€84,50`, as the design set's currency
+  screen has it; every other currency keeps `₺84.50`, `$1,234.50`, `¥8,450`. The app's
+  `MoneyFormat` and the server's `Money.format` share the one rule (a set of decimal-comma
+  currencies, holding only `EUR`), so a push and the screen it opens still agree. A euro price
+  field shows `84,50`; the parser already took either mark.
+- **No screen claims a push.** Push to phones is not built and will not be before the
+  deadline, but three places said otherwise: the open sheet ("The house gets a notification
+  the second you do"), an empty basket naming who "just got the notification", and Nudge,
+  which answered "Nudged 1 person" while the server's sender — with no Firebase account —
+  only logged it. "Nothing critical is faked" is the heaviest judging line, so one constant,
+  `kPushOnPhones` in `core/push_status.dart`, now gates all three, and the settings note that
+  already said phones cannot receive notifications. Presence ("Ayşe is looking now") stays: it
+  is true. Flip the constant in the change that adds the app half of push.
+- **The submission text was read against the repository.** It said "two developers"; the
+  history has one author, so it now says what happened.
+
