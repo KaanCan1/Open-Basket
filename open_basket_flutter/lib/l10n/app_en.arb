@@ -122,6 +122,7 @@
   "homeBasketFrozenTitle": "At checkout",
   "@homeBasketFrozenTitle": {},
   "homeBasketFrozenNote": "The list is final. {name} is paying.",
+  "homeBasketFrozenNoteYou": "The list is final. You're paying.",
   "@homeBasketFrozenNote": {
     "placeholders": {
       "name": {
@@ -1614,6 +1615,7 @@
     }
   },
   "liveBasketYouFrozeNote": "The list is final. Type in what the till charged.",
+  "liveBasketTypeTill": "Type in what the till charged.",
   "liveBasketWholeBasket": "The whole basket",
   "cancelSheetTitle": "Cancel this basket?",
   "cancelSheetNote": "The clock stops now and nobody can add anything. Nothing gets priced and nobody owes anybody.",

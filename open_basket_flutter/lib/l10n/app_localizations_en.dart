@@ -228,6 +228,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeBasketFrozenNoteYou => 'The list is final. You\'re paying.';
+
+  @override
   String get homeBasketSee => 'See the basket';
 
   @override
@@ -1727,6 +1730,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get liveBasketYouFrozeNote =>
       'The list is final. Type in what the till charged.';
+
+  @override
+  String get liveBasketTypeTill => 'Type in what the till charged.';
 
   @override
   String get liveBasketWholeBasket => 'The whole basket';

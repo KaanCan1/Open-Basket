@@ -125,9 +125,10 @@ Source: https://github.com/KaanCan1/Open-Basket
 
 ## Checklist before submitting
 
-- [ ] **Demo video under 2:00.** The official rules say "less than two (2) minutes";
-      the BuilderBase page says three. Rules section 11: where they disagree, the
-      Official Rules prevail. Public on YouTube or Vimeo. No copyrighted music.
+- [x] **Demo video under 2:00** — recorded 2026-10-12, 1:47 (`docs/DEMO_SCRIPT.md` says
+      how). The organisers' last email (2026-10-12) confirms "max 2 minutes".
+- [ ] **Upload it** to YouTube or Vimeo (public or unlisted), no music, and paste the link.
+      Then **watch it from that link**, not from the file — the organisers ask for exactly that.
 - [x] **A judge can actually sign in.** Deployed to Serverpod Cloud on 2026-09-22, which
       manages `scloudAuthEmailKey`, so the six-digit code is delivered by real email.
       Verified end to end against production.
@@ -136,8 +137,13 @@ Source: https://github.com/KaanCan1/Open-Basket
       nothing installed.
 - [x] **Build and run instructions in the repository.** In `README.md`, including how to
       point a build at production.
-- [ ] GitHub repository description filled in (currently empty).
-- [ ] Project description above updated to match what actually shipped.
+- [x] GitHub repository description, website and topics filled in (2026-10-12).
+- [x] Project description above updated to match what actually shipped (2026-10-12).
+- [ ] **Open the repository link in a private browser window** and confirm it is visible
+      (organisers' last-mile check).
+- [ ] **Run the core flow once from scratch, the way a judge would**: a private window on
+      https://open-basket.serverpod.space, a fresh address, `docs/TESTING.md` step by step.
+- [ ] Team field on the form: list who actually took part.
 - [ ] **Most Valuable Feedback submission** ($500 cash + $500 credits, one per entrant),
       through the feedback form on BuilderBase. Nine findings so far, all hit in this
       build and all reproducible:
@@ -187,3 +193,15 @@ Source: https://github.com/KaanCan1/Open-Basket
          the errors that matter.
 - [ ] A public post about the project, tagging Serverpod, during the event period
       (Best Hackathon Post, $500 in credits).
+      Draft — edit freely, attach the video or a screenshot:
+
+      > Built for #BuildSomethingReal with @ServerpodDev: **Open Basket**, a shopping basket
+      > that's open for a few minutes and then closes itself.
+      >
+      > One person heads to the shop, everyone at home adds what they need, items land on every
+      > phone over a Serverpod stream — and when time's up a Serverpod *future call* closes the
+      > basket on the server, even if the shopper's phone is dead. At the till the server works
+      > out who owes whom, in whole kuruş.
+      >
+      > Flutter on the phone, Serverpod Cloud behind it. Try it: open-basket.serverpod.space
+      > Code: github.com/KaanCan1/Open-Basket

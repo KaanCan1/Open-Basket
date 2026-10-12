@@ -1328,6 +1328,13 @@ class _ClosedView extends ConsumerWidget {
     if (cancelled) {
       title = l10n.countdownCancelledBy(shopperName);
       body = l10n.countdownCancelledNote;
+    } else if (isShopper && frozen && basket.closedAutomatically) {
+      // The shopper did not freeze it; the server did, on time. Saying "you
+      // froze it" here contradicted the CLOSED ON TIME card right above.
+      title = l10n.countdownClosedItself(at);
+      body =
+          '${l10n.countdownClosedItselfNote(ran < 1 ? 1 : ran)} '
+          '${l10n.liveBasketTypeTill}';
     } else if (isShopper && frozen) {
       title = l10n.liveBasketYouFroze(at);
       body = l10n.liveBasketYouFrozeNote;

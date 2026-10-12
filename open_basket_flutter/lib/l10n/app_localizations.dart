@@ -478,6 +478,12 @@ abstract class AppLocalizations {
   /// **'The list is final. {name} is paying.'**
   String homeBasketFrozenNote(String name);
 
+  /// No description provided for @homeBasketFrozenNoteYou.
+  ///
+  /// In en, this message translates to:
+  /// **'The list is final. You\'re paying.'**
+  String get homeBasketFrozenNoteYou;
+
   /// No description provided for @homeBasketSee.
   ///
   /// In en, this message translates to:
@@ -2649,6 +2655,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The list is final. Type in what the till charged.'**
   String get liveBasketYouFrozeNote;
+
+  /// No description provided for @liveBasketTypeTill.
+  ///
+  /// In en, this message translates to:
+  /// **'Type in what the till charged.'**
+  String get liveBasketTypeTill;
 
   /// No description provided for @liveBasketWholeBasket.
   ///

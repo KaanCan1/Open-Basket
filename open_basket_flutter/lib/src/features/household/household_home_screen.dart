@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +37,16 @@ class HouseholdHomeScreen extends ConsumerStatefulWidget {
 
 class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
   late final AppLifecycleListener _lifecycle;
+  Timer? _poll;
+
+  /// How often the home screen asks whether a basket opened or closed.
+  ///
+  /// Push is what would tell someone a basket opened, and phones do not get
+  /// push yet (`kPushOnPhones`). Without this, a person sitting on this
+  /// screen never saw the basket someone else opened until they left the app
+  /// and came back, or knew to pull down. One small read every few seconds,
+  /// only while this screen is on top and the app is in front.
+  static const _pollEvery = Duration(seconds: 8);
 
   @override
   void initState() {
@@ -51,10 +63,33 @@ class _HouseholdHomeScreenState extends ConsumerState<HouseholdHomeScreen> {
         ref.invalidate(historyProvider);
       },
     );
+    _poll = Timer.periodic(_pollEvery, (_) => _checkForBasket());
+    // A basket that appears, closes or settles changes the last-run card and
+    // the recent runs too, so they follow it rather than polling themselves.
+    ref.listenManual(activeBasketProvider, (previous, next) {
+      final before = previous?.value;
+      final after = next.value;
+      if (next.isLoading) return;
+      if (before?.id != after?.id || before?.status != after?.status) {
+        ref.invalidate(lastSettledRunProvider);
+        ref.invalidate(historyProvider);
+      }
+    });
+  }
+
+  void _checkForBasket() {
+    if (!mounted) return;
+    if (WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
+      return;
+    }
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    if (ref.read(myHouseholdProvider).value == null) return;
+    ref.invalidate(activeBasketProvider);
   }
 
   @override
   void dispose() {
+    _poll?.cancel();
     _lifecycle.dispose();
     super.dispose();
   }
@@ -268,7 +303,9 @@ class _BasketSection extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        l10n.homeBasketFrozenNote(shopper ?? ''),
+                        me != null && basket.shopperMemberId == me.id
+                            ? l10n.homeBasketFrozenNoteYou
+                            : l10n.homeBasketFrozenNote(shopper ?? ''),
                         style: OpenBasketText.meta(ob.meta),
                       ),
                     ],
