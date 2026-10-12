@@ -1082,8 +1082,9 @@ was the flat, square first pass. On 2026-10-02 every screen was rebuilt on one d
   `kPushOnPhones` in `core/push_status.dart`, now gates all three, and the settings note that
   already said phones cannot receive notifications. Presence ("Ayşe is looking now") stays: it
   is true. Flip the constant in the change that adds the app half of push.
-- **The submission text was read against the repository.** It said "two developers"; the
-  history has one author, so it now says what happened.
+- **The submission text was read against the repository.** The history shows one author, so
+  the text now says why: the app was built by Kaan and Yeşim together, and every commit was
+  pushed from Kaan's account.
 - **Found while recording the demo** (a real run on two simulators, 2026-10-12):
   - *The home screen never saw a basket open.* It fetched once and again only on resume or a
     pull, which push was supposed to make unnecessary. Someone sitting on home stayed on "No

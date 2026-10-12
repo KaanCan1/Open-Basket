@@ -97,7 +97,8 @@ Submission closes **2026-10-14 23:59 CEST**. The app is finished: design set v3 
 (ADR-050), presence (ADR-049), the last sweep (ADR-051: euro format, no screen claims a push,
 the home screen notices a basket, the shopper is told when the server closed it). Live on
 Serverpod Cloud. A 1:47 demo video is recorded and waits to be uploaded. Push to phones is not
-built and the app says so. B never committed; every commit is A's.
+built and the app says so. Built by Kaan and Yeşim together; every commit went in from
+Kaan's account.
 
 What works, walked on simulators and deployed:
 
