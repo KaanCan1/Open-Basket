@@ -172,7 +172,7 @@ The pitch says "we'll use it in our own homes for six weeks", but we have 29 day
   - Average chosen duration, extension rate
   - Share of members who added at least one item (the key metric: "shared attention")
   - Median time from open to first item
-- [ ] **A** Write results as tables in `docs/REPORT.md`, with an honest "what didn't work" section
+- [x] **A** Write results as tables in `docs/REPORT.md`, with an honest "what didn't work" section — production read 2026-10-12: our own test runs only, and the report says so
 
 ### Day 27: Demo
 - [x] **A for B** `docs/DEMO_SCRIPT.md` (without the notification beat until push exists): two phones side by side, basket opens → notification → item lands instantly → app is force-killed → basket still closes on time → checkout → settlement
