@@ -8,6 +8,16 @@ void main() {
       expect(MoneyFormat.format(120400, 'USD'), r'$1,204.00');
     });
 
+    test(
+      'the euro is written with a decimal comma, as the design set has it',
+      () {
+        expect(MoneyFormat.format(8450, 'EUR'), '€84,50');
+        expect(MoneyFormat.format(123450, 'EUR'), '€1.234,50');
+        expect(MoneyFormat.format(-50, 'EUR'), '-€0,50');
+        expect(MoneyFormat.format(123450, 'GBP'), '£1,234.50');
+      },
+    );
+
     test('a zero-decimal currency has no cents', () {
       expect(MoneyFormat.format(1003, 'JPY'), '¥1,003');
     });
@@ -28,6 +38,7 @@ void main() {
       expect(MoneyFormat.plain(5, 'TRY'), '0.05');
       expect(MoneyFormat.plain(1003, 'JPY'), '1003');
       expect(MoneyFormat.plain(-50, 'TRY'), '-0.50');
+      expect(MoneyFormat.plain(8450, 'EUR'), '84,50');
     });
   });
 
@@ -45,6 +56,15 @@ void main() {
       for (final minor in [0, 1, 9, 10, 99, 100, 5980, 1234567]) {
         expect(
           MoneyFormat.parse(MoneyFormat.plain(minor, 'TRY'), 'TRY'),
+          minor,
+        );
+      }
+    });
+
+    test('a euro price field round-trips through its comma', () {
+      for (final minor in [0, 5, 8450, 1234567]) {
+        expect(
+          MoneyFormat.parse(MoneyFormat.plain(minor, 'EUR'), 'EUR'),
           minor,
         );
       }

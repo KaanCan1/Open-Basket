@@ -8,6 +8,7 @@ import 'package:open_basket_client/open_basket_client.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../core/eta.dart';
 import '../../core/location.dart';
+import '../../core/push_status.dart';
 import '../../core/router.dart';
 import '../../core/server_clock.dart';
 import '../../core/theme.dart';
@@ -189,7 +190,9 @@ class _OpenBasketSheetState extends ConsumerState<OpenBasketSheet> {
         children: [
           ScreenTitle(
             l10n.openSheetTitle,
-            subtitle: l10n.openSheetBlurb,
+            subtitle: kPushOnPhones
+                ? l10n.openSheetBlurb
+                : l10n.openSheetBlurbNoPush,
             fontSize: 27,
           ),
           const SizedBox(height: 22),
