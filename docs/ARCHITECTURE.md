@@ -1084,4 +1084,15 @@ was the flat, square first pass. On 2026-10-02 every screen was rebuilt on one d
   is true. Flip the constant in the change that adds the app half of push.
 - **The submission text was read against the repository.** It said "two developers"; the
   history has one author, so it now says what happened.
+- **Found while recording the demo** (a real run on two simulators, 2026-10-12):
+  - *The home screen never saw a basket open.* It fetched once and again only on resume or a
+    pull, which push was supposed to make unnecessary. Someone sitting on home stayed on "No
+    basket open" for the whole run. It now asks for the active basket every 8 seconds while it
+    is the screen on top and the app is in front, and the last-run card and recent runs follow
+    when the basket changes. A household stream would be the better answer; this is the one
+    that fits two days before the deadline.
+  - *The shopper was told "You froze it at 20:13" when the server had closed it*, right under
+    the card that said CLOSED ON TIME — at the exact moment the demo exists to show. A basket
+    that closed itself now says so to the shopper too.
+  - *The home card told the shopper "Kaan is paying."* It says "You're paying." to them now.
 

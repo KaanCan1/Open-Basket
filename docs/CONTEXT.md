@@ -91,10 +91,13 @@ buys roughly 18 days of real data — and the report says that honestly. `analyt
 exist from Day 2, because a metric added later is data already lost. End-to-end flow first,
 polish second.
 
-## Status — 2026-09-23 (calendar Day 9) — plan Days 1-25 done, deployed
+## Status — 2026-10-12 (calendar Day 28) — last sweep done, deployed
 
-The plan ran ahead of the calendar: everything through the Day 24-25 code freeze is merged and
-live on Serverpod Cloud. B has still not committed; A wrote every screen (ADR-012, ADR-020).
+Submission closes **2026-10-14 23:59 CEST**. The app is finished: design set v3 on every screen
+(ADR-050), presence (ADR-049), the last sweep (ADR-051: euro format, no screen claims a push,
+the home screen notices a basket, the shopper is told when the server closed it). Live on
+Serverpod Cloud. A 1:47 demo video is recorded and waits to be uploaded. Push to phones is not
+built and the app says so. B never committed; every commit is A's.
 
 What works, walked on simulators and deployed:
 

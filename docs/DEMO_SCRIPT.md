@@ -13,7 +13,35 @@ so a judge can see that time passed rather than be told it did. If push notifica
 not built by recording day, beat 2 shows Ayşe opening the app herself — do not mock a
 notification.
 
-## The story in one line
+## What was recorded (2026-10-12)
+
+`open-basket-demo.mp4`, 1:47, 1920×1080, silent, English captions. Not in git; it goes to
+YouTube or Vimeo as an unlisted or public video and only the link is submitted.
+
+A real run on two iPhone simulators side by side (Kaan left, Ayşe right) against a Serverpod
+server running on the laptop — the same code as Serverpod Cloud, but the sign-in codes for
+the two test accounts come from the server console rather than an inbox. Nothing is mocked:
+the estimate comes from the simulator's location, items travel over the stream, Kaan's app is
+terminated (`simctl terminate`) and the basket is closed by the future call 3.4 s after its
+deadline (`closedAutomatically = true` in the database), and the settlement is the server's.
+
+How it was edited, so a judge can check it:
+
+- Stretches of typing are sped up, and say so on screen (`4× SPEED`, `6× SPEED`).
+- The four-minute wait while the app is closed is one cut, on a card that says how long passed;
+  the status-bar clocks are real (20:08 → 20:12).
+- While Kaan's app is closed his side shows "App closed" rather than the simulator's home
+  screen. Before Ayşe joins, his side is dimmed ("Walking to Migros…"), because the simulator
+  recorder dropped those frames.
+- Recorded with `xcrun simctl io <udid> recordVideo`, assembled with ffmpeg; the captions are
+  rendered images over the footage.
+
+Two bugs surfaced while recording and were fixed in the same session (ADR-051): the home
+screen did not notice a basket opening, and the shopper was told "You froze it" when the
+server had closed it. The take shows Ayşe pulling down once on home, from before the first
+fix, and Kaan's screen after the second.
+
+## The story in one line (the original plan)
 
 Kaan is walking to Migros. He opens a basket for twelve minutes. Ayşe adds what she needs
 from the sofa. Kaan's phone dies on the way. The basket closes on time anyway — on the
