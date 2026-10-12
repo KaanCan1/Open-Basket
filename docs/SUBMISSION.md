@@ -50,8 +50,9 @@ Serverpod is doing the work here, not hosting a form.
   first event — so a client that dropped its connection resyncs from the stream itself
   and never needs a second call. Every mutation posts to the channel through
   `session.messages`. Every event carries the server's clock, so the countdown keeps
-  correcting for device clock drift.
-- **The database schema is the model layer.** Seventeen `.spy.yaml` models generate the
+  correcting for device clock drift. The same stream carries presence: the shopper sees who
+  else has the basket open right now, counted in memory and never written down.
+- **The database schema is the model layer.** Twenty `.spy.yaml` models generate the
   ORM, the migrations and a fully typed Dart client. Endpoint signatures landed on the
   main branch on day two with `UnimplementedError` bodies, so the Flutter side could be
   built against a compiling, typed client before a single endpoint existed.
@@ -69,9 +70,12 @@ Serverpod is doing the work here, not hosting a form.
 One codebase, Android and iOS. Riverpod for state, `go_router` for navigation driven by
 the auth state, and every user-facing string through an ARB file so a second language is
 a translation rather than a refactor. The design is a system rather than a set of
-screens: one paper/ink palette with a single signal colour used only as fill, a
-monospace face for every number so countdowns and prices do not jitter as digits change,
-and a countdown rendered from server time rather than the device's.
+screens — thirty of them, light and dark, all built: one paper/ink palette with a single
+signal colour used only as fill, frosted glass for what floats and solid cards for anything
+with a number on it, a monospace face for every number so countdowns and prices do not
+jitter as digits change, iPhone-style navigation on both platforms, and a countdown rendered
+from server time rather than the device's. Money is written the way its currency is —
+₺84.50, €84,50, ¥8,450 — not the way the phone happens to be set.
 
 ### Details we took seriously
 
@@ -89,14 +93,23 @@ and a countdown rendered from server time rather than the device's.
   receipt total is split evenly across every member of the house, with the remainder
   going to the shopper, so the settlement lines always add up to exactly what was paid.
 
+### What is not built
+
+**Push notifications on the phone.** The server half exists — who is told when a basket
+opens, a two-minute reminder for whoever has not added anything, "you owe" after settling,
+and a nudge — but the app does not register for notifications yet (a free Apple developer
+account cannot receive them at all). So people see a basket when they open the app, and the
+app never pretends otherwise: no screen says anyone "got the notification".
+
 ### How it was built
 
-Two developers over four weeks, each working with Claude Code in a separate session that
-could not see the other. The repository was the only channel between them: a shared
-`CLAUDE.md` holding the product rules, a `PLAN.md` used as the status board, and an
-architecture decision record for anything the two sides had to agree on. All endpoint
-signatures and data models were frozen on day two so the two halves could be built in
-parallel.
+Four weeks, with Claude Code doing most of the typing. The project was set up for two
+developers working in separate Claude Code sessions that could not see each other, so the
+repository was the only channel: a shared `CLAUDE.md` holding the product rules, a `PLAN.md`
+used as the status board, and a numbered architecture decision record (fifty of them) for
+anything that had to be agreed. All endpoint signatures and data models were frozen on day
+two, before any endpoint existed, so the app could be built against a compiling, typed
+client.
 
 **AI disclosure:** this project was built with heavy use of Claude Code (Anthropic) as a
 coding assistant, for implementation, review and documentation, and Claude Design for the

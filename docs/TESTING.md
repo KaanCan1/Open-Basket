@@ -16,28 +16,33 @@ backs the phones. Nothing to install.
 
 1. **Sign in.** Type any email address you can read mail at and press *Send me a code*.
    There is no password, no registration step and no approval — the address is the
-   account. A six-digit code arrives by email within a few seconds. Enter it.
-2. **Start a household.** Give it any name. You become its owner, and a six-character
-   join code appears on the home screen.
-3. **Open a basket.** Press *Open a basket*. Optionally add a store first (*Add a store*); a
-   store saved with a location gets a suggested duration, worked out on the device. Pick a
-   duration and press *Open for N minutes*. The countdown is rendered from the server's
+   account. A six-digit code arrives by email within a few seconds (check spam if it does
+   not). Type it on *Check your email*.
+2. **Start a household.** On *Find your people*, give it a name under *Start a household*
+   and press *Create it*. You become its owner. *Invite* on the home screen shows the
+   six-character code someone else joins with.
+3. **Open a basket.** Press *Open a basket*. Optionally add a store first (*Add a store*);
+   a store saved with a location gets a suggested duration, worked out on the device. Pick
+   a duration and press *Open for N minutes*. The countdown is rendered from the server's
    clock, not the browser's.
-4. **Add items.** Type a name and an optional note, tap *×1* to pick how many, press *Add*. The row appears once the
-   server has accepted it and pushed it back down the stream — it is not drawn
-   optimistically.
-5. **Extend once.** *Extend once* adds five minutes to the deadline and then disables
-   itself. One extension per basket, by design.
-6. **Check out.** *At checkout* freezes the list: no more items, the countdown stops. As the
-   shopper you can already tick items off while the basket is open, by tapping them.
-7. **Price it.** *Enter the prices*: type what each item cost, or tap it and choose *Not
-   available*. Enter the receipt total if it differs — tax, a bag, a discount.
-8. **Settle.** *Work out who owes what*. The server computes the lines: each member owes
-   their own items plus an even share of any gap between the items and the receipt, and
-   the lines always add up to exactly what was paid. A settled run cannot be changed.
-9. **Look back.** *History* on the home screen lists every settled or cancelled run; tap one
-   for the full breakdown. *Settings* (the gear) has the household name, currency, stores,
-   sign out and leave.
+4. **Add items.** As the shopper, tap the round **+** at the bottom to bring up the add bar.
+   Type a name, use **−**/**+** for how many (tap the amount to count in kilograms, litres
+   or packs), optionally add a note, and press the arrow. The row appears once the server
+   has accepted it and pushed it back down the stream — it is not drawn optimistically.
+5. **Extend once.** *Extend +5* on the countdown card adds five minutes and then shows
+   *Extend used*. One extension per basket, by design, and only the shopper sees it.
+6. **Check out.** *At checkout — freeze basket* freezes the list: no more items, the
+   countdown stops. As the shopper you can already tick items off while the basket is
+   open, by tapping them.
+7. **Price it.** *Enter the prices*: type what each item cost, or tap an item and choose
+   *Not available*. Enter the receipt total if it differs — tax, a bag, a discount.
+8. **Settle.** *Work out who owes what*, then confirm. The server computes the lines: each
+   member owes their own items plus an even share of any gap between the items and the
+   receipt, and the lines always add up to exactly what was paid. A settled run cannot be
+   changed.
+9. **Look back.** The home screen lists recent runs; tap one for the full breakdown, or
+   *All* for the whole history. *Settings* (the gear) has the household name, currency,
+   stores, members and code, your own name, sign out and leave.
 
 ## Seeing the live part, which is the point of the app
 
@@ -50,7 +55,9 @@ The basket is a stream, not a poll. To watch it:
 3. Open the basket on both, then add an item in one.
 
 It appears in the other without a refresh. Extending the timer and checking out travel the
-same way.
+same way. With two different people, the shopper's screen also says who else has the basket
+open right now ("Ayşe is looking now") — presence over the same stream, held in memory and
+never stored.
 
 To do it as two people, sign the second window in with a **different** address and join
 with the six-character household code from the first.
@@ -80,9 +87,11 @@ default is a local one.
 Said plainly so no one hunts for a screen that does not exist:
 
 - **Push notifications, on the phone.** The server side is built — who is told about a new
-  basket, the "two minutes left" reminder for whoever has not added anything, and "you owe"
-  after settling (ADR-043) — but the app does not register for notifications yet, so none
-  arrive. People see a basket when they open the app.
+  basket, the "two minutes left" reminder for whoever has not added anything, "you owe"
+  after settling, and a nudge (ADR-043, ADR-049) — but the app does not register for
+  notifications yet, so none arrive. People see a basket when they open the app. Because of
+  that, the app does not show the *Nudge* button and never says anyone "got the
+  notification"; the notification switches in Settings say so too.
 - **One open basket per household at a time.** Deliberate (rule 4), not a missing feature: a
   second *Open a basket* takes you into the one already running.
 
