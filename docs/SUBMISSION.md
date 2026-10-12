@@ -103,13 +103,14 @@ app never pretends otherwise: no screen says anyone "got the notification".
 
 ### How it was built
 
-Four weeks, with Claude Code doing most of the typing. The project was set up for two
-developers working in separate Claude Code sessions that could not see each other, so the
-repository was the only channel: a shared `CLAUDE.md` holding the product rules, a `PLAN.md`
-used as the status board, and a numbered architecture decision record (fifty of them) for
-anything that had to be agreed. All endpoint signatures and data models were frozen on day
-two, before any endpoint existed, so the app could be built against a compiling, typed
-client.
+Built together by Kaan Can Kurt and Yeşim Gündüz over four weeks, with Claude Code doing
+most of the typing. Every commit was pushed from Kaan's GitHub account, so the history shows
+a single author for work the two of us did together. The project was set up for two Claude
+Code sessions that could not see each other, so the repository was the only channel: a
+shared `CLAUDE.md` holding the product rules, a `PLAN.md` used as the status board, and a
+numbered architecture decision record (fifty of them) for anything that had to be agreed.
+All endpoint signatures and data models were frozen on day two, before any endpoint existed,
+so the app could be built against a compiling, typed client.
 
 **AI disclosure:** this project was built with heavy use of Claude Code (Anthropic) as a
 coding assistant, for implementation, review and documentation, and Claude Design for the
@@ -143,7 +144,7 @@ Source: https://github.com/KaanCan1/Open-Basket
       (organisers' last-mile check).
 - [ ] **Run the core flow once from scratch, the way a judge would**: a private window on
       https://open-basket.serverpod.space, a fresh address, `docs/TESTING.md` step by step.
-- [ ] Team field on the form: list who actually took part.
+- [ ] Team field on the form: Kaan Can Kurt and Yeşim Gündüz.
 - [ ] **Most Valuable Feedback submission** ($500 cash + $500 credits, one per entrant),
       through the feedback form on BuilderBase. Nine findings so far, all hit in this
       build and all reproducible:
